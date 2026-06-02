@@ -41,7 +41,7 @@ function waitForServer(url, timeout = 30000) {
 
 function startPreviewServer() {
   return new Promise((resolve, reject) => {
-    const server = spawn('pnpm', ['preview', '--port', '4321'], {
+    const server = spawn('bun', ['run', 'preview', '--port', '4321'], {
       cwd: join(__dirname, '..'),
       stdio: 'pipe',
     });
@@ -73,7 +73,7 @@ function startPreviewServer() {
 
 async function captureScreenshots() {
   if (!existsSync(DIST_DIR)) {
-    console.error('dist/ not found. Run pnpm build first.');
+    console.error('dist/ not found. Run bun run build first.');
     process.exit(1);
   }
 

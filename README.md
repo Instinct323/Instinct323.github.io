@@ -5,8 +5,8 @@ Personal site built with Astro and published to GitHub Pages.
 ## Quick Start
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun dev
 ```
 
 ## Project Layout
@@ -67,8 +67,8 @@ Do not use `git` commands in this repository.
 ### Validation gate (must pass)
 
 - Use risk-based validation; do not run expensive checks when the change cannot affect runtime behavior.
-- Doc-only changes (for example README/text-only docs): skip `pnpm check` and `pnpm test:site`.
-- Code, config, style, or route changes: run `pnpm check` and `pnpm test:site`.
+- Doc-only changes (for example README/text-only docs): skip `bun run check` and `bun run test:site`.
+- Code, config, style, or route changes: run `bun run check` and `bun run test:site`.
 - If failures are pre-existing, separate them clearly from new regressions in your report.
 
 ### README gate (must pass)

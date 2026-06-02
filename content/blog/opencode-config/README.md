@@ -22,13 +22,17 @@ wsl
 
 ### Ubuntu
 
-下载最新版本的 [Node.js](https://nodejs.org/zh-cn/download)，并安装
+通过以下命令安装 bun：
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
 
 通过命令行安装 [OpenCode](https://opencode.ai/zh)：
 
 ```bash
-npm config set registry https://registry.npmmirror.com
-npm i -g opencode-ai
+printf '[install]\nregistry = "https://registry.npmmirror.com/"\n' > ~/.bunfig.toml
+bun add -g opencode-ai
 ```
 
 ## Configuration
