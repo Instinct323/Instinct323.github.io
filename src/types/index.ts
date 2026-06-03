@@ -16,13 +16,13 @@ export type {
 } from './site';
 
 // Home page types
+export type { HomePageConfig } from './home-config';
 export type {
   HomepageSectionKey,
   HomepageHeroDeckField,
   HomepageEditorialGapVariant,
   HomePageHero,
   HomePageFeaturedMediaConfig,
-  HomePageConfig,
   HomePageConfigGroup,
   Home,
   HomepageConfig,

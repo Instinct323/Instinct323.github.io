@@ -8,15 +8,6 @@ import { normalizeContentImagePath, resolveContentImageMetadata } from './media-
 import { calculateCarouselWidths } from './media-responsive';
 import { createCachedLoader } from '../utils/cache';
 
-export {
-  assertStrictlyIncreasingPositiveWidths,
-  IMAGE_MEDIUM_WIDTHS_KEY,
-  IMAGE_HIGH_WIDTHS_KEY,
-  selectCandidateWidthsByPolicy,
-} from '../utils/image-width-utils';
-
-export type { CandidateWidthPolicyInput } from '../utils/image-width-utils';
-
 export interface ValidatedHomepageGalleryConfig {
   featured: string[];
   image: HomePageImageConfig;

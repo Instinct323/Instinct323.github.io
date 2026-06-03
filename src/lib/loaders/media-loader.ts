@@ -16,11 +16,13 @@ import {
   deriveGalleryInferredWidthsFromGrid,
 } from './media-responsive';
 import {
-  IMAGE_MEDIUM_WIDTHS_KEY,
   assertMediaConfigShape,
   getValidatedHomepageGalleryConfig,
-  selectCandidateWidthsByPolicy,
 } from './media-validation';
+import {
+  IMAGE_MEDIUM_WIDTHS_KEY,
+  selectCandidateWidthsByPolicy,
+} from '../utils/image-width-utils';
 import {
   loadFeaturedSlidesForHomepage,
   loadMediaTreeFromGallery,

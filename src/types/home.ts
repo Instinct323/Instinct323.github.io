@@ -1,6 +1,11 @@
+// IMPORTANT: HomePageConfig is defined in ./home-config.ts to avoid circular dependency with ./site.ts
+
 import type { HomePageCarouselConfig } from './carousel';
-import type { SiteConfig } from './site';
 import type { ResolvedProfileData } from './profile';
+import type { SiteConfig } from './site';
+import type { HomePageConfig } from './home-config';
+
+export type { HomePageConfig } from './home-config';
 
 export type HomepageSectionKey = 'hero' | 'carousel';
 export type HomepageHeroDeckField = 'location' | 'organization';
@@ -15,20 +20,6 @@ export interface HomePageFeaturedMediaConfig {
   carousel: HomePageCarouselConfig;
 }
 
-export interface HomePageConfig {
-  hero: HomePageHero;
-  layout: {
-    contentWidth: 'compact' | 'standard' | 'wide';
-    sectionOrder: HomepageSectionKey[];
-    editorialGapVariant: HomepageEditorialGapVariant;
-  };
-  editorialHero: {
-    deckFields: HomepageHeroDeckField[];
-    showDeckDivider: boolean;
-  };
-  featuredMedia: HomePageFeaturedMediaConfig;
-}
-
 export type Home = HomePageHero;
 
 export interface HomepageConfig {
@@ -40,11 +31,11 @@ export interface HomepageConfig {
 export type HomepageConfigSlice = HomePageConfigGroup;
 
 export interface HomePageConfigGroup {
-  hero: SiteConfig['home']['hero'];
-  layout: SiteConfig['home']['layout'];
-  editorialHero: SiteConfig['home']['editorialHero'];
-  featuredMedia: SiteConfig['home']['featuredMedia'];
-  featuredCarousel: SiteConfig['home']['featuredMedia']['carousel'];
+  hero: HomePageConfig['hero'];
+  layout: HomePageConfig['layout'];
+  editorialHero: HomePageConfig['editorialHero'];
+  featuredMedia: HomePageConfig['featuredMedia'];
+  featuredCarousel: HomePageConfig['featuredMedia']['carousel'];
 }
 
 export interface HomePageData {
