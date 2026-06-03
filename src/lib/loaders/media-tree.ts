@@ -1,7 +1,7 @@
 import type { ImageMetadata } from 'astro';
 
 import { compareNatural } from '../utils/content-normalize';
-import { PHOTOGRAPHY_FILTER } from './content-paths';
+import { PHOTOGRAPHY_FILTER, CONTENT_IMAGE_PATH_PREFIX } from './content-paths';
 import { HOME_COVERFLOW_SIZES } from './media-responsive';
 import type {
   ContentImage,
@@ -13,7 +13,8 @@ import type {
   MediaImage,
   MediaTree,
 } from '../../types';
-import { CONTENT_IMAGE_MODULES, parseMediaPath, buildImageVariantSet } from './media-loader-core';
+import { parseMediaPath, buildImageVariantSet } from './media-loader-core';
+import { CONTENT_IMAGE_MODULES } from './astro-adapter';
 
 export type { ParsedMediaPath } from './media-loader-core';
 
@@ -143,7 +144,7 @@ export async function loadMediaTreeFromGallery(
       continue;
     }
 
-    const image = loadImageFromContentPath(path.replace('../../../content/', ''), galleryImageOptions);
+    const image = loadImageFromContentPath(path.replace(CONTENT_IMAGE_PATH_PREFIX, ''), galleryImageOptions);
 
     if (!image) {
       continue;

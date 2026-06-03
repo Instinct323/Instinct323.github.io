@@ -31,16 +31,6 @@ function resolvePhotographyConfig(config: SiteConfig['photography']): Photograph
 /**
  * Parses raw site configuration JSONC string into a typed SiteConfig object.
  *
- * @sideEffect This function is called at module load time (line 71), not lazily.
- * When this module is imported, the configuration is parsed immediately.
- * This has important implications:
- * - Testing: The parsed config is cached in module scope. Tests that modify
- *   source files or mock the config loader may encounter stale cached values.
- * - Module imports: Any import of this module triggers config parsing, even if
- *   the imported functions are never called. This is eager evaluation.
- * - Runtime: Config errors will surface immediately on first import, not on
- *   first function call.
- *
  * @param raw - Raw JSONC string from site config file
  * @returns Parsed SiteConfig object
  * @throws Error if parsed config is not a valid object
@@ -72,7 +62,18 @@ function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia'])
   };
 }
 
-const siteConfig = parseSiteConfig(siteConfigRaw);
+let siteConfig: SiteConfig | null = null;
+
+function getSiteConfigInternal(): SiteConfig {
+  if (!siteConfig) {
+    siteConfig = parseSiteConfig(siteConfigRaw);
+  }
+  return siteConfig;
+}
+
+export function resetSiteConfig(): void {
+  siteConfig = null;
+}
 
 function normalizeProfile(profileData: ProfileData): ProfileData {
   return {
@@ -89,15 +90,15 @@ export function loadProfile(): ProfileData {
 }
 
 export function loadSiteConfig(): SiteConfig {
-  return siteConfig;
+  return getSiteConfigInternal();
 }
 
 export function loadNavigationConfig(): NavigationConfig {
-  return siteConfig.navigation;
+  return getSiteConfigInternal().navigation;
 }
 
 export function loadHomepageConfig(): HomePageConfigGroup {
-  const { home } = siteConfig;
+  const { home } = getSiteConfigInternal();
   const featuredMedia = buildFeaturedMediaConfig(home.featuredMedia);
 
   return {
@@ -110,11 +111,12 @@ export function loadHomepageConfig(): HomePageConfigGroup {
 }
 
 export function loadMediaConfig(): MediaConfig {
-  const featuredMedia = buildFeaturedMediaConfig(siteConfig.home.featuredMedia);
+  const config = getSiteConfigInternal();
+  const featuredMedia = buildFeaturedMediaConfig(config.home.featuredMedia);
 
   return {
-    grid: siteConfig.photography.grid,
-    image: resolveSiteImageConfig(siteConfig.image),
+    grid: config.photography.grid,
+    image: resolveSiteImageConfig(config.image),
     homepage: {
       featured: featuredMedia.items,
       carousel: featuredMedia.carousel,
@@ -127,11 +129,11 @@ export function loadIntroduction(): string {
 }
 
 export function loadPhotography(): PhotographyPageConfig {
-  return resolvePhotographyConfig(siteConfig.photography);
+  return resolvePhotographyConfig(getSiteConfigInternal().photography);
 }
 
 export function loadSiteMetadata(): SiteMetadata {
-  const { siteUrl, defaultTitle, defaultDescription, keyword } = siteConfig.metadata;
+  const { siteUrl, defaultTitle, defaultDescription, keyword } = getSiteConfigInternal().metadata;
 
   return {
     siteUrl,
@@ -142,7 +144,7 @@ export function loadSiteMetadata(): SiteMetadata {
 }
 
 export async function loadEffectsConfig(): Promise<SiteEffectsConfig> {
-  const effects = siteConfig.effects;
+  const effects = getSiteConfigInternal().effects;
   if (!effects || typeof effects !== 'object' || Array.isArray(effects)) {
     throw new Error('Missing or invalid effects configuration');
   }

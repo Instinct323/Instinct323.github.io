@@ -1,18 +1,7 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { createCachedLoader } from './cache';
+import { describe, expect, it, vi } from 'vitest';
+import { createCachedLoader, resetLoaderCache } from './cache';
 
 describe('createCachedLoader', () => {
-  let originalDev: boolean;
-
-  beforeEach(() => {
-    originalDev = import.meta.env.DEV;
-    import.meta.env.DEV = false;
-  });
-
-  afterEach(() => {
-    import.meta.env.DEV = originalDev;
-  });
-
   it('caches value and returns it on subsequent calls without re-invoking loader', async () => {
     const loader = vi.fn().mockResolvedValue('cached-result');
     const cachedLoader = createCachedLoader(loader);
@@ -57,34 +46,6 @@ describe('createCachedLoader', () => {
     expect(init).toHaveBeenCalledWith('init-value');
   });
 
-  it('busts cache in DEV mode and re-invokes loader each time', async () => {
-    import.meta.env.DEV = true;
-
-    const loader = vi.fn().mockResolvedValue('fresh-result');
-    const cachedLoader = createCachedLoader(loader);
-
-    const result1 = await cachedLoader();
-    const result2 = await cachedLoader();
-
-    expect(result1).toBe('fresh-result');
-    expect(result2).toBe('fresh-result');
-    expect(loader).toHaveBeenCalledTimes(2);
-  });
-
-  it('calls init callback in DEV mode on every invocation', async () => {
-    import.meta.env.DEV = true;
-
-    const init = vi.fn();
-    const loader = vi.fn().mockResolvedValue('dev-value');
-    const cachedLoader = createCachedLoader(loader, { init });
-
-    await cachedLoader();
-    await cachedLoader();
-
-    expect(init).toHaveBeenCalledTimes(2);
-    expect(init).toHaveBeenCalledWith('dev-value');
-  });
-
   it('handles synchronous loader values', async () => {
     const loader = vi.fn().mockReturnValue('sync-result');
     const cachedLoader = createCachedLoader(loader);
@@ -95,5 +56,27 @@ describe('createCachedLoader', () => {
     expect(result1).toBe('sync-result');
     expect(result2).toBe('sync-result');
     expect(loader).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('resetLoaderCache', () => {
+  it('forces the loader to re-invoke on next call', async () => {
+    const loader = vi.fn().mockResolvedValue('cached-result');
+    const cachedLoader = createCachedLoader(loader);
+
+    const result1 = await cachedLoader();
+    expect(result1).toBe('cached-result');
+    expect(loader).toHaveBeenCalledTimes(1);
+
+    resetLoaderCache(cachedLoader);
+
+    const result2 = await cachedLoader();
+    expect(result2).toBe('cached-result');
+    expect(loader).toHaveBeenCalledTimes(2);
+  });
+
+  it('does nothing for an unknown loader', () => {
+    const unknownLoader = vi.fn() as () => Promise<string>;
+    expect(() => resetLoaderCache(unknownLoader)).not.toThrow();
   });
 });

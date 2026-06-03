@@ -1,11 +1,10 @@
 import {
   loadHomepageConfig,
   loadIntroduction,
-  loadPhotography,
   loadProfile,
   loadSiteConfig,
 } from './config-loader';
-import { compareNatural, stripNumericPrefix } from '../utils/content-normalize';
+import { compareNatural } from '../utils/content-normalize';
 import type {
   AboutPageData,
   ContentImage,
@@ -17,57 +16,11 @@ import type {
 import {
   deriveContentImageOptions,
   loadContentImage,
-  loadFeaturedSlides,
-  loadMediaTree,
 } from './media-loader';
 import { renderMarkdown } from '../utils/markdown';
 import { normalizePublication } from '../domain/publication-utils';
 import { AVATAR_JPG } from './content-paths';
 import { PUBLICATION_MODULES } from './astro-adapter';
-
-export {
-  deriveContentImageOptions,
-  loadContentImage,
-  loadFeaturedSlides,
-  loadIntroduction,
-  loadMediaTree,
-  loadPhotography,
-  loadProfile,
-  loadSiteConfig,
-  stripNumericPrefix,
-};
-
-// Re-export types for convenience
-export type {
-  // Site types
-  AboutPageData,
-  // Profile types
-  ProfileFact,
-  ProfileData,
-  ResolvedProfileData,
-} from '../../types';
-
-// Re-export Home types
-export type {
-  HomePageHero as Home,
-  HomePageConfigGroup as HomepageConfig,
-} from '../../types/home';
-
-// Re-export Carousel types  
-export type {
-  FeaturedSlide,
-} from '../../types/media';
-
-// Re-export Media types
-export type {
-  MediaImage,
-  MediaAlbum,
-} from '../../types/media';
-
-// Re-export Image config types
-export type {
-  GridColumns,
-} from '../../types/image-config';
 
 const REQUIRED_PROFILE_FACT_IDS = ['name', 'organization', 'location'] as const;
 

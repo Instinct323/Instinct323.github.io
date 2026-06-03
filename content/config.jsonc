@@ -36,12 +36,12 @@
     // Owned by media editors; consumed by homepage featured media loaders and carousel UI.
     "featuredMedia": {
       "items": [
-        "2-collection/2.jpg",
-        "0-travel/4-Guangzhou/4.jpg",
-        "0-travel/2-Hong Kong/1.jpg",
-        "0-travel/0-Northeast/1.jpg",
-        "2-collection/7.jpg",
-        "2-collection/0.jpg"
+        "0-collection/2.jpg",
+        "2-travel/4-Guangzhou/4.jpg",
+        "2-travel/2-Hong Kong/1.jpg",
+        "2-travel/0-Northeast/1.jpg",
+        "0-collection/7.jpg",
+        "0-collection/0.jpg"
       ],
       // Owned by interaction/accessibility maintainers; consumed by carousel controls and labels.
       "carousel": {

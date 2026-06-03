@@ -1,11 +1,12 @@
-import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, IMAGE_HIGH_WIDTHS_KEY } from '../utils/image-width-utils';
+import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, IMAGE_HIGH_WIDTHS_KEY, assertPositiveScale } from '../utils/image-width-utils';
 import type {
   MediaConfig,
   HomePageImageConfig,
   HomePageCarouselConfig,
 } from '../../types';
-import { normalizeContentImagePath, resolveContentImageMetadata, assertPositiveScale } from './media-loader-core';
+import { normalizeContentImagePath, resolveContentImageMetadata } from './media-loader-core';
 import { calculateCarouselWidths } from './media-responsive';
+import { createCachedLoader } from '../utils/cache';
 
 export {
   assertStrictlyIncreasingPositiveWidths,
@@ -71,7 +72,7 @@ export async function getValidatedHomepageGalleryConfig(
     const globalImage = mediaConfig.image;
 
     if (!Array.isArray(featured)) {
-      throw new Error('Invalid homepage.featured: expected an array of image paths relative to content/media/.');
+      throw new Error('Invalid homepage.featured: expected an array of image paths relative to content/photography/.');
     }
 
     if (typeof globalImage?.format !== 'string' || !globalImage.format.trim()) {
@@ -114,16 +115,6 @@ export async function getValidatedHomepageGalleryConfig(
     };
   };
 
-  const state: { value: ValidatedHomepageGalleryConfig | null } = { value: null };
-
-  if (import.meta.env.DEV) {
-    return loadAndValidate();
-  }
-
-  if (state.value) {
-    return state.value;
-  }
-
-  state.value = await loadAndValidate();
-  return state.value;
+  const cachedLoader = createCachedLoader(loadAndValidate);
+  return cachedLoader();
 }

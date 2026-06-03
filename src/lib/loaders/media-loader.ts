@@ -51,7 +51,7 @@ function resolveMediumSurfaceProfile(
 
   return {
     inferredWidths: deriveGalleryInferredWidthsFromGrid(mediaConfig.grid),
-    sizes: buildGallerySizes(mediaConfig.grid),
+    sizes: buildGridSizesString(mediaConfig.grid),
   };
 }
 
@@ -104,10 +104,6 @@ function buildMediumSurfaceOptions(
     }),
     sizes: profile.sizes,
   };
-}
-
-function buildGallerySizes(grid: MediaConfig['grid']): string {
-  return buildGridSizesString(grid);
 }
 
 export async function deriveContentImageOptions(

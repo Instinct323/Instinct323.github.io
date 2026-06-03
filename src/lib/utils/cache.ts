@@ -3,18 +3,13 @@ interface CacheState<T> {
   promise: Promise<T> | null;
 }
 
+const loaderCache = new WeakMap<() => Promise<unknown>, CacheState<unknown>>();
+
 /**
- * Creates a cached loader function that wraps a promise-returning loader.
- *
+ * Creates a cached loader function. Caches value and promise in all environments.
  * @param loader - Function that returns data (sync or async)
  * @param options - Optional init callback called when value is ready
  * @returns A function that returns a Promise resolving to the loaded data
- *
- * @example
- * ```ts
- * const getConfig = createCachedLoader(() => fetch('/api/config').then(r => r.json()));
- * // First call loads, subsequent calls in PROD return cached value
- * ```
  */
 export function createCachedLoader<T>(
   loader: () => T | Promise<T>,
@@ -22,17 +17,7 @@ export function createCachedLoader<T>(
 ): () => Promise<T> {
   const state: CacheState<T> = { value: null, promise: null };
 
-  return (): Promise<T> => {
-    if (import.meta.env.DEV) {
-      const freshPromise = Promise.resolve(loader()).then((result) => {
-        options?.init?.(result);
-        state.value = result;
-        return result;
-      });
-      state.promise = freshPromise;
-      return freshPromise;
-    }
-
+  const cachedLoader = (): Promise<T> => {
     if (state.value) {
       return Promise.resolve(state.value);
     }
@@ -47,4 +32,19 @@ export function createCachedLoader<T>(
 
     return state.promise;
   };
+
+  loaderCache.set(cachedLoader, state as CacheState<unknown>);
+  return cachedLoader;
+}
+
+/**
+ * Resets the cache for a given cached loader, forcing the next call to re-fetch.
+ * @param loader - The cached loader function returned by createCachedLoader
+ */
+export function resetLoaderCache<T>(loader: () => Promise<T>): void {
+  const state = loaderCache.get(loader as () => Promise<unknown>);
+  if (state) {
+    state.value = null;
+    state.promise = null;
+  }
 }

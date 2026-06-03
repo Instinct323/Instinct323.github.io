@@ -2,8 +2,6 @@ import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
 import { CONTENT_IMAGE_MODULES } from './astro-adapter';
 
-export { CONTENT_IMAGE_MODULES };
-
 import {
   filenameWithoutExt,
   folderNameToSlug,
@@ -12,6 +10,7 @@ import {
   stripNumericPrefix,
 } from '../utils/content-normalize';
 import { RESPONSIVE_WIDTH_STEPS } from './media-responsive';
+import { assertPositiveScale } from '../utils/image-width-utils';
 
 import type {
   ContentImage,
@@ -34,13 +33,6 @@ export interface ImageVariantSet {
 }
 
 const CONTENT_IMAGE_EXTENSIONS = /\.(jpg|jpeg|png|webp)$/i;
-
-export function assertPositiveScale(value: unknown, key: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
-    throw new Error(`Invalid ${key}: expected a positive number.`);
-  }
-  return value;
-}
 
 export function normalizeContentImagePath(path: string): string | null {
   const normalizedPath = path.trim().replace(/^\.\//, '').replace(/^\//, '');

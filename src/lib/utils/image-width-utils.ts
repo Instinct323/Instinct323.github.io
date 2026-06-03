@@ -1,8 +1,3 @@
-/**
- * Image width selection utilities - pure functions with no external dependencies.
- * This module lives in utils layer and can be imported by both utils and loaders.
- */
-
 export const IMAGE_MEDIUM_WIDTHS_KEY = 'image.widths.medium';
 export const IMAGE_HIGH_WIDTHS_KEY = 'image.widths.high';
 
@@ -14,7 +9,7 @@ export interface CandidateWidthPolicyInput {
   maxSelectableWidth?: number;
 }
 
-function assertPositiveScale(value: unknown, key: string): number {
+export function assertPositiveScale(value: unknown, key: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
     throw new Error(`Invalid ${key}: expected a positive number.`);
   }

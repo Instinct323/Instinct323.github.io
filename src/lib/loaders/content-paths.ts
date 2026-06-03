@@ -9,6 +9,8 @@ export const PUBLICATION_DIR = `${ABOUT_DIR}/publication`;
 // CONTENT_IMAGES_GLOB: '../../../content/**/*.{jpg,jpeg,png,webp}'
 // PUBLICATION_GLOB: '../../../content/about/publication/*.json'
 
+export const CONTENT_IMAGE_PATH_PREFIX = '../../../content/';
+
 // Config files
 export const CONFIG_FILE = `${CONTENT_ROOT}/config.jsonc`;
 

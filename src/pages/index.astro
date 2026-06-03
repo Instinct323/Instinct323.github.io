@@ -2,7 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import EditorialHero from '../components/home/EditorialHero.astro';
 import FeaturedMediaCarousel from '../components/home/FeaturedMediaCarousel.astro';
-import { loadFeaturedSlides, loadHomePage } from '../lib/loaders/content-loader';
+import { loadHomePage } from '../lib/loaders/content-loader';
+import { loadFeaturedSlides } from '../lib/loaders/media-loader';
 import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-bootstrap';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
 

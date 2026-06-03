@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import GallerySection from '../components/photography/GallerySection.astro';
-import { loadMediaTree, loadPhotography } from '../lib/loaders/content-loader';
+import { loadPhotography } from '../lib/loaders/config-loader';
+import { loadMediaTree } from '../lib/loaders/media-loader';
 import { loadMediaConfig } from '../lib/loaders/config-loader';
 import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-bootstrap';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';

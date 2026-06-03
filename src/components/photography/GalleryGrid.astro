@@ -4,7 +4,8 @@
 
 import GalleryImage from './GalleryImage.astro';
 import EmptyState from './EmptyState.astro';
-import type { GridColumns, MediaImage } from '../../lib/loaders/content-loader';
+import type { GridColumns } from '../../types/image-config';
+import type { MediaImage } from '../../types/media';
 
 interface Props {
   images: MediaImage[];
