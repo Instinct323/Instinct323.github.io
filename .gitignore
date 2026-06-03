@@ -1,15 +1,32 @@
 tmp*
 
-# Local orchestration notes and verification artifacts
-.sisyphus/
-.DS_Store
-desktop.ini
-.idea/
-.vscode/
+# Agents
+.codegraph
+.sisyphus
 
 # Astro/Node build artifacts
-public/
-node_modules/
 .astro/
 dist/
-.opencode/
+node_modules/
+public/
+
+# Byte-compiled
+__*cache__
+.ipynb_checkpoints
+~$*.*
+.~*.*
+*.egg-info
+
+# Environments
+desktop.ini
+.idea
+.vscode
+.clion.source.upload.marker
+
+# datasets and projects
+.DS_Store
+cmake-build*
+build
+log
+runs
+install

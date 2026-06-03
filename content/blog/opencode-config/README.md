@@ -26,12 +26,13 @@ wsl
 
 ```bash
 curl -fsSL https://bun.sh/install | bash
+ln -sf ~/.bun/bin/bun ~/.bun/bin/node
+printf '[install]\nregistry = "https://registry.npmmirror.com/"\n' > ~/.bunfig.toml
 ```
 
 通过命令行安装 [OpenCode](https://opencode.ai/zh)：
 
 ```bash
-printf '[install]\nregistry = "https://registry.npmmirror.com/"\n' > ~/.bunfig.toml
 bun add -g opencode-ai
 ```
 
