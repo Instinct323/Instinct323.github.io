@@ -14,6 +14,7 @@ export interface ParseMarkdownResult {
   title: string | null;
   date: Date | null;
   content: string;
+  data: Record<string, unknown>;
 }
 
 export interface MarkdownRenderer {
@@ -171,5 +172,6 @@ export function parseMarkdownWithFrontmatter(markdown: string): ParseMarkdownRes
     title: validTitle,
     date,
     content: parsed.content.trim(),
+    data: parsed.data ?? {},
   };
 }

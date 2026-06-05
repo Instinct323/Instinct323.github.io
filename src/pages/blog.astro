@@ -24,13 +24,18 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
             data-content={post.content}
             data-base-url={post.baseUrl}
           >
-            <h3 class="blog-item-title">{post.title}</h3>
-            <div class="blog-item-date">
-              <span class="date-mask" />
-              <time datetime={post.date.toISOString()}>
-                {post.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </time>
-            </div>
+            <h3 class="blog-item-title">
+              {post.title}
+              {post.weight > 0 && <span class="blog-item-pin">Pinned</span>}
+            </h3>
+            {post.date && (
+              <div class="blog-item-date">
+                <span class="date-mask" />
+                <time datetime={post.date.toISOString()}>
+                  {post.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </time>
+              </div>
+            )}
           </button>
         ))}
       </aside>
@@ -99,6 +104,18 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
     font-weight: 600;
     color: var(--text-strong);
     line-height: 1.4;
+  }
+
+  .blog-item-pin {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    background: var(--link-accent);
+    color: white;
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--radius-sm);
+    margin-left: 0.375rem;
+    vertical-align: middle;
+    font-weight: 500;
   }
 
   .blog-item-date {

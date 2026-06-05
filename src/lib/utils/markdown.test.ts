@@ -123,4 +123,48 @@ No frontmatter here`;
     const result = parseMarkdownWithFrontmatter(input);
     expect(result.date).toBeNull();
   });
+
+  it('data field contains raw frontmatter fields including weight', () => {
+    const input = `---
+title: Hello World
+weight: 5
+customField: test-value
+---
+
+Content here`;
+
+    const result = parseMarkdownWithFrontmatter(input);
+    expect(result.data).toBeDefined();
+    expect(result.data.weight).toBe(5);
+    expect(result.data.customField).toBe('test-value');
+    expect(result.data.title).toBe('Hello World');
+  });
+
+  it('data field is empty object when no frontmatter exists', () => {
+    const input = `# Just content
+No frontmatter here`;
+
+    const result = parseMarkdownWithFrontmatter(input);
+    expect(result.data).toBeDefined();
+    expect(Object.keys(result.data)).toHaveLength(0);
+  });
+
+  it('data field preserves types (number, string, boolean)', () => {
+    const input = `---
+title: Test Post
+weight: 10
+published: true
+tags:
+  - tech
+  - code
+---
+
+Content`;
+
+    const result = parseMarkdownWithFrontmatter(input);
+    expect(result.data.weight).toBe(10);
+    expect(result.data.published).toBe(true);
+    expect(result.data.tags).toEqual(['tech', 'code']);
+    expect(result.data.title).toBe('Test Post');
+  });
 });

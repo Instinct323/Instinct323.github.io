@@ -3,10 +3,11 @@ import { BLOG_POST_MODULES } from './astro-adapter';
 
 export interface BlogPost {
   title: string;
-  date: Date;
+  date: Date | null;
   content: string;
   slug: string;
   baseUrl: string;
+  weight: number;
 }
 
 function extractSlugFromPath(filePath: string): string {
@@ -36,6 +37,18 @@ export function extractDateFromSlug(slug: string): Date | null {
   return null;
 }
 
+export function compareBlogPosts(a: BlogPost, b: BlogPost): number {
+  if (a.weight !== b.weight) {
+    return b.weight - a.weight;
+  }
+  if (a.date === null && b.date !== null) return -1;
+  if (a.date !== null && b.date === null) return 1;
+  if (a.date && b.date) {
+    return b.date.getTime() - a.date.getTime();
+  }
+  return a.slug.localeCompare(b.slug);
+}
+
 export function loadBlogPosts(): BlogPost[] {
   const entries = Object.entries(BLOG_POST_MODULES);
 
@@ -50,9 +63,8 @@ export function loadBlogPosts(): BlogPost[] {
     const slug = extractSlugFromPath(filePath);
     const fileURL = new URL(filePath, import.meta.url).href;
 
-    // Resolve date: frontmatter → slug → fallback to epoch
-    const date = parsed.date ?? extractDateFromSlug(slug) ?? new Date(0);
-
+    const date = parsed.date ?? extractDateFromSlug(slug) ?? null;
+    const weight = typeof parsed.data.weight === 'number' ? parsed.data.weight : 0;
     const title = parsed.title ?? slug;
 
     posts.push({
@@ -61,10 +73,11 @@ export function loadBlogPosts(): BlogPost[] {
       content: parsed.content,
       slug,
       baseUrl: fileURL,
+      weight,
     });
   }
 
-  posts.sort((a, b) => b.date.getTime() - a.date.getTime());
+  posts.sort(compareBlogPosts);
 
   return posts;
 }

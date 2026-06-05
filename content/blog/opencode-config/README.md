@@ -1,5 +1,6 @@
 ---
 title: OpenCode 配置教程
+weight: 1
 ---
 
 ## Installation

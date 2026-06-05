@@ -18,6 +18,8 @@ body {
   pointer-events: none;
   background: var(--page-canvas);
   overflow: hidden;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .site-frame::before,
