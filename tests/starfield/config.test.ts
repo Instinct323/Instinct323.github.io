@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { resolveStarfieldEffectConfig } from './starfield-config';
-import type { StarfieldEffectConfig } from '../../types';
+import { resolveStarfieldEffectConfig } from '../../src/plugins/starfield';
+import type { StarfieldEffectConfig } from '../../src/plugins/starfield';
 
 describe('resolveStarfieldEffectConfig', () => {
   const validConfig: StarfieldEffectConfig = {
@@ -24,7 +24,6 @@ describe('resolveStarfieldEffectConfig', () => {
 
   it('returns complete config object with valid input', () => {
     const result = resolveStarfieldEffectConfig(validConfig);
-
     expect(result).toEqual(validConfig);
   });
 
@@ -45,7 +44,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithoutStarDensity)).toThrow(
-      'Missing or invalid effects.starfield.starDensity (must be low/medium/high/ultra)'
+      'Missing or invalid effects.starfield.starDensity (must be low/medium/high/ultra)',
     );
   });
 
@@ -56,7 +55,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithInvalidDensity)).toThrow(
-      'Missing or invalid effects.starfield.starDensity (must be low/medium/high/ultra)'
+      'Missing or invalid effects.starfield.starDensity (must be low/medium/high/ultra)',
     );
   });
 
@@ -67,7 +66,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithInvalidRange)).toThrow(
-      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)'
+      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)',
     );
   });
 
@@ -82,10 +81,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithZeroMin)).toThrow(
-      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)'
+      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)',
     );
     expect(() => resolveStarfieldEffectConfig(configWithNegativeMin)).toThrow(
-      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)'
+      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)',
     );
   });
 
@@ -100,10 +99,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithZeroMax)).toThrow(
-      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)'
+      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)',
     );
     expect(() => resolveStarfieldEffectConfig(configWithNegativeMax)).toThrow(
-      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)'
+      'Missing or invalid effects.starfield.starSize range (0 < min <= max required)',
     );
   });
 
@@ -118,10 +117,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithHighOpacity)).toThrow(
-      'Missing or invalid effects.starfield opacity values (must be within [0, 1])'
+      'Missing or invalid effects.starfield opacity values (must be within [0, 1])',
     );
     expect(() => resolveStarfieldEffectConfig(configWithLowOpacity)).toThrow(
-      'Missing or invalid effects.starfield opacity values (must be within [0, 1])'
+      'Missing or invalid effects.starfield opacity values (must be within [0, 1])',
     );
   });
 
@@ -136,10 +135,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithHighLinkOpacity)).toThrow(
-      'Missing or invalid effects.starfield opacity values (must be within [0, 1])'
+      'Missing or invalid effects.starfield opacity values (must be within [0, 1])',
     );
     expect(() => resolveStarfieldEffectConfig(configWithLowLinkOpacity)).toThrow(
-      'Missing or invalid effects.starfield opacity values (must be within [0, 1])'
+      'Missing or invalid effects.starfield opacity values (must be within [0, 1])',
     );
   });
 
@@ -150,7 +149,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithNegativeSpeed)).toThrow(
-      'Missing or invalid effects.starfield.speedFactor (must be >= 0)'
+      'Missing or invalid effects.starfield.speedFactor (must be >= 0)',
     );
   });
 
@@ -165,10 +164,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithZeroMaxDistance)).toThrow(
-      'Missing or invalid effects.starfield.maxDistance (must be > 0)'
+      'Missing or invalid effects.starfield.maxDistance (must be > 0)',
     );
     expect(() => resolveStarfieldEffectConfig(configWithNegativeMaxDistance)).toThrow(
-      'Missing or invalid effects.starfield.maxDistance (must be > 0)'
+      'Missing or invalid effects.starfield.maxDistance (must be > 0)',
     );
   });
 
@@ -183,10 +182,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithZeroParallax)).toThrow(
-      'Missing or invalid effects.starfield.parallaxStrength (must be > 0)'
+      'Missing or invalid effects.starfield.parallaxStrength (must be > 0)',
     );
     expect(() => resolveStarfieldEffectConfig(configWithNegativeParallax)).toThrow(
-      'Missing or invalid effects.starfield.parallaxStrength (must be > 0)'
+      'Missing or invalid effects.starfield.parallaxStrength (must be > 0)',
     );
   });
 
@@ -197,7 +196,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithNegativeMouseRadius)).toThrow(
-      'Missing or invalid effects.starfield.mouseRadius (must be >= 0)'
+      'Missing or invalid effects.starfield.mouseRadius (must be >= 0)',
     );
   });
 
@@ -208,7 +207,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithInvalidRotationRange)).toThrow(
-      'Missing or invalid effects.starfield.rotationSpeed range (0 <= min <= max required)'
+      'Missing or invalid effects.starfield.rotationSpeed range (0 <= min <= max required)',
     );
   });
 
@@ -219,7 +218,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithNegativeRotationMin)).toThrow(
-      'Missing or invalid effects.starfield.rotationSpeed range (0 <= min <= max required)'
+      'Missing or invalid effects.starfield.rotationSpeed range (0 <= min <= max required)',
     );
   });
 
@@ -230,7 +229,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithNegativeRotationMax)).toThrow(
-      'Missing or invalid effects.starfield.rotationSpeed range (0 <= min <= max required)'
+      'Missing or invalid effects.starfield.rotationSpeed range (0 <= min <= max required)',
     );
   });
 
@@ -245,10 +244,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithHighPercent)).toThrow(
-      'Missing or invalid effects.starfield.percentStarsConnecting (must be within [0, 100])'
+      'Missing or invalid effects.starfield.percentStarsConnecting (must be within [0, 100])',
     );
     expect(() => resolveStarfieldEffectConfig(configWithNegativePercent)).toThrow(
-      'Missing or invalid effects.starfield.percentStarsConnecting (must be within [0, 100])'
+      'Missing or invalid effects.starfield.percentStarsConnecting (must be within [0, 100])',
     );
   });
 
@@ -263,10 +262,10 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithZeroThickness)).toThrow(
-      'Missing or invalid effects.starfield.lineThickness (must be > 0)'
+      'Missing or invalid effects.starfield.lineThickness (must be > 0)',
     );
     expect(() => resolveStarfieldEffectConfig(configWithNegativeThickness)).toThrow(
-      'Missing or invalid effects.starfield.lineThickness (must be > 0)'
+      'Missing or invalid effects.starfield.lineThickness (must be > 0)',
     );
   });
 
@@ -277,7 +276,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithInvalidShapes)).toThrow(
-      'Missing or invalid effects.starfield.starShapes (must be non-empty array)'
+      'Missing or invalid effects.starfield.starShapes (must be non-empty array)',
     );
   });
 
@@ -288,7 +287,7 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithEmptyShapes)).toThrow(
-      'Missing or invalid effects.starfield.starShapes (must be non-empty array)'
+      'Missing or invalid effects.starfield.starShapes (must be non-empty array)',
     );
   });
 
@@ -299,25 +298,25 @@ describe('resolveStarfieldEffectConfig', () => {
     };
 
     expect(() => resolveStarfieldEffectConfig(configWithInvalidShape)).toThrow(
-      'Missing or invalid effects.starfield.starShapes (values must be circle/star)'
+      'Missing or invalid effects.starfield.starShapes (values must be circle/star)',
     );
   });
 
   it('throws when config is not an object', () => {
     expect(() => resolveStarfieldEffectConfig(null)).toThrow(
-      'Missing or invalid effects.starfield configuration object'
+      'Missing or invalid effects.starfield configuration object',
     );
     expect(() => resolveStarfieldEffectConfig('string')).toThrow(
-      'Missing or invalid effects.starfield configuration object'
+      'Missing or invalid effects.starfield configuration object',
     );
     expect(() => resolveStarfieldEffectConfig(42)).toThrow(
-      'Missing or invalid effects.starfield configuration object'
+      'Missing or invalid effects.starfield configuration object',
     );
   });
 
   it('throws when config is an array', () => {
     expect(() => resolveStarfieldEffectConfig([validConfig])).toThrow(
-      'Missing or invalid effects.starfield configuration object'
+      'Missing or invalid effects.starfield configuration object',
     );
   });
 });

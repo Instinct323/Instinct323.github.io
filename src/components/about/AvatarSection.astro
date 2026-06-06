@@ -5,7 +5,7 @@
 
 import DeferredImage from '../common/DeferredImage.astro';
 import type { ContentImage } from '../../types';
-import { buildImageVariantSet } from '../../lib/loaders/media-loader-core';
+import { createImageVariantSet } from '../../lib/loaders/media-loader-core';
 import { resolveControlImageLoading } from '../../lib/loaders/page-load-orchestrator';
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 
 const { avatarImage, placeholderEffectName } = Astro.props;
 const { alt, responsive } = avatarImage;
-const variantSet = await buildImageVariantSet(avatarImage);
+const variantSet = await createImageVariantSet(avatarImage);
 const criticalImageLoading = resolveControlImageLoading('critical');
 ---
 

@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
-  deriveGridCellWidths,
-  buildGridSizesString,
+  computeGridCellWidths,
+  createGridSizesString,
   MOBILE_BREAKPOINT,
   RESPONSIVE_VIEWPORT_WIDTHS,
   type GridDefinition,
-} from './grid-width-utils';
+} from '../../../src/lib/utils/grid-width-utils';
 
 describe('grid-width-utils', () => {
-  describe('deriveGridCellWidths', () => {
+  describe('computeGridCellWidths', () => {
     it('calculates correct cell widths for mobile-first grid', () => {
       const grid: GridDefinition = {
         columns: { desktop: 4, mobile: 2 },
@@ -20,7 +20,7 @@ describe('grid-width-utils', () => {
         RESPONSIVE_VIEWPORT_WIDTHS.desktop,   // 1440
       ];
 
-      const widths = deriveGridCellWidths(grid, viewports);
+      const widths = computeGridCellWidths(grid, viewports);
 
       // Mobile: (375 - (2-1)*16) / 2 = (375 - 16) / 2 = 179.5 → round to 180
       expect(widths[0]).toBe(180);
@@ -37,7 +37,7 @@ describe('grid-width-utils', () => {
       };
       const viewports = [375, 1024, 1440];
 
-      const widths = deriveGridCellWidths(grid, viewports);
+      const widths = computeGridCellWidths(grid, viewports);
 
       // Mobile: (375 - (1-1)*16) / 1 = 375
       expect(widths[0]).toBe(375);
@@ -54,7 +54,7 @@ describe('grid-width-utils', () => {
       };
       const viewports = [375, 768, 1440];
 
-      const widths = deriveGridCellWidths(grid, viewports);
+      const widths = computeGridCellWidths(grid, viewports);
 
       // Mobile: (375 - (3-1)*24) / 3 = (375 - 48) / 3 = 327 / 3 = 109
       expect(widths[0]).toBe(109);
@@ -70,7 +70,7 @@ describe('grid-width-utils', () => {
         gap: 'invalid',
       };
 
-      expect(() => deriveGridCellWidths(grid, [375, 1024, 1440])).toThrow(
+      expect(() => computeGridCellWidths(grid, [375, 1024, 1440])).toThrow(
         /Invalid photography.grid.gap/i,
       );
     });
@@ -81,7 +81,7 @@ describe('grid-width-utils', () => {
         gap: '100px',
       };
 
-      expect(() => deriveGridCellWidths(grid, [375, 1024, 1440])).toThrow(
+      expect(() => computeGridCellWidths(grid, [375, 1024, 1440])).toThrow(
         /horizontal gaps exceed viewport/i,
       );
     });
@@ -92,7 +92,7 @@ describe('grid-width-utils', () => {
         gap: '16px',
       };
 
-      expect(() => deriveGridCellWidths(grid, [375, 1024, 1440])).toThrow(
+      expect(() => computeGridCellWidths(grid, [375, 1024, 1440])).toThrow(
         /Invalid grid columns/i,
       );
     });
@@ -105,7 +105,7 @@ describe('grid-width-utils', () => {
       // Custom viewport widths
       const viewports = [320, 800, 1920];
 
-      const widths = deriveGridCellWidths(grid, viewports);
+      const widths = computeGridCellWidths(grid, viewports);
 
       // Mobile 320: (320 - 0) / 1 = 320
       expect(widths[0]).toBe(320);
@@ -116,14 +116,14 @@ describe('grid-width-utils', () => {
     });
   });
 
-  describe('buildGridSizesString', () => {
+  describe('createGridSizesString', () => {
     it('generates correct sizes string for standard grid', () => {
       const grid: GridDefinition = {
         columns: { desktop: 4, mobile: 2 },
         gap: '16px',
       };
 
-      const result = buildGridSizesString(grid);
+      const result = createGridSizesString(grid);
 
       expect(result).toBe('(max-width: 767px) 50.00vw, 25.00vw');
     });
@@ -134,7 +134,7 @@ describe('grid-width-utils', () => {
         gap: '12px',
       };
 
-      const result = buildGridSizesString(grid);
+      const result = createGridSizesString(grid);
 
       expect(result).toBe('(max-width: 767px) 100.00vw, 33.33vw');
     });
@@ -145,7 +145,7 @@ describe('grid-width-utils', () => {
         gap: '8px',
       };
 
-      const result = buildGridSizesString(grid);
+      const result = createGridSizesString(grid);
 
       expect(result).toBe('(max-width: 767px) 33.33vw, 16.67vw');
     });
@@ -156,7 +156,7 @@ describe('grid-width-utils', () => {
         gap: '16px',
       };
 
-      const result = buildGridSizesString(grid);
+      const result = createGridSizesString(grid);
 
       expect(result).toContain(`(max-width: ${MOBILE_BREAKPOINT}px)`);
       expect(result).toContain('100.00vw, 50.00vw');
@@ -174,7 +174,7 @@ describe('grid-width-utils', () => {
 
       for (const { desktop, mobile, expectedDesktop } of testCases) {
         const grid: GridDefinition = { columns: { desktop, mobile }, gap: '16px' };
-        const result = buildGridSizesString(grid);
+        const result = createGridSizesString(grid);
         expect(result).toContain(expectedDesktop);
       }
     });

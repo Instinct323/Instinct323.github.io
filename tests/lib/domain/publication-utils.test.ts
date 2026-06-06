@@ -3,8 +3,8 @@ import {
   normalizePublication,
   formatPublicationLinkLabel,
   resolvePublicationLinks,
-} from './publication-utils';
-import type { Publication } from '../../types';
+} from '../../../src/lib/domain/publication-utils';
+import type { Publication } from '../../../src/types';
 
 describe('normalizePublication', () => {
   const filePath = 'test/publication.yaml';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareBlogPosts, extractDateFromSlug } from './blog-loader';
+import { compareBlogPosts, extractDateFromSlug } from '../../../src/lib/loaders/blog-loader';
 
 // extractDateFromSlug is tested in isolation since loadBlogPosts
 // depends on import.meta.glob which is only available at build time.

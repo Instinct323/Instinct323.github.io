@@ -8,7 +8,7 @@ import {
   loadSiteConfig,
   loadSiteMetadata,
   resetSiteConfig,
-} from './config-loader';
+} from '../../../src/lib/loaders/config-loader';
 
 describe('config-loader lazy singleton', () => {
   it('loadSiteConfig returns the same object on repeated calls (caching)', () => {

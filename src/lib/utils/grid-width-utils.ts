@@ -32,7 +32,7 @@ function parseGridGapToPx(gap: string): number {
   return matched[2] === 'rem' ? value * 16 : value;
 }
 
-function deriveGridCellWidth(viewportWidth: number, columns: number, gapPx: number): number {
+function computeGridCellWidth(viewportWidth: number, columns: number, gapPx: number): number {
   if (!Number.isInteger(columns) || columns <= 0) {
     throw new Error(`Invalid grid columns: expected a positive integer, received ${String(columns)}.`);
   }
@@ -47,17 +47,17 @@ function deriveGridCellWidth(viewportWidth: number, columns: number, gapPx: numb
   return Math.round(contentWidth / columns);
 }
 
-export function deriveGridCellWidths(grid: GridDefinition, viewports: number[]): number[] {
+export function computeGridCellWidths(grid: GridDefinition, viewports: number[]): number[] {
   const gapPx = parseGridGapToPx(grid.gap);
 
   return [
-    deriveGridCellWidth(viewports[0], grid.columns.mobile, gapPx),
-    deriveGridCellWidth(viewports[1], grid.columns.desktop, gapPx),
-    deriveGridCellWidth(viewports[2], grid.columns.desktop, gapPx),
+    computeGridCellWidth(viewports[0], grid.columns.mobile, gapPx),
+    computeGridCellWidth(viewports[1], grid.columns.desktop, gapPx),
+    computeGridCellWidth(viewports[2], grid.columns.desktop, gapPx),
   ];
 }
 
-export function buildGridSizesString(grid: GridDefinition): string {
+export function createGridSizesString(grid: GridDefinition): string {
   const mobileColumns = assertPositiveInteger(
     grid.columns.mobile,
     'photography.grid.columns.mobile',

@@ -3,32 +3,18 @@
 import type { HomePageCarouselConfig } from './carousel';
 import type { ResolvedProfileData } from './profile';
 import type { SiteConfig } from './site';
-import type { HomePageConfig } from './home-config';
+import type { HomePageConfig, HomePageHero } from './home-config';
 
-export type { HomePageConfig } from './home-config';
+export type { HomePageConfig, HomePageHero } from './home-config';
 
 export type HomepageSectionKey = 'hero' | 'carousel';
 export type HomepageHeroDeckField = 'location' | 'organization';
 export type HomepageEditorialGapVariant = 'tight' | 'roomy';
 
-export interface HomePageHero {
-  eyebrow: string;
-}
-
 export interface HomePageFeaturedMediaConfig {
   items: string[];
   carousel: HomePageCarouselConfig;
 }
-
-export type Home = HomePageHero;
-
-export interface HomepageConfig {
-  layout: HomePageConfig['layout'];
-  editorialHero: HomePageConfig['editorialHero'];
-  featuredCarousel: HomePageConfig['featuredMedia']['carousel'];
-}
-
-export type HomepageConfigSlice = HomePageConfigGroup;
 
 export interface HomePageConfigGroup {
   hero: HomePageConfig['hero'];

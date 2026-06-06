@@ -5,10 +5,8 @@
 export type {
   SiteConfig,
   SiteMetadata,
-  SiteMetadataConfig,
   NavigationConfig,
   SiteNavigation,
-  SiteMetadataInput,
   PhotographyPageConfig,
   MediaConfig,
   Publication,
@@ -16,17 +14,13 @@ export type {
 } from './site';
 
 // Home page types
-export type { HomePageConfig } from './home-config';
+export type { HomePageConfig, HomePageHero } from './home-config';
 export type {
   HomepageSectionKey,
   HomepageHeroDeckField,
   HomepageEditorialGapVariant,
-  HomePageHero,
   HomePageFeaturedMediaConfig,
   HomePageConfigGroup,
-  Home,
-  HomepageConfig,
-  HomepageConfigSlice,
   HomePageData,
 } from './home';
 
@@ -45,11 +39,7 @@ export type {
   HomePageImageConfig,
 } from './image-config';
 
-// Effects types
-export type {
-  StarfieldEffectConfig,
-  SiteEffectsConfig,
-} from './effects';
+
 
 // Profile types
 export type {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildShellStyle } from './layout-shell';
+import { buildShellStyle } from '../../../src/lib/domain/layout-shell';
 
 describe('buildShellStyle', () => {
   it('buildShellStyle("home", "standard") contains home shell tokens and standard content width', () => {

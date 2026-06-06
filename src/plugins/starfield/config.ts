@@ -1,20 +1,20 @@
-import type { StarfieldEffectConfig } from '../../types';
+import type { StarfieldEffectConfig } from './types';
 import {
   assertBoolean,
   assertFiniteNumber,
   assertObject,
   assertString,
-} from '../utils/assertions';
+} from './assertions';
 
 export function resolveStarfieldEffectConfig(config: unknown): StarfieldEffectConfig {
-  const source = assertObject<Partial<StarfieldEffectConfig>>(config, 'effects.starfield');
+  const rawConfig = assertObject<Partial<StarfieldEffectConfig>>(config, 'effects.starfield');
 
-  const starDensity = source.starDensity;
+  const starDensity = rawConfig.starDensity;
   if (!starDensity || !['low', 'medium', 'high', 'ultra'].includes(starDensity)) {
     throw new Error('Missing or invalid effects.starfield.starDensity (must be low/medium/high/ultra)');
   }
 
-  const starSize = source.starSize;
+  const starSize = rawConfig.starSize;
   const starSizeConfig = assertObject<{ min: number; max: number }>(starSize, 'effects.starfield.starSize');
   const starSizeMin = assertFiniteNumber(starSizeConfig.min, 'effects.starfield.starSize.min');
   const starSizeMax = assertFiniteNumber(starSizeConfig.max, 'effects.starfield.starSize.max');
@@ -22,25 +22,25 @@ export function resolveStarfieldEffectConfig(config: unknown): StarfieldEffectCo
     throw new Error('Missing or invalid effects.starfield.starSize range (0 < min <= max required)');
   }
 
-  const speedFactor = assertFiniteNumber(source.speedFactor, 'effects.starfield.speedFactor');
+  const speedFactor = assertFiniteNumber(rawConfig.speedFactor, 'effects.starfield.speedFactor');
   if (speedFactor < 0) {
     throw new Error('Missing or invalid effects.starfield.speedFactor (must be >= 0)');
   }
 
-  const maxDistance = assertFiniteNumber(source.maxDistance, 'effects.starfield.maxDistance');
+  const maxDistance = assertFiniteNumber(rawConfig.maxDistance, 'effects.starfield.maxDistance');
   if (maxDistance <= 0) {
     throw new Error('Missing or invalid effects.starfield.maxDistance (must be > 0)');
   }
 
-  const linkOpacity = assertFiniteNumber(source.linkOpacity, 'effects.starfield.linkOpacity');
-  const starOpacity = assertFiniteNumber(source.starOpacity, 'effects.starfield.starOpacity');
+  const linkOpacity = assertFiniteNumber(rawConfig.linkOpacity, 'effects.starfield.linkOpacity');
+  const starOpacity = assertFiniteNumber(rawConfig.starOpacity, 'effects.starfield.starOpacity');
   if (linkOpacity < 0 || linkOpacity > 1 || starOpacity < 0 || starOpacity > 1) {
     throw new Error('Missing or invalid effects.starfield opacity values (must be within [0, 1])');
   }
 
-  const starColor = assertString(source.starColor, 'effects.starfield.starColor');
+  const starColor = assertString(rawConfig.starColor, 'effects.starfield.starColor');
 
-  const starShapes = source.starShapes;
+  const starShapes = rawConfig.starShapes;
   if (!Array.isArray(starShapes) || starShapes.length === 0) {
     throw new Error('Missing or invalid effects.starfield.starShapes (must be non-empty array)');
   }
@@ -48,18 +48,18 @@ export function resolveStarfieldEffectConfig(config: unknown): StarfieldEffectCo
     throw new Error('Missing or invalid effects.starfield.starShapes (values must be circle/star)');
   }
 
-  const parallaxEffect = assertBoolean(source.parallaxEffect, 'effects.starfield.parallaxEffect');
-  const parallaxStrength = assertFiniteNumber(source.parallaxStrength, 'effects.starfield.parallaxStrength');
+  const parallaxEffect = assertBoolean(rawConfig.parallaxEffect, 'effects.starfield.parallaxEffect');
+  const parallaxStrength = assertFiniteNumber(rawConfig.parallaxStrength, 'effects.starfield.parallaxStrength');
   if (parallaxStrength <= 0) {
     throw new Error('Missing or invalid effects.starfield.parallaxStrength (must be > 0)');
   }
 
-  const mouseRadius = assertFiniteNumber(source.mouseRadius, 'effects.starfield.mouseRadius');
+  const mouseRadius = assertFiniteNumber(rawConfig.mouseRadius, 'effects.starfield.mouseRadius');
   if (mouseRadius < 0) {
     throw new Error('Missing or invalid effects.starfield.mouseRadius (must be >= 0)');
   }
 
-  const rotationSpeed = source.rotationSpeed;
+  const rotationSpeed = rawConfig.rotationSpeed;
   const rotationSpeedConfig = assertObject<{ min: number; max: number }>(
     rotationSpeed,
     'effects.starfield.rotationSpeed',
@@ -71,24 +71,24 @@ export function resolveStarfieldEffectConfig(config: unknown): StarfieldEffectCo
   }
 
   const connectionsWhenNoMouse = assertBoolean(
-    source.connectionsWhenNoMouse,
+    rawConfig.connectionsWhenNoMouse,
     'effects.starfield.connectionsWhenNoMouse',
   );
   const percentStarsConnecting = assertFiniteNumber(
-    source.percentStarsConnecting,
+    rawConfig.percentStarsConnecting,
     'effects.starfield.percentStarsConnecting',
   );
   if (percentStarsConnecting < 0 || percentStarsConnecting > 100) {
     throw new Error('Missing or invalid effects.starfield.percentStarsConnecting (must be within [0, 100])');
   }
 
-  const lineThickness = assertFiniteNumber(source.lineThickness, 'effects.starfield.lineThickness');
+  const lineThickness = assertFiniteNumber(rawConfig.lineThickness, 'effects.starfield.lineThickness');
   if (lineThickness <= 0) {
     throw new Error('Missing or invalid effects.starfield.lineThickness (must be > 0)');
   }
 
   return {
-    enabled: assertBoolean(source.enabled, 'effects.starfield.enabled'),
+    enabled: assertBoolean(rawConfig.enabled, 'effects.starfield.enabled'),
     starDensity: starDensity as 'low' | 'medium' | 'high' | 'ultra',
     starSize: { min: starSizeMin, max: starSizeMax },
     speedFactor,

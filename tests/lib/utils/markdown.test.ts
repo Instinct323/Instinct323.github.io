@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseMarkdownWithFrontmatter, renderMarkdown } from './markdown';
+import { parseMarkdownWithFrontmatter, renderMarkdown } from '../../../src/lib/utils/markdown';
 
 describe('renderMarkdown', () => {
   it('renders basic markdown', () => {

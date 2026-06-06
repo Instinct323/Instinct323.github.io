@@ -1,8 +1,3 @@
-/**
- * Pure utility functions extracted from starfield-runtime.ts for testability.
- * No side effects, no DOM or canvas dependencies.
- */
-
 export const DPR_CAP = 2;
 export const IDLE_RESTART_TIME = 1000;
 export const STAR_POINTS = 5;
@@ -30,7 +25,7 @@ export interface Star {
   rotation: number;
   rotationSpeed: number;
   depth: number;
-  connects: boolean;
+  canConnect: boolean;
   originalX: number;
   originalY: number;
 }

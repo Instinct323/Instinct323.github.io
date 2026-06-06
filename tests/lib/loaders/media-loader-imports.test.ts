@@ -2,17 +2,17 @@ import { describe, expect, it } from 'vitest';
 import {
   IMAGE_MEDIUM_WIDTHS_KEY,
   selectCandidateWidthsByPolicy,
-} from '../utils/image-width-utils';
+} from '../../../src/lib/utils/image-width-utils';
 import {
-  deriveContentImageOptions,
+  computeContentImageOptions,
   loadContentImage,
   loadFeaturedSlides,
   loadMediaTree,
-} from './media-loader';
+} from '../../../src/lib/loaders/media-loader';
 import {
   assertMediaConfigShape,
   getValidatedHomepageGalleryConfig,
-} from './media-validation';
+} from '../../../src/lib/loaders/media-validation';
 
 describe('media-loader import path changes', () => {
   it('can import IMAGE_MEDIUM_WIDTHS_KEY directly from image-width-utils', () => {
@@ -23,8 +23,8 @@ describe('media-loader import path changes', () => {
     expect(typeof selectCandidateWidthsByPolicy).toBe('function');
   });
 
-  it('media-loader exports deriveContentImageOptions', () => {
-    expect(typeof deriveContentImageOptions).toBe('function');
+  it('media-loader exports computeContentImageOptions', () => {
+    expect(typeof computeContentImageOptions).toBe('function');
   });
 
   it('media-loader exports loadContentImage', () => {

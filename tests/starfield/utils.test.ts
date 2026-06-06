@@ -13,7 +13,7 @@ import {
   starDensities,
   type CellGrid,
   type Star,
-} from './starfield-utils';
+} from '../../src/plugins/starfield/utils';
 
 function makeStar(overrides: Partial<Star> = {}): Star {
   return {
@@ -26,7 +26,7 @@ function makeStar(overrides: Partial<Star> = {}): Star {
     rotation: 0,
     rotationSpeed: 0,
     depth: 0.5,
-    connects: false,
+    canConnect: false,
     originalX: 0,
     originalY: 0,
     ...overrides,

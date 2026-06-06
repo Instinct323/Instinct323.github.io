@@ -1,8 +1,8 @@
 import { introductionRaw, profile, siteConfigRaw } from './content-paths';
 import { parse } from 'jsonc-parser';
 
+import { resolveStarfieldEffectConfig } from '../../plugins/starfield';
 import { resolveFeaturedCarouselVisual } from '../domain/carousel-config';
-import { resolveStarfieldEffectConfig } from '../domain/starfield-config';
 import { resolveSiteImageConfig } from '../domain/image-config';
 
 import type {
@@ -11,10 +11,10 @@ import type {
   NavigationConfig,
   PhotographyPageConfig,
   ProfileData,
-  SiteEffectsConfig,
   SiteConfig,
   SiteMetadata,
 } from '../../types';
+import type { SiteEffectsConfig } from '../../plugins/starfield';
 
 function resolvePhotographyConfig(config: SiteConfig['photography']): PhotographyPageConfig {
   const source = config as Partial<PhotographyPageConfig>;

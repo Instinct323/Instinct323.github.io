@@ -4,8 +4,8 @@ import {
   buildPrimaryNavModel,
   type SiteNavItem,
   type SiteNavModel,
-} from './site-navigation';
-import type { NavigationConfig } from '../../types';
+} from '../../../src/lib/domain/site-navigation';
+import type { NavigationConfig } from '../../../src/types';
 
 describe('formatPageLabel', () => {
   it("returns '' for empty string", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { resolveDeferredMountRuntimeConfig } from '../domain/image-config';
-import type { DeferredImageLazyLoadConfig } from '../../types/page-load';
+import { resolveDeferredMountRuntimeConfig } from '../../../src/lib/domain/image-config';
+import type { DeferredImageLazyLoadConfig } from '../../../src/types/page-load';
 
 describe('resolveDeferredMountRuntimeConfig', () => {
   const validLazyLoadConfig: DeferredImageLazyLoadConfig = {

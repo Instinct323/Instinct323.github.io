@@ -1,4 +1,4 @@
-import { initStarfield } from './starfield-runtime';
+import { initStarfield } from '../../plugins/starfield';
 import { runWhenIdle, SHELL_BACKGROUND_TIMEOUT, SHELL_BACKGROUND_FALLBACK } from './scheduling';
 
 const ENABLE_STARFIELD = true;

@@ -4,9 +4,9 @@ import {
   resolveImageLazyLoadConfig,
   resolveDeferredMountRuntimeConfig,
   resolveImagePlaceholderEffectConfig,
-} from './image-config';
-import type { SiteImageConfig } from '../../types';
-import type { DeferredImageLazyLoadConfig } from '../../types/page-load';
+} from '../../../src/lib/domain/image-config';
+import type { SiteImageConfig } from '../../../src/types';
+import type { DeferredImageLazyLoadConfig } from '../../../src/types/page-load';
 
 describe('resolveSiteImageConfig', () => {
   const validConfig: SiteImageConfig = {

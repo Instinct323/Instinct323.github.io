@@ -14,7 +14,7 @@ import type {
   ResolvedProfileData,
 } from '../../types';
 import {
-  deriveContentImageOptions,
+  computeContentImageOptions,
   loadContentImage,
 } from './media-loader';
 import { renderMarkdown } from '../utils/markdown';
@@ -87,7 +87,7 @@ export async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarI
 }
 
 export async function loadAboutAvatarImage(profileData: ProfileData): Promise<ContentImage> {
-  const aboutImageOptions = await deriveContentImageOptions('about', {
+  const aboutImageOptions = await computeContentImageOptions('about', {
     alt: resolveAvatarAltFromProfile(profileData),
   });
   const avatarImage = await loadContentImage(AVATAR_JPG.replace('../../content/', ''), aboutImageOptions);

@@ -120,7 +120,7 @@ function getMaxResponsiveWidth(source: ImageMetadata, maxLongEdge: number): numb
   return Math.max(1, Math.round(source.width * scale));
 }
 
-function deriveResponsiveWidths(source: ImageMetadata, options: ContentImageOptions): number[] {
+function computeResponsiveWidths(source: ImageMetadata, options: ContentImageOptions): number[] {
   const explicitWidths = sanitizePositiveWidths(options.widths);
 
   if (explicitWidths.length > 0) {
@@ -136,8 +136,8 @@ function deriveResponsiveWidths(source: ImageMetadata, options: ContentImageOpti
   return Array.from(new Set(widths.filter(width => width > 0))).sort((a, b) => a - b);
 }
 
-function buildContentImageResponsive(source: ImageMetadata, options: ContentImageOptions): ContentImageResponsive {
-  const widths = deriveResponsiveWidths(source, options);
+function createContentImageResponsive(source: ImageMetadata, options: ContentImageOptions): ContentImageResponsive {
+  const widths = computeResponsiveWidths(source, options);
 
   const format = options.format;
   if (!format || typeof format !== 'string') {
@@ -172,7 +172,7 @@ export function loadContentImageResolved(path: string, options: ContentImageOpti
     width: source.width,
     height: source.height,
     aspectRatio: source.width / source.height,
-    responsive: buildContentImageResponsive(source, options),
+    responsive: createContentImageResponsive(source, options),
   };
 }
 
@@ -181,15 +181,15 @@ function capWidthsBySourceWidth(widths: number[], sourceWidth: number): number[]
   return bounded.length > 0 ? bounded : [sourceWidth];
 }
 
-function deriveRenderableWidths(image: ContentImage): number[] {
+function computeRenderableWidths(image: ContentImage): number[] {
   const responsiveWidths = image.responsive.widths
     .filter((width) => Number.isInteger(width) && width > 0 && width <= image.width);
   const normalizedWidths = Array.from(new Set(responsiveWidths)).sort((a, b) => a - b);
   return normalizedWidths.length > 0 ? normalizedWidths : [image.width];
 }
 
-export async function buildImageVariantSet(image: ContentImage): Promise<ImageVariantSet> {
-  const widths = deriveRenderableWidths(image);
+export async function createImageVariantSet(image: ContentImage): Promise<ImageVariantSet> {
+  const widths = computeRenderableWidths(image);
   const variants = await Promise.all(
     widths.map((width) =>
       getImage({

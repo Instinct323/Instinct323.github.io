@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadAboutPageFrame, loadHomePage } from './content-loader';
+import { loadAboutPageFrame, loadHomePage } from '../../../src/lib/loaders/content-loader';
 
 describe('content-loader', () => {
   describe('loadHomePage', () => {

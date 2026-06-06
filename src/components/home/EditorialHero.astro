@@ -1,6 +1,6 @@
 ---
 import type { ResolvedProfileData } from '../../types';
-import type { HomePageHero as Home, HomePageConfigGroup as HomepageConfig } from '../../types/home';
+import type { HomePageHero, HomePageConfigGroup as HomepageConfig } from '../../types/home';
 import type { HomepageHeroDeckField } from '../../types/home';
 
 // Contract: Render the identity-focused hero copy block on the home page,
@@ -8,7 +8,7 @@ import type { HomepageHeroDeckField } from '../../types/home';
 
 interface Props {
   profile: ResolvedProfileData;
-  home: Home;
+  home: HomePageHero;
   settings: HomepageConfig['editorialHero'];
 }
 

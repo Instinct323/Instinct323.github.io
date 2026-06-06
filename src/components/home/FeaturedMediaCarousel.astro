@@ -131,12 +131,12 @@ const nextIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
 )}
 
 {hasSlides && <script>
-  import { initHomeCarouselDeferredMounts } from '../../lib/runtime/deferred-mount-bootstrap';
+  import { initHomeCarouselDeferredMounts } from '../../lib/runtime/deferred-mount-init';
   initHomeCarouselDeferredMounts();
 </script>}
 
 {hasMultiSlides && <script>
-  import { initCarouselWithPrewarm } from '../../lib/runtime/carousel-init';
+  import { initCarouselWithPrewarm } from '../../lib/runtime/carousel-prewarm';
 
   const carouselRoot = document.querySelector('.home-carousel');
   if (carouselRoot instanceof HTMLElement) {

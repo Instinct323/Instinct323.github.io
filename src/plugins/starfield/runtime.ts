@@ -1,4 +1,4 @@
-import type { StarfieldEffectConfig } from '../../types';
+import type { StarfieldEffectConfig } from './types';
 import {
   parseHexColor,
   calculateDistance,
@@ -11,7 +11,7 @@ import {
   starDensities,
   type CellGrid,
   type Star,
-} from './starfield-utils';
+} from './utils';
 
 interface PointerState {
   x: number | null;
@@ -84,7 +84,7 @@ function createStar(x: number, y: number, config: StarfieldEffectConfig): Star {
   const speedY = (Math.random() - 0.5) * config.speedFactor;
   const rotationSpeed = randomRange(config.rotationSpeed.min, config.rotationSpeed.max);
   const depth = Math.random();
-  const connects = config.percentStarsConnecting === 100
+  const canConnect = config.percentStarsConnecting === 100
     ? true
     : config.connectionsWhenNoMouse && Math.random() < config.percentStarsConnecting / 100;
 
@@ -98,7 +98,7 @@ function createStar(x: number, y: number, config: StarfieldEffectConfig): Star {
     rotation: 0,
     rotationSpeed,
     depth,
-    connects,
+    canConnect,
     originalX: x,
     originalY: y,
   };
@@ -214,7 +214,7 @@ function shouldDrawConnection(
     pointerDistance = calculateDistance(star.x, star.y, pointer.x, pointer.y);
   }
 
-  return distance < maxDistance && (pointerDistance < mouseRadius || (star.connects && otherStar.connects));
+  return distance < maxDistance && (pointerDistance < mouseRadius || (star.canConnect && otherStar.canConnect));
 }
 
 function drawConnectionLine(

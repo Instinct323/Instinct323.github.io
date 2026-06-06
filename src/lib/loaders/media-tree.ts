@@ -13,7 +13,7 @@ import type {
   MediaImage,
   MediaTree,
 } from '../../types';
-import { parseMediaPath, buildImageVariantSet } from './media-loader-core';
+import { parseMediaPath, createImageVariantSet } from './media-loader-core';
 import { CONTENT_IMAGE_MODULES } from './astro-adapter';
 
 export type { ParsedMediaPath } from './media-loader-core';
@@ -99,7 +99,7 @@ function finalizeCategories(categoryMap: Map<string, CategoryAccumulator>): Medi
 }
 
 export async function createFeaturedSlide(image: ContentImage): Promise<FeaturedSlide> {
-  const variantSet = await buildImageVariantSet(image);
+  const variantSet = await createImageVariantSet(image);
 
   return {
     src: variantSet.src,

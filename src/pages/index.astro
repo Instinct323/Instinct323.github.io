@@ -4,7 +4,7 @@ import EditorialHero from '../components/home/EditorialHero.astro';
 import FeaturedMediaCarousel from '../components/home/FeaturedMediaCarousel.astro';
 import { loadHomePage } from '../lib/loaders/content-loader';
 import { loadFeaturedSlides } from '../lib/loaders/media-loader';
-import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-bootstrap';
+import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
 
 const homeLoad = await orchestratePageLoad({

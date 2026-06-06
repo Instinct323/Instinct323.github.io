@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCachedLoader, resetLoaderCache } from './cache';
+import { createCachedLoader, resetLoaderCache } from '../../../src/lib/utils/cache';
 
 describe('createCachedLoader', () => {
   it('caches value and returns it on subsequent calls without re-invoking loader', async () => {

@@ -5,7 +5,7 @@ import {
   assertString,
   assertPositiveInteger,
   assertObject,
-} from './assertions';
+} from '../../../src/lib/utils/assertions';
 
 describe('assertFiniteNumber', () => {
   it('passes with a valid finite number', () => {

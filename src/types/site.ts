@@ -1,18 +1,15 @@
 // IMPORTANT: Imports HomePageConfig from ./home-config.ts to avoid circular dependency with ./home.ts
 import type { HomePageConfig } from './home-config';
 import type { MediaGridConfig, SiteImageConfig } from './image-config';
-import type { SiteEffectsConfig } from './effects';
+import type { SiteEffectsConfig } from '../plugins/starfield';
 import type { ResolvedProfileData } from './profile';
 import type { ContentImage } from './media';
 
-export interface SiteMetadataInput {
+export interface SiteMetadata {
   siteUrl: string;
   defaultTitle: string;
   defaultDescription: string;
   keyword?: string;
-}
-
-export interface SiteMetadata extends SiteMetadataInput {
 }
 
 export interface SiteNavigation {
@@ -24,7 +21,7 @@ export interface PhotographyPageConfig {
 }
 
 export interface SiteConfig {
-  metadata: SiteMetadataInput;
+  metadata: SiteMetadata;
   navigation: SiteNavigation;
   home: HomePageConfig;
   image: SiteImageConfig;
@@ -32,7 +29,6 @@ export interface SiteConfig {
   effects: SiteEffectsConfig;
 }
 
-export type SiteMetadataConfig = SiteConfig['metadata'];
 export type NavigationConfig = SiteConfig['navigation'];
 
 export interface MediaConfig {

@@ -6,7 +6,7 @@ import ProfileCard from '../components/about/ProfileCard.astro';
 import PublicationsSection from '../components/about/PublicationsSection.astro';
 import { loadAboutAvatarImage, loadAboutPageFrame } from '../lib/loaders/content-loader';
 import { loadMediaConfig } from '../lib/loaders/config-loader';
-import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-bootstrap';
+import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
 
 const aboutLoad = await orchestratePageLoad({
@@ -61,7 +61,7 @@ const profileName = profile.facts.find(({ id }) => id === 'name')?.value;
   import {
     buildDeferredMountBootstrapOptions,
     initDeferredMountGroupSafely,
-  } from '../lib/runtime/deferred-mount-bootstrap';
+  } from '../lib/runtime/deferred-mount-init';
 
   initDeferredMountGroupSafely(
     buildDeferredMountBootstrapOptions(

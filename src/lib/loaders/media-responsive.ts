@@ -1,4 +1,4 @@
-import { RESPONSIVE_VIEWPORT_WIDTHS, deriveGridCellWidths } from '../utils/grid-width-utils';
+import { RESPONSIVE_VIEWPORT_WIDTHS, computeGridCellWidths } from '../utils/grid-width-utils';
 import { selectCandidateWidthsByPolicy, IMAGE_MEDIUM_WIDTHS_KEY } from '../utils/image-width-utils';
 import type { MediaConfig, HomePageCarouselConfig } from '../../types';
 
@@ -18,7 +18,7 @@ interface ResponsiveSlideWidthPercent {
   mobile: string;
 }
 
-export function deriveCarouselResponsiveWidths(
+export function computeCarouselResponsiveWidths(
   viewportWidth: number,
   cssPercentage: number,
   maxLongEdge: number
@@ -39,7 +39,7 @@ export function deriveCarouselResponsiveWidths(
   return Array.from(new Set(widths.filter(width => width > 0))).sort((a, b) => a - b);
 }
 
-export function deriveLayoutResponsiveWidths(
+export function computeLayoutResponsiveWidths(
   profile: ResponsiveWidthProfile,
   maxLongEdge: number
 ): number[] {
@@ -49,7 +49,7 @@ export function deriveLayoutResponsiveWidths(
     ['mobile', RESPONSIVE_VIEWPORT_WIDTHS.mobile],
   ];
   const merged = entries.flatMap(([key, viewport]) => {
-    return deriveCarouselResponsiveWidths(viewport, profile[key], maxLongEdge);
+    return computeCarouselResponsiveWidths(viewport, profile[key], maxLongEdge);
   });
 
   return Array.from(new Set(merged))
@@ -70,24 +70,24 @@ function parseResponsivePercentage(value: string, key: string): number {
   return parsed;
 }
 
-export function deriveCarouselInferredWidths(slideWidth: ResponsiveSlideWidthPercent): number[] {
+export function computeCarouselInferredWidths(slideWidth: ResponsiveSlideWidthPercent): number[] {
   const profile: ResponsiveWidthProfile = {
     desktop: parseResponsivePercentage(slideWidth.desktop, 'carousel.slideWidth.desktop'),
     tablet: parseResponsivePercentage(slideWidth.tablet, 'carousel.slideWidth.tablet'),
     mobile: parseResponsivePercentage(slideWidth.mobile, 'carousel.slideWidth.mobile'),
   };
 
-  return deriveLayoutResponsiveWidths(profile, Number.POSITIVE_INFINITY);
+  return computeLayoutResponsiveWidths(profile, Number.POSITIVE_INFINITY);
 }
 
-export function deriveGalleryInferredWidthsFromGrid(grid: MediaConfig['grid']): number[] {
+export function computeGalleryWidthsFromGrid(grid: MediaConfig['grid']): number[] {
   const viewports = [
     RESPONSIVE_VIEWPORT_WIDTHS.mobile,
     RESPONSIVE_VIEWPORT_WIDTHS.tablet,
     RESPONSIVE_VIEWPORT_WIDTHS.desktop,
   ];
 
-  return deriveGridCellWidths(grid, viewports);
+  return computeGridCellWidths(grid, viewports);
 }
 
 export function calculateCarouselWidths(
@@ -95,7 +95,7 @@ export function calculateCarouselWidths(
   candidateWidths: number[],
   homepageDprScale: number,
 ): number[] {
-  const inferredWidths = deriveCarouselInferredWidths(slideWidth);
+  const inferredWidths = computeCarouselInferredWidths(slideWidth);
 
   return selectCandidateWidthsByPolicy({
     candidateWidths,

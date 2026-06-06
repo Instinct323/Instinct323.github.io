@@ -1,8 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { initStarfield } from './starfield-runtime';
-import type { StarfieldEffectConfig } from '../../types';
+import { initStarfield } from '../../src/plugins/starfield';
+import type { StarfieldEffectConfig } from '../../src/plugins/starfield';
 
-// Test helper to create minimal config
 function createTestConfig(overrides: Partial<StarfieldEffectConfig> = {}): StarfieldEffectConfig {
   return {
     enabled: true,
@@ -25,7 +24,6 @@ function createTestConfig(overrides: Partial<StarfieldEffectConfig> = {}): Starf
   };
 }
 
-// Mock DOM APIs for testing
 function createMockCanvases(): {
   backgroundCanvas: HTMLCanvasElement;
   starsCanvas: HTMLCanvasElement;
@@ -110,7 +108,6 @@ describe('starfield-runtime', () => {
   let mockClearTimeout: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    // Mock window properties
     mockMatchMedia = vi.fn().mockReturnValue({ matches: false });
     (window as unknown as Record<string, unknown>).matchMedia = mockMatchMedia;
 
@@ -134,12 +131,10 @@ describe('starfield-runtime', () => {
     (window as unknown as Record<string, unknown>).setTimeout = mockSetTimeout;
     (window as unknown as Record<string, unknown>).clearTimeout = mockClearTimeout;
 
-    // Mock window dimensions
     Object.defineProperty(window, 'innerWidth', { value: 800, writable: true });
     Object.defineProperty(window, 'innerHeight', { value: 600, writable: true });
     Object.defineProperty(window, 'devicePixelRatio', { value: 1, writable: true });
 
-    // Mock document
     const mockDocument = {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
@@ -193,7 +188,6 @@ describe('starfield-runtime', () => {
     });
   });
 
-  // Edge case: invalid parameters
   describe('edge cases', () => {
     it('handles canvas without valid 2d context', () => {
       const bgCanvas = {
@@ -228,7 +222,6 @@ describe('starfield-runtime', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
       const config = createTestConfig({ maxDistance: 0 });
 
-      // Should handle gracefully
       expect(() => {
         const cleanup = initStarfield(backgroundCanvas, starsCanvas, config);
         cleanup();
@@ -256,7 +249,6 @@ describe('starfield-runtime', () => {
     });
   });
 
-  // Test the behavior that exercises createStar, drawStar, drawConnections
   describe('createStar behavior', () => {
     it('creates stars with size within configured range', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
@@ -336,27 +328,23 @@ describe('starfield-runtime', () => {
   describe('drawConnections behavior', () => {
     it('draws connections when mouse is within radius', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
-      const config = createTestConfig({ 
-        maxDistance: 100, 
+      const config = createTestConfig({
+        maxDistance: 100,
         mouseRadius: 200,
         connectionsWhenNoMouse: false,
       });
-      
+
       const cleanup = initStarfield(backgroundCanvas, starsCanvas, config);
-      
-      // Simulate mouse movement to trigger connection drawing
+
       const mouseMoveHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'mousemove'
+        (call: unknown[]) => call[0] === 'mousemove',
       )?.[1] as ((_e: MouseEvent) => void) | undefined;
-      
+
       if (mouseMoveHandler) {
         mouseMoveHandler({ clientX: 400, clientY: 300 } as MouseEvent);
       }
 
-      // Let animation run
       cleanup();
-      
-      // Note: connections may or may not be drawn depending on star positions
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
     });
 
@@ -373,7 +361,6 @@ describe('starfield-runtime', () => {
       const config = createTestConfig({ linkOpacity: 0.8 });
       initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // linkOpacity is used in calculateConnectionOpacity
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
     });
 
@@ -382,12 +369,10 @@ describe('starfield-runtime', () => {
       const config = createTestConfig({ lineThickness: 2 });
       initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // lineWidth should be set to lineThickness
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
     });
   });
 
-  // Test cleanup function behavior
   describe('cleanup', () => {
     it('removes all event listeners on cleanup', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
@@ -410,7 +395,6 @@ describe('starfield-runtime', () => {
     });
   });
 
-  // Additional tests for drawStar, drawConnections, createStar
   describe('createStar behavior - extended', () => {
     it('creates stars with varying depth values', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
@@ -441,9 +425,9 @@ describe('starfield-runtime', () => {
 
     it('respects rotationSpeed configuration for star shapes', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
-      const config = createTestConfig({ 
+      const config = createTestConfig({
         starShapes: ['star'],
-        rotationSpeed: { min: 0.1, max: 0.5 }
+        rotationSpeed: { min: 0.1, max: 0.5 },
       });
       const cleanup = initStarfield(backgroundCanvas, starsCanvas, config);
 
@@ -467,7 +451,6 @@ describe('starfield-runtime', () => {
       const config = createTestConfig();
       const cleanup = initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // Trigger animation
       const mockRaf = (window as unknown as Record<string, unknown>).requestAnimationFrame as ReturnType<typeof vi.fn>;
       const cb = mockRaf.mock.calls[0]?.[0] as FrameRequestCallback;
       if (cb) cb(0);
@@ -511,7 +494,6 @@ describe('starfield-runtime', () => {
       const cb = mockRaf.mock.calls[0]?.[0] as FrameRequestCallback;
       if (cb) cb(0);
 
-      // fillStyle should be set to the config color
       expect(starCtx.beginPath).toHaveBeenCalled();
       cleanup();
     });
@@ -536,9 +518,8 @@ describe('starfield-runtime', () => {
       const config = createTestConfig({ connectionsWhenNoMouse: false });
       const cleanup = initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // Find and trigger mouseleave handler
       const mouseleaveHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'mouseleave'
+        (call: unknown[]) => call[0] === 'mouseleave',
       )?.[1] as (() => void) | undefined;
 
       if (mouseleaveHandler) {
@@ -554,9 +535,8 @@ describe('starfield-runtime', () => {
       const config = createTestConfig();
       initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // Find touchstart handler
       const touchStartHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'touchstart'
+        (call: unknown[]) => call[0] === 'touchstart',
       )?.[1] as ((_e: TouchEvent) => void) | undefined;
 
       if (touchStartHandler) {
@@ -572,9 +552,8 @@ describe('starfield-runtime', () => {
       const config = createTestConfig({ enabled: true });
       initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // Find touchmove handler
       const touchMoveHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'touchmove'
+        (call: unknown[]) => call[0] === 'touchmove',
       )?.[1] as ((_e: TouchEvent) => void) | undefined;
 
       if (touchMoveHandler) {
@@ -600,7 +579,7 @@ describe('starfield-runtime', () => {
       initStarfield(backgroundCanvas, starsCanvas, config);
 
       const touchMoveHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'touchmove'
+        (call: unknown[]) => call[0] === 'touchmove',
       )?.[1] as ((_e: TouchEvent) => void) | undefined;
 
       if (touchMoveHandler) {
@@ -617,7 +596,7 @@ describe('starfield-runtime', () => {
       initStarfield(backgroundCanvas, starsCanvas, config);
 
       const touchEndHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'touchend'
+        (call: unknown[]) => call[0] === 'touchend',
       )?.[1] as (() => void) | undefined;
 
       expect(touchEndHandler).toBeUndefined();
@@ -639,7 +618,6 @@ describe('starfield-runtime', () => {
       const config = createTestConfig();
       const cleanup = initStarfield(backgroundCanvas, starsCanvas, config);
 
-      // Verify initial animation started
       expect(mockRequestAnimationFrame).toHaveBeenCalled();
       cleanup();
     });

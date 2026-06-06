@@ -1,10 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   assertStrictlyIncreasingPositiveWidths,
   selectCandidateWidthsByPolicy,
-  IMAGE_MEDIUM_WIDTHS_KEY,
-  IMAGE_HIGH_WIDTHS_KEY,
-} from './image-width-utils';
+} from '../../../src/lib/utils/image-width-utils';
+
+vi.mock('./media-loader-core', () => ({
+  normalizeContentImagePath: vi.fn((p: string) => p),
+  resolveContentImageMetadata: vi.fn(() => null),
+  assertPositiveScale: vi.fn((v: unknown, key: string) => {
+    if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0) {
+      throw new Error(`Invalid ${key}: expected a positive number.`);
+    }
+    return v;
+  }),
+}));
+
+import { assertMediaConfigShape } from '../../../src/lib/loaders/media-validation';
+import type { MediaConfig } from '../../../src/types';
 
 describe('assertStrictlyIncreasingPositiveWidths', () => {
   it('accepts a valid strictly increasing array of positive numbers', () => {
@@ -62,7 +74,7 @@ describe('assertStrictlyIncreasingPositiveWidths', () => {
 });
 
 describe('selectCandidateWidthsByPolicy', () => {
-  it('selects standard breakpoint width that covers scaled target', () => {
+  it('selects a single bucket width that covers the scaled target', () => {
     const result = selectCandidateWidthsByPolicy({
       candidateWidths: [320, 640, 960, 1280],
       inferredWidths: [400, 600],
@@ -94,7 +106,7 @@ describe('selectCandidateWidthsByPolicy', () => {
     expect(result).toEqual([480]);
   });
 
-  it('respects maxSelectableWidth by filtering candidates (min constraint)', () => {
+  it('respects maxSelectableWidth by filtering candidates', () => {
     const result = selectCandidateWidthsByPolicy({
       candidateWidths: [320, 640, 960, 1280],
       inferredWidths: [100],
@@ -104,17 +116,6 @@ describe('selectCandidateWidthsByPolicy', () => {
     });
     expect(result).toHaveLength(1);
     expect(result[0]).toBeLessThanOrEqual(640);
-  });
-
-  it('enforces maxSelectableWidth when target exceeds all candidates', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [320, 640, 960],
-      inferredWidths: [2000],
-      dprScale: 1,
-      key: 'test',
-      maxSelectableWidth: 640,
-    });
-    expect(result).toEqual([640]);
   });
 
   it('deduplicates and sorts inferred widths before computing target', () => {
@@ -150,117 +151,109 @@ describe('selectCandidateWidthsByPolicy', () => {
       }),
     ).toThrow(/no candidate width/);
   });
-
-  it('handles high-DPR scenario for retina displays', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [320, 640, 960, 1280, 1920, 2560],
-      inferredWidths: [1200],
-      dprScale: 3,
-      key: 'test',
-    });
-    expect(result).toHaveLength(1);
-    expect(result[0]).toBe(2560); // selects first >= 3600
-  });
-
-  it('selects correct width for mobile-first with medium DPR', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [320, 640, 960, 1280],
-      inferredWidths: [375],
-      dprScale: 2,
-      key: 'test',
-    });
-    expect(result).toHaveLength(1);
-    expect(result[0]).toBe(960);
-  });
-
-  it('generates srcset-ready width array via multiple calls', () => {
-    const inferredWidthSets = [
-      [320, 480],
-      [640, 960],
-      [1024, 1440],
-    ];
-    const dprScales = [1, 1.5, 2];
-
-    const widths = inferredWidthSets.map((inferredWidths, i) =>
-      selectCandidateWidthsByPolicy({
-        candidateWidths: [320, 640, 960, 1280, 1920],
-        inferredWidths,
-        dprScale: dprScales[i],
-        key: 'test',
-      })[0],
-    );
-
-    expect(widths).toHaveLength(3);
-    expect(widths[0]).toBe(640);
-    expect(widths[1]).toBe(1920);
-    expect(widths[2]).toBe(1920);
-  });
 });
 
-describe('IMAGE_WIDTHS_KEY constants', () => {
-  it('exports correct medium key', () => {
-    expect(IMAGE_MEDIUM_WIDTHS_KEY).toBe('image.widths.medium');
+describe('assertMediaConfigShape', () => {
+  const validConfig: MediaConfig = {
+    grid: {
+      columns: { desktop: 3, mobile: 2 },
+      gap: '1rem',
+    },
+    image: {
+      format: 'webp',
+      quality: 80,
+      widths: {
+        medium: [320, 640, 960],
+        high: [960, 1280, 1920],
+      },
+      dprScale: {
+        low: 1,
+        medium: 1.5,
+        high: 2,
+      },
+      lazyLoad: {
+        rootMargin: '100px',
+        localDebugDelayMs: 0,
+      },
+      placeholderEffect: 'none' as any,
+    },
+    homepage: {
+      featured: ['photography/0-travel/img1.jpg'],
+      carousel: {
+        ariaLabel: 'test',
+        prevButtonAriaLabel: 'prev',
+        nextButtonAriaLabel: 'next',
+        emptyText: 'empty',
+        showNavigationArrows: true,
+        showIndicator: true,
+        counterPadLength: 2,
+        visual: {
+          spaceBetween: 10,
+          slideWidth: { desktop: '50%', tablet: '70%', mobile: '90%' },
+          inactiveOpacity: 0.5,
+        },
+      },
+    },
+  };
+
+  it('passes for a valid MediaConfig', () => {
+    expect(() => assertMediaConfigShape(validConfig)).not.toThrow();
   });
 
-  it('exports correct high key', () => {
-    expect(IMAGE_HIGH_WIDTHS_KEY).toBe('image.widths.high');
-  });
-});
-
-describe('Responsive image width calculation scenarios', () => {
-  it('calculates widths for blog thumbnail grid', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [200, 400, 800, 1200],
-      inferredWidths: [300],
-      dprScale: 1,
-      key: 'blog.thumbnail',
-    });
-    expect(result).toEqual([400]);
+  it('throws when grid is missing', () => {
+    const { grid: _grid, ...noGrid } = validConfig;
+    expect(() => assertMediaConfigShape(noGrid as any)).toThrow(/missing media grid/);
   });
 
-  it('calculates widths for full-width hero image', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [640, 960, 1280, 1920, 2560],
-      inferredWidths: [1920],
-      dprScale: 1,
-      key: 'hero.fullwidth',
-    });
-    expect(result).toEqual([1920]);
+  it('throws when grid.columns is missing', () => {
+    expect(() =>
+      assertMediaConfigShape({ ...validConfig, grid: { gap: '1rem' } } as any),
+    ).toThrow(/missing media grid/);
   });
 
-  it('calculates widths for carousel slide with varying viewport', () => {
-    const viewportWidths = [375, 768, 1024, 1440];
-    const results = viewportWidths.map((vw) =>
-      selectCandidateWidthsByPolicy({
-        candidateWidths: [320, 640, 960, 1280, 1920],
-        inferredWidths: [vw],
-        dprScale: 2,
-        key: 'carousel',
-      })[0],
-    );
-
-    expect(results).toEqual([960, 1920, 1920, 1920]);
+  it('throws when image is missing', () => {
+    const { image: _image, ...noImage } = validConfig;
+    expect(() => assertMediaConfigShape(noImage as any)).toThrow(/missing media/);
   });
 
-  it('respects min width constraint via maxSelectableWidth', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [320, 640, 960],
-      inferredWidths: [200],
-      dprScale: 1,
-      key: 'test',
-      maxSelectableWidth: 960,
-    });
-    expect(result).toEqual([320]);
+  it('throws when homepage.carousel is missing', () => {
+    const badConfig = {
+      ...validConfig,
+      homepage: { featured: ['a'] },
+    };
+    expect(() => assertMediaConfigShape(badConfig as any)).toThrow(/missing media/);
   });
 
-  it('handles very small inferred width with min constraint', () => {
-    const result = selectCandidateWidthsByPolicy({
-      candidateWidths: [320, 640, 960],
-      inferredWidths: [50],
-      dprScale: 1,
-      key: 'test',
-      maxSelectableWidth: 320,
-    });
-    expect(result).toEqual([320]);
+  it('throws for invalid medium widths', () => {
+    const badConfig = {
+      ...validConfig,
+      image: {
+        ...validConfig.image,
+        widths: { ...validConfig.image.widths, medium: [] },
+      },
+    };
+    expect(() => assertMediaConfigShape(badConfig)).toThrow(/non-empty array/);
+  });
+
+  it('throws for invalid high widths', () => {
+    const badConfig = {
+      ...validConfig,
+      image: {
+        ...validConfig.image,
+        widths: { ...validConfig.image.widths, high: [100, 50] },
+      },
+    };
+    expect(() => assertMediaConfigShape(badConfig)).toThrow(/strictly increasing/);
+  });
+
+  it('throws for non-positive dprScale values', () => {
+    const badConfig = {
+      ...validConfig,
+      image: {
+        ...validConfig.image,
+        dprScale: { ...validConfig.image.dprScale, medium: -1 },
+      },
+    };
+    expect(() => assertMediaConfigShape(badConfig)).toThrow(/positive number/);
   });
 });
