@@ -6,9 +6,14 @@
  *   resolveStarfieldEffectConfig(raw) -> validated StarfieldEffectConfig
  *
  * Types:
- *   StarfieldEffectConfig, SiteEffectsConfig
+ *   StarfieldEffectConfig
  */
 
-export type { StarfieldEffectConfig, SiteEffectsConfig } from './types';
+import { registerEffectsResolver } from '../../lib/domain/effects-resolver';
+import { resolveStarfieldEffectConfig } from './config';
+
+export type { StarfieldEffectConfig } from './types';
 export { initStarfield } from './runtime';
 export { resolveStarfieldEffectConfig } from './config';
+
+registerEffectsResolver('starfield', resolveStarfieldEffectConfig);

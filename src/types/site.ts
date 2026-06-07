@@ -1,7 +1,7 @@
 // IMPORTANT: Imports HomePageConfig from ./home-config.ts to avoid circular dependency with ./home.ts
 import type { HomePageConfig } from './home-config';
 import type { MediaGridConfig, SiteImageConfig } from './image-config';
-import type { SiteEffectsConfig } from '../plugins/starfield';
+import type { SiteEffectsConfig } from './effects';
 import type { ResolvedProfileData } from './profile';
 import type { ContentImage } from './media';
 

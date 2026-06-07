@@ -1,10 +1,6 @@
-import {
-  loadHomepageConfig,
-  loadIntroduction,
-  loadProfile,
-  loadSiteConfig,
-} from './config-loader';
-import { compareNatural } from '../utils/content-normalize';
+import { loadHomepageConfig, loadSiteConfig } from './config-loader';
+import { loadIntroduction, loadProfile } from './profile-loader';
+import { compareNatural, trimProfileFacts } from '../utils/content-normalize';
 import type {
   AboutPageData,
   ContentImage,
@@ -46,7 +42,7 @@ function normalizeProfileForHome(profileData: ProfileData): ResolvedProfileData 
   const location = requireProfileFactValue(profileData, 'location');
 
   return {
-    facts: profileData.facts,
+    facts: trimProfileFacts(profileData.facts),
     email: profileData.email,
     website: profileData.website,
     social: profileData.social,
@@ -60,6 +56,7 @@ function resolveAvatarAltFromProfile(profileData: ProfileData): string {
   return requireProfileFactValue(profileData, 'name');
 }
 
+/** Composes the full about page by combining frame data with the avatar image. */
 export async function loadAboutPage(): Promise<AboutPageData> {
   const frame = await loadAboutPageFrame();
   const avatarImage = await loadAboutAvatarImage(frame.profile);
@@ -72,6 +69,7 @@ export async function loadAboutPage(): Promise<AboutPageData> {
   };
 }
 
+/** Loads about page core data in parallel to minimize async overhead. */
 export async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarImage'>> {
   const [profileData, introduction, publications] = await Promise.all([
     loadProfile(),
@@ -86,6 +84,10 @@ export async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarI
   };
 }
 
+/**
+ * Resolves the avatar image with alt text derived from the profile name.
+ * @throws Error if the avatar image is missing
+ */
 export async function loadAboutAvatarImage(profileData: ProfileData): Promise<ContentImage> {
   const aboutImageOptions = await computeContentImageOptions('about', {
     alt: resolveAvatarAltFromProfile(profileData),
@@ -99,6 +101,7 @@ export async function loadAboutAvatarImage(profileData: ProfileData): Promise<Co
   return avatarImage;
 }
 
+/** Loads, normalizes, and sorts all publication entries by date. */
 export async function loadPublications(): Promise<Publication[]> {
   return Object.entries(PUBLICATION_MODULES)
     .sort(([pathA], [pathB]) => compareNatural(pathA, pathB))
@@ -107,6 +110,7 @@ export async function loadPublications(): Promise<Publication[]> {
     .sort((a, b) => compareNatural(b.date, a.date));
 }
 
+/** Composes homepage data by merging profile and site configuration. */
 export async function loadHomePage(): Promise<HomePageData> {
   const [profileData, homepageConfig] = await Promise.all([
     loadProfile(),

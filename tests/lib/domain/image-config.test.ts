@@ -94,7 +94,7 @@ describe('resolveSiteImageConfig', () => {
     };
 
     expect(() => resolveSiteImageConfig(configWithEmptyMedium)).toThrow(
-      'Missing or invalid image.widths.medium (must be a non-empty number array)'
+      'Missing or invalid image.widths.medium (must be a non-empty array of positive integers)'
     );
   });
 
@@ -108,7 +108,7 @@ describe('resolveSiteImageConfig', () => {
     };
 
     expect(() => resolveSiteImageConfig(configWithEmptyHigh)).toThrow(
-      'Missing or invalid image.widths.high (must be a non-empty number array)'
+      'Missing or invalid image.widths.high (must be a non-empty array of positive integers)'
     );
   });
 
@@ -136,13 +136,13 @@ describe('resolveSiteImageConfig', () => {
     };
 
     expect(() => resolveSiteImageConfig(configWithZeroWidth)).toThrow(
-      'Missing or invalid image.widths.medium entry (must be positive integer)'
+      'Missing or invalid image.widths.medium[0] (must be a positive integer, received 0)'
     );
     expect(() => resolveSiteImageConfig(configWithNegativeWidth)).toThrow(
-      'Missing or invalid image.widths.medium entry (must be positive integer)'
+      'Missing or invalid image.widths.medium[0] (must be a positive integer, received -100)'
     );
     expect(() => resolveSiteImageConfig(configWithFloatWidth)).toThrow(
-      'Missing or invalid image.widths.medium entry (must be positive integer)'
+      'Missing or invalid image.widths.medium[0] (must be a positive integer, received 400.5)'
     );
   });
 

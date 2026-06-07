@@ -15,16 +15,25 @@ interface DeferredMountBootstrapConfig {
 }
 
 function parseBootstrapConfig(serializedConfig: string): DeferredMountBootstrapConfig {
-  const rawConfig = JSON.parse(serializedConfig);
-  const rootMargin = assertString(rawConfig?.rootMargin, 'deferred mount bootstrap rootMargin');
+  let rawConfig: unknown;
+  try {
+    rawConfig = JSON.parse(serializedConfig);
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      throw new Error(`Invalid deferred mount bootstrap config: ${e.message}`);
+    }
+    throw e;
+  }
+  const config = rawConfig as Record<string, unknown>;
+  const rootMargin = assertString(config?.rootMargin, 'deferred mount bootstrap rootMargin');
 
-  if (typeof rawConfig?.mountDelayMs !== 'number' || rawConfig.mountDelayMs < 0) {
+  if (typeof config?.mountDelayMs !== 'number' || config.mountDelayMs < 0) {
     throw new Error('Invalid deferred mount bootstrap mountDelayMs.');
   }
 
   return {
     rootMargin,
-    mountDelayMs: rawConfig.mountDelayMs,
+    mountDelayMs: config.mountDelayMs as number,
   };
 }
 
@@ -71,6 +80,11 @@ export function buildDeferredMountBootstrapOptions(
   };
 }
 
+/**
+ * Wraps deferred mount initialization in a try/catch so one failed group
+ * does not crash the page or block other groups. Deferred mounts are
+ * non-critical; graceful degradation keeps the rest of the page usable.
+ */
 export function initDeferredMountGroupSafely(
   options: DeferredMountBootstrapOptions,
   errorContext: string,
@@ -82,6 +96,11 @@ export function initDeferredMountGroupSafely(
   }
 }
 
+/**
+ * Convenience wrapper that bootstraps deferred mounts for the home carousel
+ * image group. Encapsulates the specific selector and config key pairing
+ * so page-level code does not repeat them.
+ */
 export function initHomeCarouselDeferredMounts(): void {
   initDeferredMountGroupSafely(
     buildDeferredMountBootstrapOptions(

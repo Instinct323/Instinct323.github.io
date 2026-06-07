@@ -44,6 +44,11 @@ function hideCanvases(backgroundCanvas: HTMLCanvasElement, starsCanvas: HTMLCanv
   starsCanvas.style.display = 'none';
 }
 
+/**
+ * Initializes the starfield canvas animation if enabled and motion is not reduced.
+ * Returns a cleanup function so the caller can properly dispose event listeners
+ * and animation frames to avoid memory leaks.
+ */
 export function initStarfield(
   backgroundCanvas: HTMLCanvasElement,
   starsCanvas: HTMLCanvasElement,

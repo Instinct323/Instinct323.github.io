@@ -1,6 +1,13 @@
 import type { HomePageCarouselVisualConfig } from '../../types';
 import { assertFiniteNumber } from '../utils/assertions';
 
+/**
+ * Validates and normalizes the carousel visual configuration.
+ * Fail-fast validation ensures missing or invalid slide width values
+ * are caught early before they break responsive layout.
+ *
+ * @throws When slideWidth breakpoints or spaceBetween are missing/invalid.
+ */
 export function resolveFeaturedCarouselVisual(visual: unknown): HomePageCarouselVisualConfig {
   const source = visual && typeof visual === 'object' && !Array.isArray(visual)
     ? (visual as Partial<HomePageCarouselVisualConfig>)

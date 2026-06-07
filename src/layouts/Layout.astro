@@ -1,10 +1,12 @@
 ---
 import { getImage } from 'astro:assets';
-import { backgroundDesktopSource, backgroundMobileSource } from '../lib/loaders/content-paths';
+import { backgroundDesktopSource, backgroundMobileSource } from '../lib/loaders/content-modules';
 import LayoutHead from '../components/layout/LayoutHead.astro';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
-import { loadEffectsConfig, loadMediaConfig, loadSiteMetadata } from '../lib/loaders/config-loader';
+import '../plugins/starfield';
+import { loadMediaConfig, loadSiteMetadata } from '../lib/loaders/config-loader';
+import { loadEffectsConfig } from '../lib/loaders/photography-effects-loader';
 import { buildShellStyle, type LayoutProps } from '../lib/domain/layout-shell';
 import { RESPONSIVE_VIEWPORT_WIDTHS } from '../lib/utils/grid-width-utils';
 import { assertMediaConfigShape } from '../lib/loaders/media-validation';

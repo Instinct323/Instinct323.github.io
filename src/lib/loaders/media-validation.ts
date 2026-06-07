@@ -1,11 +1,11 @@
-import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, IMAGE_HIGH_WIDTHS_KEY, assertPositiveScale } from '../utils/image-width-utils';
+import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, IMAGE_HIGH_WIDTHS_KEY, assertPositiveScale, selectCandidateWidthsByPolicy } from '../utils/image-width-utils';
 import type {
   MediaConfig,
   HomePageImageConfig,
   HomePageCarouselConfig,
 } from '../../types';
 import { normalizeContentImagePath, resolveContentImageMetadata } from './media-loader-core';
-import { calculateCarouselWidths } from './media-responsive';
+import { computeCarouselInferredWidths } from './media-responsive';
 import { createCachedLoader } from '../utils/cache';
 
 export interface ValidatedHomepageGalleryConfig {
@@ -46,8 +46,29 @@ function validateHomepageFeaturedPath(entry: unknown, index: number): string {
   return normalizedPath;
 }
 
+export function calculateCarouselWidths(
+  slideWidth: HomePageCarouselConfig['visual']['slideWidth'],
+  candidateWidths: number[],
+  homepageDprScale: number,
+): number[] {
+  const inferredWidths = computeCarouselInferredWidths(slideWidth);
+
+  return selectCandidateWidthsByPolicy({
+    candidateWidths,
+    inferredWidths,
+    dprScale: homepageDprScale,
+    key: IMAGE_MEDIUM_WIDTHS_KEY,
+  });
+}
+
 /**
- * Loads and validates the homepage gallery configuration.
+ * Retrieves the homepage gallery configuration with fail-fast validation.
+ *
+ * Homepage gallery is a critical visual path — misconfiguration (missing featured images,
+ * invalid carousel dimensions, malformed image settings) would result in a broken or
+ * missing gallery at runtime. This function validates all configuration contracts upfront
+ * so the build fails immediately on misconfiguration rather than silently rendering
+ * an invalid state.
  *
  * @param getMediaConfigCached - A cached loader for media configuration
  * @returns Promise resolving to validated homepage gallery config

@@ -54,3 +54,15 @@ export function parseNumericAttr(
     : Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
+
+export interface ProfileFact {
+  id: string;
+  value: string;
+}
+
+export function trimProfileFacts(facts: ProfileFact[]): ProfileFact[] {
+  return facts.map((fact) => ({
+    id: fact.id.trim(),
+    value: fact.value.trim(),
+  }));
+}

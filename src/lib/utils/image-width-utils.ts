@@ -1,3 +1,5 @@
+import { assertPositiveIntegerArray } from './assertions';
+
 export const IMAGE_MEDIUM_WIDTHS_KEY = 'image.widths.medium';
 export const IMAGE_HIGH_WIDTHS_KEY = 'image.widths.high';
 
@@ -17,17 +19,11 @@ export function assertPositiveScale(value: unknown, key: string): number {
 }
 
 export function assertStrictlyIncreasingPositiveWidths(widths: unknown, key: string): number[] {
-  if (!Array.isArray(widths) || widths.length === 0) {
-    throw new Error(`Invalid ${key}: expected a non-empty array of strictly increasing positive numbers.`);
-  }
+  const validated = assertPositiveIntegerArray(widths, key);
 
   let previous = 0;
 
-  return widths.map((width, index) => {
-    if (typeof width !== 'number' || !Number.isFinite(width) || width <= 0) {
-      throw new Error(`Invalid ${key}[${index}]: expected a positive number, received ${String(width)}.`);
-    }
-
+  return validated.map((width) => {
     if (width <= previous) {
       throw new Error(`Invalid ${key}: expected a strictly increasing list of positive numbers.`);
     }

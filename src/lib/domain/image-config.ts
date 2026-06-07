@@ -6,6 +6,7 @@ import type {
 import {
   assertFiniteNumber,
   assertObject,
+  assertPositiveIntegerArray,
   assertString,
 } from '../utils/assertions';
 import {
@@ -19,6 +20,13 @@ function isImageLoadingEffectName(value: string): value is ImageLoadingEffectNam
   return IMAGE_LOADING_EFFECT_NAME_SET.has(value);
 }
 
+/**
+ * Validates the lazy-load subset of image config.
+ * Extracting this allows reuse by both the build-time image pipeline and
+ * the runtime deferred mount bootstrap.
+ *
+ * @throws When rootMargin is missing/invalid or localDebugDelayMs is not a non-negative integer.
+ */
 export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['lazyLoad'] {
   const source = assertObject<Partial<SiteImageConfig['lazyLoad']>>(config, 'image.lazyLoad');
   const rootMargin = assertString(source.rootMargin, 'image.lazyLoad.rootMargin');
@@ -37,6 +45,13 @@ export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['la
   };
 }
 
+/**
+ * Validates the placeholder effect name against the allowed set.
+ * Restricting to known effects prevents runtime errors from typos
+ * or unsupported effect names.
+ *
+ * @throws When the effect name is not in the registered set.
+ */
 export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageConfig['placeholderEffect'] {
   const effectName = assertString(config, 'image.placeholderEffect');
 
@@ -49,6 +64,11 @@ export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageC
   return effectName;
 }
 
+/**
+ * Derives the runtime deferred mount config from lazy-load settings.
+ * In development we add an artificial delay so developers can observe
+ * the loading behavior; in production we mount immediately for speed.
+ */
 export function resolveDeferredMountRuntimeConfig(
   lazyLoad: DeferredImageLazyLoadConfig,
   isDev: boolean,
@@ -59,6 +79,13 @@ export function resolveDeferredMountRuntimeConfig(
   };
 }
 
+/**
+ * Validates and normalizes the full site image configuration object.
+ * Centralizing validation ensures invalid config fails fast at build time
+ * rather than producing broken images at runtime.
+ *
+ * @throws When any required field is missing or out of range.
+ */
 export function resolveSiteImageConfig(config: unknown): SiteImageConfig {
   const source = assertObject<Partial<SiteImageConfig>>(config, 'image');
   const format = assertString(source.format, 'image.format');
@@ -70,19 +97,6 @@ export function resolveSiteImageConfig(config: unknown): SiteImageConfig {
 
   const widths = source.widths;
   const widthConfig = assertObject<SiteImageConfig['widths']>(widths, 'image.widths');
-
-  const normalizeWidths = (values: unknown, key: string): number[] => {
-    if (!Array.isArray(values) || values.length === 0) {
-      throw new Error(`Missing or invalid ${key} (must be a non-empty number array)`);
-    }
-
-    return values.map((value) => {
-      if (!Number.isInteger(value) || value <= 0) {
-        throw new Error(`Missing or invalid ${key} entry (must be positive integer)`);
-      }
-      return value;
-    });
-  };
 
   const dprScale = assertObject<SiteImageConfig['dprScale']>(source.dprScale, 'image.dprScale');
 
@@ -97,8 +111,8 @@ export function resolveSiteImageConfig(config: unknown): SiteImageConfig {
     format,
     quality,
     widths: {
-      medium: normalizeWidths(widthConfig.medium, 'image.widths.medium'),
-      high: normalizeWidths(widthConfig.high, 'image.widths.high'),
+      medium: assertPositiveIntegerArray(widthConfig.medium, 'image.widths.medium'),
+      high: assertPositiveIntegerArray(widthConfig.high, 'image.widths.high'),
     },
     dprScale: {
       low: lowScale,

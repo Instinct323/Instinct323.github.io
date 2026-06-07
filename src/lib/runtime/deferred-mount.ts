@@ -67,8 +67,9 @@ function mountDeferredNode(node: HTMLElement): void {
     template.remove();
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.mounted;
     waitForMountedContent(node, host);
-  // Silent: deferred mount failure - error state already handled
-  } catch {
+  // Deferred mount failed — error logged but UI state already handled (error state set below)
+  } catch (error) {
+    console.error('[deferred-mount]', error);
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.error;
     setPlaceholderMessage(node, 'Failed to load content.', 'error');
     node.querySelector<HTMLElement>(`[${DEFERRED_MOUNT_DATA.placeholder}]`)?.remove();
@@ -77,7 +78,13 @@ function mountDeferredNode(node: HTMLElement): void {
   }
 }
 
+/**
+ * Waits for images inside freshly mounted content to finish loading before
+ * removing the placeholder. Removing the placeholder early would cause layout
+ * shift and a flash of unstyled content.
+ */
 function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
+  // Detect images that may still be loading so we can gate the placeholder removal.
   const mountedImages = Array.from(host.querySelectorAll<HTMLImageElement>('img'));
   const placeholder = node.querySelector<HTMLElement>(`[${DEFERRED_MOUNT_DATA.placeholder}]`);
 
@@ -112,6 +119,11 @@ function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
   });
 }
 
+/**
+ * Mounts a deferred node immediately or after a configurable delay.
+ * The debug delay lets developers visually verify deferred mount behavior
+ * during development without changing production logic.
+ */
 function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
   if (mountDelayMs <= 0) {
     mountDeferredNode(node);
@@ -123,6 +135,13 @@ function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
   }, mountDelayMs);
 }
 
+/**
+ * Sets up intersection-based lazy mounting for deferred content nodes.
+ * Heavy DOM subtrees are deferred until they enter the viewport so initial
+ * page load stays fast and lightweight.
+ *
+ * @throws When selector, rootMargin, or mountDelayMs are missing or invalid.
+ */
 export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
   const { selector, rootMargin, mountDelayMs } = config;
 

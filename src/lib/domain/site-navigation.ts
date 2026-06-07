@@ -44,12 +44,18 @@ export function formatPageLabel(key: string): string {
 }
 
 function buildNavItems(routeKeys: string[]): SiteNavItem[] {
-  return routeKeys.map((key) => ({
-    key,
-    href: NAV_ROUTES[key].href,
-    navTestId: NAV_ROUTES[key].navTestId,
-    label: formatPageLabel(key),
-  }));
+  return routeKeys.map((key) => {
+    const route = NAV_ROUTES[key];
+    if (!route) {
+      throw new Error(`buildNavItems: key "${key}" not found in NAV_ROUTES`);
+    }
+    return {
+      key,
+      href: route.href,
+      navTestId: route.navTestId,
+      label: formatPageLabel(key),
+    };
+  });
 }
 
 export function buildPrimaryNavModel(navigation: NavigationConfig): SiteNavModel {

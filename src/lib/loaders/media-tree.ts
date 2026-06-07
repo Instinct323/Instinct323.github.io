@@ -2,18 +2,15 @@ import type { ImageMetadata } from 'astro';
 
 import { compareNatural } from '../utils/content-normalize';
 import { PHOTOGRAPHY_FILTER, CONTENT_IMAGE_PATH_PREFIX } from './content-paths';
-import { HOME_COVERFLOW_SIZES } from './media-responsive';
 import type {
-  ContentImage,
   ContentImageOptions,
-  FeaturedSlide,
   MediaAlbum,
   MediaCategory,
   MediaConfig,
   MediaImage,
   MediaTree,
 } from '../../types';
-import { parseMediaPath, createImageVariantSet } from './media-loader-core';
+import { parseMediaPath } from './media-loader-core';
 import { CONTENT_IMAGE_MODULES } from './astro-adapter';
 
 export type { ParsedMediaPath } from './media-loader-core';
@@ -96,39 +93,6 @@ function finalizeCategories(categoryMap: Map<string, CategoryAccumulator>): Medi
       albums: albums.length > 0 ? albums : undefined,
     };
   });
-}
-
-export async function createFeaturedSlide(image: ContentImage): Promise<FeaturedSlide> {
-  const variantSet = await createImageVariantSet(image);
-
-  return {
-    src: variantSet.src,
-    srcset: variantSet.srcset,
-    sizes: image.responsive.sizes ?? HOME_COVERFLOW_SIZES,
-    alt: image.alt,
-    width: variantSet.width,
-    height: variantSet.height,
-    aspectRatio: image.aspectRatio,
-    image,
-  };
-}
-
-export async function loadFeaturedSlidesForHomepage(
-  featuredPaths: string[],
-  homeImageOptions: ContentImageOptions,
-  loadContentImage: (_path: string, _options: ContentImageOptions) => Promise<ContentImage | null>
-): Promise<FeaturedSlide[]> {
-  const featuredImages = await Promise.all(featuredPaths.map(async (path) => {
-    const image = await loadContentImage(path, homeImageOptions);
-
-    if (!image) {
-      throw new Error(`Invalid homepage.featured: failed to load validated image "${path}".`);
-    }
-
-    return image;
-  }));
-
-  return Promise.all(featuredImages.map((image) => createFeaturedSlide(image)));
 }
 
 export async function loadMediaTreeFromGallery(

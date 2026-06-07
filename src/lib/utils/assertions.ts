@@ -30,6 +30,19 @@ export function assertPositiveInteger(value: unknown, key: string): number {
   return value;
 }
 
+export function assertPositiveIntegerArray(values: unknown, key: string): number[] {
+  if (!Array.isArray(values) || values.length === 0) {
+    throw new Error(`Missing or invalid ${key} (must be a non-empty array of positive integers)`);
+  }
+
+  return values.map((value, index) => {
+    if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
+      throw new Error(`Missing or invalid ${key}[${index}] (must be a positive integer, received ${String(value)})`);
+    }
+    return value;
+  });
+}
+
 export function assertObject<T extends object = Record<string, unknown>>(value: unknown, key: string): T {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error(`Missing or invalid ${key} configuration object`);

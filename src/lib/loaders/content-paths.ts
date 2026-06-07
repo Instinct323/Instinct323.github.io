@@ -26,12 +26,4 @@ export const AVATAR_JPG = `${ABOUT_DIR}/avatar.jpg`;
 export const DESKTOP_BG_JPG = `${BACKGROUND_DIR}/desktop.jpg`;
 export const MOBILE_BG_JPG = `${BACKGROUND_DIR}/mobile.jpg`;
 
-export {
-  introductionRaw,
-  profile,
-  siteConfigRaw,
-  backgroundDesktopSource,
-  backgroundMobileSource,
-} from './astro-adapter';
-
 export const ABOUT_AVATAR_SIZES = [180, 220] as const;

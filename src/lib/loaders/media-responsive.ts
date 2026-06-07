@@ -1,10 +1,7 @@
 import { RESPONSIVE_VIEWPORT_WIDTHS, computeGridCellWidths } from '../utils/grid-width-utils';
-import { selectCandidateWidthsByPolicy, IMAGE_MEDIUM_WIDTHS_KEY } from '../utils/image-width-utils';
-import type { MediaConfig, HomePageCarouselConfig } from '../../types';
+import type { MediaConfig } from '../../types';
 
 export const RESPONSIVE_WIDTH_STEPS = [320, 480, 640, 768, 960, 1200, 1600, 2000, 2400];
-export const HOME_COVERFLOW_MOBILE_BREAKPOINT = 767;
-export const HOME_COVERFLOW_SIZES = `(max-width: ${HOME_COVERFLOW_MOBILE_BREAKPOINT}px) 480px, (max-width: 1024px) 640px, 768px`;
 
 export interface ResponsiveWidthProfile {
   desktop: number;
@@ -88,19 +85,4 @@ export function computeGalleryWidthsFromGrid(grid: MediaConfig['grid']): number[
   ];
 
   return computeGridCellWidths(grid, viewports);
-}
-
-export function calculateCarouselWidths(
-  slideWidth: HomePageCarouselConfig['visual']['slideWidth'],
-  candidateWidths: number[],
-  homepageDprScale: number,
-): number[] {
-  const inferredWidths = computeCarouselInferredWidths(slideWidth);
-
-  return selectCandidateWidthsByPolicy({
-    candidateWidths,
-    inferredWidths,
-    dprScale: homepageDprScale,
-    key: IMAGE_MEDIUM_WIDTHS_KEY,
-  });
 }

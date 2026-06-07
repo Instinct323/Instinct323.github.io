@@ -10,9 +10,8 @@ import type {
   MediaImage,
   MediaTree,
 } from '../../types';
-import { loadContentImageResolved } from './media-loader-core';
+import { loadContentImageResolved, createImageVariantSet } from './media-loader-core';
 import {
-  HOME_COVERFLOW_SIZES,
   computeGalleryWidthsFromGrid,
 } from './media-responsive';
 import {
@@ -24,7 +23,6 @@ import {
   selectCandidateWidthsByPolicy,
 } from '../utils/image-width-utils';
 import {
-  loadFeaturedSlidesForHomepage,
   loadMediaTreeFromGallery,
 } from './media-tree';
 
@@ -34,6 +32,9 @@ const getMediaConfigCached = createCachedLoader(loadMediaConfig, {
 
 const ABOUT_AVATAR_SIZES_STRING = `(max-width: ${MOBILE_BREAKPOINT}px) ${ABOUT_AVATAR_SIZES[0]}px, ${ABOUT_AVATAR_SIZES[1]}px`;
 const ABOUT_AVATAR_INFERRED_WIDTHS = [...ABOUT_AVATAR_SIZES];
+
+export const HOME_COVERFLOW_MOBILE_BREAKPOINT = 767;
+export const HOME_COVERFLOW_SIZES = `(max-width: ${HOME_COVERFLOW_MOBILE_BREAKPOINT}px) 480px, (max-width: 1024px) 640px, 768px`;
 
 interface SurfaceSizingProfile {
   inferredWidths: number[];
@@ -108,6 +109,7 @@ function buildMediumSurfaceOptions(
   };
 }
 
+/** Derives responsive image options for a given surface, applying config defaults. */
 export async function computeContentImageOptions(
   surface: string,
   overrides: Partial<ContentImageOptions>
@@ -116,16 +118,51 @@ export async function computeContentImageOptions(
   return computeContentImageOptionsFromConfig(mediaConfig, surface, overrides);
 }
 
+/** Resolves a content image through the cached media config pipeline. */
 export async function loadContentImage(path: string, options: ContentImageOptions): Promise<ContentImage | null> {
   await getMediaConfigCached();
   return loadContentImageResolved(path, options);
 }
 
+/** Loads homepage featured slides with validated gallery config. */
 export async function loadFeaturedSlides(): Promise<FeaturedSlide[]> {
   const homepageGalleryConfig = await getValidatedHomepageGalleryConfig(getMediaConfigCached);
   const homeImageOptions = await computeContentImageOptions('home', {});
 
   return loadFeaturedSlidesForHomepage(homepageGalleryConfig.featured, homeImageOptions, loadContentImage);
+}
+
+export async function createFeaturedSlide(image: ContentImage): Promise<FeaturedSlide> {
+  const variantSet = await createImageVariantSet(image);
+
+  return {
+    src: variantSet.src,
+    srcset: variantSet.srcset,
+    sizes: image.responsive.sizes ?? HOME_COVERFLOW_SIZES,
+    alt: image.alt,
+    width: variantSet.width,
+    height: variantSet.height,
+    aspectRatio: image.aspectRatio,
+    image,
+  };
+}
+
+export async function loadFeaturedSlidesForHomepage(
+  featuredPaths: string[],
+  homeImageOptions: ContentImageOptions,
+  loadContentImage: (_path: string, _options: ContentImageOptions) => Promise<ContentImage | null>
+): Promise<FeaturedSlide[]> {
+  const featuredImages = await Promise.all(featuredPaths.map(async (path) => {
+    const image = await loadContentImage(path, homeImageOptions);
+
+    if (!image) {
+      throw new Error(`Invalid homepage.featured: failed to load validated image "${path}".`);
+    }
+
+    return image;
+  }));
+
+  return Promise.all(featuredImages.map((image) => createFeaturedSlide(image)));
 }
 
 function mapGalleryImage(path: string, options: ContentImageOptions): MediaImage | null {
@@ -146,6 +183,7 @@ function mapGalleryImage(path: string, options: ContentImageOptions): MediaImage
   };
 }
 
+/** Builds the full photography gallery tree with responsive image variants. */
 export async function loadMediaTree(): Promise<MediaTree> {
   const mediaConfig = await getMediaConfigCached();
   const galleryImageOptions = await computeContentImageOptionsFromConfig(mediaConfig, 'photography', {});

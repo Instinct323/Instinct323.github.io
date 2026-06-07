@@ -34,6 +34,7 @@ export interface ImageVariantSet {
 
 const CONTENT_IMAGE_EXTENSIONS = /\.(jpg|jpeg|png|webp)$/i;
 
+/** Sanitizes user-provided paths to prevent directory traversal and enforce extensions. */
 export function normalizeContentImagePath(path: string): string | null {
   const normalizedPath = path.trim().replace(/^\.\//, '').replace(/^\//, '');
 
@@ -44,6 +45,7 @@ export function normalizeContentImagePath(path: string): string | null {
   return normalizedPath.startsWith('content/') ? normalizedPath.slice('content/'.length) : normalizedPath;
 }
 
+/** Looks up image metadata from the Astro content module glob, with photography prefix fallback. */
 export function resolveContentImageMetadata(path: string): ImageMetadata | null {
   const normalizedPath = normalizeContentImagePath(path);
 
@@ -57,12 +59,13 @@ export function resolveContentImageMetadata(path: string): ImageMetadata | null 
     return directMatch;
   }
 
-  // Try with photography/ prefix for featured media paths
+  // Try with photography/ prefix for homepage media paths
   // config.jsonc paths like "0-travel/..." need to map to "photography/0-travel/..."
   const withPhotographyPrefix = `photography/${normalizedPath}`;
   return CONTENT_IMAGE_MODULES[`../../../content/${withPhotographyPrefix}`]?.default ?? null;
 }
 
+/** Extracts album, category, and alt text from photography content paths for semantic labeling. */
 export function parseMediaPath(path: string): ParsedMediaPath | null {
   const segments = path.split('/');
   const mediaIndex = segments.indexOf('photography');
@@ -157,6 +160,7 @@ function createContentImageResponsive(source: ImageMetadata, options: ContentIma
   };
 }
 
+/** Builds a complete ContentImage with responsive metadata from a content path. */
 export function loadContentImageResolved(path: string, options: ContentImageOptions): ContentImage | null {
   const normalizedPath = normalizeContentImagePath(path);
   const source = resolveContentImageMetadata(path);
@@ -188,6 +192,7 @@ function computeRenderableWidths(image: ContentImage): number[] {
   return normalizedWidths.length > 0 ? normalizedWidths : [image.width];
 }
 
+/** Generates Astro-optimized image variants and srcset for responsive rendering. */
 export async function createImageVariantSet(image: ContentImage): Promise<ImageVariantSet> {
   const widths = computeRenderableWidths(image);
   const variants = await Promise.all(

@@ -50,20 +50,20 @@ describe('assertStrictlyIncreasingPositiveWidths', () => {
 
   it('throws for zero or negative values', () => {
     expect(() => assertStrictlyIncreasingPositiveWidths([0, 100, 200], 'test.key')).toThrow(
-      /positive number/,
+      /positive integer/,
     );
     expect(() => assertStrictlyIncreasingPositiveWidths([-100, 100, 200], 'test.key')).toThrow(
-      /positive number/,
+      /positive integer/,
     );
   });
 
   it('throws for non-finite values (NaN, Infinity)', () => {
     expect(() => assertStrictlyIncreasingPositiveWidths([100, NaN, 200], 'test.key')).toThrow(
-      /positive number/,
+      /positive integer/,
     );
     expect(() =>
       assertStrictlyIncreasingPositiveWidths([100, Infinity, 200], 'test.key'),
-    ).toThrow(/positive number/);
+    ).toThrow(/positive integer/);
   });
 
   it('includes the key in error messages', () => {

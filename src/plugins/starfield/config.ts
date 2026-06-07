@@ -6,6 +6,13 @@ import {
   assertString,
 } from './assertions';
 
+/**
+ * Validates and normalizes the starfield effect configuration.
+ * The canvas animation has many interdependent numeric parameters;
+ * early validation prevents subtle runtime rendering bugs.
+ *
+ * @throws When any required field is missing, out of range, or has an invalid type.
+ */
 export function resolveStarfieldEffectConfig(config: unknown): StarfieldEffectConfig {
   const rawConfig = assertObject<Partial<StarfieldEffectConfig>>(config, 'effects.starfield');
 

@@ -23,6 +23,3 @@ export interface StarfieldEffectConfig {
   lineThickness: number;
 }
 
-export interface SiteEffectsConfig {
-  starfield: StarfieldEffectConfig;
-}
