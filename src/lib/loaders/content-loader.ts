@@ -1,6 +1,6 @@
 import { loadHomepageConfig, loadSiteConfig } from './config-loader';
 import { loadIntroduction, loadProfile } from './profile-loader';
-import { compareNatural, trimProfileFacts } from '../utils/content-normalize';
+import { compareNatural, compareByWeightAndDate, trimProfileFacts } from '../utils/content-normalize';
 import type { AboutPageData, Publication } from '../../types/site';
 import type { ContentImage } from '../../types/media';
 import type { HomePageData } from '../../types/home';
@@ -97,13 +97,21 @@ export async function loadAboutAvatarImage(profileData: ProfileData): Promise<Co
   return avatarImage;
 }
 
-/** Loads, normalizes, and sorts all publication entries by date. */
+/** Loads, normalizes, and sorts all publication entries by weight and date. */
 export async function loadPublications(): Promise<Publication[]> {
-  return Object.entries(PUBLICATION_MODULES)
+  const publications = Object.entries(PUBLICATION_MODULES)
     .sort(([pathA], [pathB]) => compareNatural(pathA, pathB))
     .map(([filePath, mod]) => normalizePublication(mod.default, filePath))
-    .filter(Boolean)
-    .sort((a, b) => compareNatural(b.date, a.date));
+    .filter(Boolean);
+
+  publications.sort((a, b) =>
+    compareByWeightAndDate(
+      { weight: a.weight ?? 0, date: a.date, slug: a.title },
+      { weight: b.weight ?? 0, date: b.date, slug: b.title }
+    )
+  );
+
+  return publications;
 }
 
 /** Composes homepage data by merging profile and site configuration. */

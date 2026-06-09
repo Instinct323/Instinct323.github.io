@@ -1,4 +1,5 @@
 import { parseMarkdownWithFrontmatter } from '../utils/markdown';
+import { compareByWeightAndDate } from '../utils/content-normalize';
 import { BLOG_POST_MODULES } from './astro-adapter';
 
 export interface BlogPost {
@@ -38,17 +39,7 @@ export function extractDateFromSlug(slug: string): Date | null {
   return null;
 }
 
-export function compareBlogPosts(a: BlogPost, b: BlogPost): number {
-  if (a.weight !== b.weight) {
-    return b.weight - a.weight;
-  }
-  if (a.date === null && b.date !== null) return -1;
-  if (a.date !== null && b.date === null) return 1;
-  if (a.date && b.date) {
-    return b.date.getTime() - a.date.getTime();
-  }
-  return a.slug.localeCompare(b.slug);
-}
+export const compareBlogPosts = compareByWeightAndDate;
 
 export function loadBlogPosts(): BlogPost[] {
   const entries = Object.entries(BLOG_POST_MODULES);

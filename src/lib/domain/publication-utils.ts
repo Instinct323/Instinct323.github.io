@@ -9,6 +9,7 @@ interface RawPublication {
   date?: unknown;
   source?: unknown;
   links?: unknown;
+  weight?: unknown;
 }
 
 function assertNonEmptyString(value: unknown, key: string, filePath: string): string {
@@ -71,7 +72,7 @@ export function normalizePublication(rawValue: unknown, filePath: string): Publi
   const title = assertNonEmptyString(raw.title, 'title', filePath);
   const date = assertNonEmptyString(raw.date, 'date', filePath);
 
-  return {
+  const publication: Publication = {
     title,
     date,
     authors: assertAuthors(raw.authors, filePath),
@@ -79,6 +80,12 @@ export function normalizePublication(rawValue: unknown, filePath: string): Publi
     source: typeof raw.source === 'string' && raw.source.trim() ? raw.source.trim() : undefined,
     links: normalizePublicationLinks(raw),
   };
+
+  if (typeof raw.weight === 'number') {
+    publication.weight = raw.weight;
+  }
+
+  return publication;
 }
 
 export interface PublicationLinkEntry {

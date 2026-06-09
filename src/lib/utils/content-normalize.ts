@@ -58,6 +58,37 @@ export function parseNumericAttr(
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+export interface WeightedContent {
+  weight: number;
+  date: Date | string | null;
+  slug: string;
+}
+
+function getDateTime(date: Date | string | null): number | null {
+  if (date === null) return null;
+  if (date instanceof Date) return date.getTime();
+  const parsed = new Date(date);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+}
+
+/**
+ * Sorts weighted content by: weight descending, null dates before non-null dates,
+ * then by date descending, and finally by slug as a tiebreaker.
+ */
+export function compareByWeightAndDate(a: WeightedContent, b: WeightedContent): number {
+  if (a.weight !== b.weight) {
+    return b.weight - a.weight;
+  }
+  const timeA = getDateTime(a.date);
+  const timeB = getDateTime(b.date);
+  if (timeA === null && timeB !== null) return -1;
+  if (timeA !== null && timeB === null) return 1;
+  if (timeA !== null && timeB !== null) {
+    return timeB - timeA;
+  }
+  return a.slug.localeCompare(b.slug);
+}
+
 export interface ProfileFact {
   id: string;
   value: string;
