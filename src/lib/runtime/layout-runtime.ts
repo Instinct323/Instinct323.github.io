@@ -1,6 +1,7 @@
 import { getEffectsResolver } from '../domain/effects-resolver';
 import { parseDatasetPayload } from '../utils/dataset';
 import { runWhenIdle, SHELL_BACKGROUND_TIMEOUT, SHELL_BACKGROUND_FALLBACK } from './scheduling';
+import '../../plugins/starfield';
 
 const ENABLE_STARFIELD = true;
 
