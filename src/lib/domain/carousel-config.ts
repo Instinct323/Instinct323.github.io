@@ -1,4 +1,4 @@
-import type { HomePageCarouselVisualConfig } from '../../types';
+import type { HomePageCarouselVisualConfig } from '../../types/carousel';
 import { assertFiniteNumber } from '../utils/assertions';
 
 /**

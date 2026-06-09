@@ -35,6 +35,7 @@ export interface DeferredImageLazyLoadConfig {
 }
 
 export interface DeferredMountRuntimeConfig {
+  selector: string;
   rootMargin: string;
   mountDelayMs: number;
 }

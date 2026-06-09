@@ -1,4 +1,4 @@
-import { assertPositiveIntegerArray } from './assertions';
+import { assertFiniteNumber, assertPositiveIntegerArray } from './assertions';
 
 export const IMAGE_MEDIUM_WIDTHS_KEY = 'image.widths.medium';
 export const IMAGE_HIGH_WIDTHS_KEY = 'image.widths.high';
@@ -12,10 +12,11 @@ export interface CandidateWidthPolicyInput {
 }
 
 export function assertPositiveScale(value: unknown, key: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+  const num = assertFiniteNumber(value, key);
+  if (num <= 0) {
     throw new Error(`Invalid ${key}: expected a positive number.`);
   }
-  return value;
+  return num;
 }
 
 export function assertStrictlyIncreasingPositiveWidths(widths: unknown, key: string): number[] {

@@ -5,7 +5,7 @@ import {
   resolveDeferredMountRuntimeConfig,
   resolveImagePlaceholderEffectConfig,
 } from '../../../src/lib/domain/image-config';
-import type { SiteImageConfig } from '../../../src/types';
+import type { SiteImageConfig } from '../../../src/types/image-config';
 import type { DeferredImageLazyLoadConfig } from '../../../src/types/page-load';
 
 describe('resolveSiteImageConfig', () => {

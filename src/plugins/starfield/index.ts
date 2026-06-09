@@ -11,9 +11,11 @@
 
 import { registerEffectsResolver } from '../../lib/domain/effects-resolver';
 import { resolveStarfieldEffectConfig } from './config';
+import { initStarfield } from './runtime';
 
 export type { StarfieldEffectConfig } from './types';
 export { initStarfield } from './runtime';
 export { resolveStarfieldEffectConfig } from './config';
 
 registerEffectsResolver('starfield', resolveStarfieldEffectConfig);
+registerEffectsResolver('starfield-runtime', initStarfield as (_config: unknown) => unknown);

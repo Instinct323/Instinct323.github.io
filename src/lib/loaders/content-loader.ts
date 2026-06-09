@@ -1,17 +1,13 @@
 import { loadHomepageConfig, loadSiteConfig } from './config-loader';
 import { loadIntroduction, loadProfile } from './profile-loader';
 import { compareNatural, trimProfileFacts } from '../utils/content-normalize';
-import type {
-  AboutPageData,
-  ContentImage,
-  HomePageData,
-  ProfileData,
-  Publication,
-  ResolvedProfileData,
-} from '../../types';
+import type { AboutPageData, Publication } from '../../types/site';
+import type { ContentImage } from '../../types/media';
+import type { HomePageData } from '../../types/home';
+import type { ProfileData, ResolvedProfileData } from '../../types/profile';
 import {
   computeContentImageOptions,
-  loadContentImage,
+  loadContentImageWithConfigValidation,
 } from './media-loader';
 import { renderMarkdown } from '../utils/markdown';
 import { normalizePublication } from '../domain/publication-utils';
@@ -92,7 +88,7 @@ export async function loadAboutAvatarImage(profileData: ProfileData): Promise<Co
   const aboutImageOptions = await computeContentImageOptions('about', {
     alt: resolveAvatarAltFromProfile(profileData),
   });
-  const avatarImage = await loadContentImage(AVATAR_JPG.replace('../../content/', ''), aboutImageOptions);
+  const avatarImage = await loadContentImageWithConfigValidation(AVATAR_JPG.replace('../../content/', ''), aboutImageOptions);
 
   if (!avatarImage) {
     throw new Error(`Missing about avatar image: ${AVATAR_JPG}`);

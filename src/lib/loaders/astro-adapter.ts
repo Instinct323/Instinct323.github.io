@@ -5,12 +5,24 @@
  * - import.meta.glob results
  * - ?raw imports
  * - Static asset imports
- *
- * Functions like getImage are imported directly where needed.
+ * - astro:assets functions and components (getImage, Image)
  */
 
 import type { ImageMetadata } from 'astro';
-import type { Publication } from '../../types';
+import { getImage, Image } from 'astro:assets';
+import type { Publication } from '../../types/site';
+
+// =============================================================================
+// Astro Assets Wrapper (isolates astro:assets imports)
+// =============================================================================
+
+/** Thin wrapper around Astro's getImage to keep astro:assets imports centralized. */
+export async function optimizeImage(options: Parameters<typeof getImage>[0]) {
+  return getImage(options);
+}
+
+/** Re-export Astro's Image component for centralized framework access. */
+export { Image };
 
 // =============================================================================
 // Content Module Globs (Vite import.meta.glob)

@@ -89,6 +89,7 @@ function assertPrimaryNavOrder(routeHtml, route, cfg) {
     const hrefMap = {
       home: '/',
       about: '/about/',
+      blog: '/blog/',
       photography: '/photography/',
     };
     return { key, href: hrefMap[key] };

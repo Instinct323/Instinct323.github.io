@@ -1,6 +1,6 @@
-import { getSiteConfigInternal } from './config-cache';
+import { loadSiteConfig } from './config-cache';
 import { resolveEffectsConfig } from '../domain/effects-resolver';
-import type { PhotographyPageConfig, SiteConfig } from '../../types';
+import type { PhotographyPageConfig, SiteConfig } from '../../types/site';
 import type { SiteEffectsConfig } from '../../types/effects';
 
 function resolvePhotographyConfig(config: SiteConfig['photography']): PhotographyPageConfig {
@@ -20,7 +20,7 @@ function resolvePhotographyConfig(config: SiteConfig['photography']): Photograph
  * @throws Error if grid configuration is missing or invalid
  */
 export function loadPhotography(): PhotographyPageConfig {
-  return resolvePhotographyConfig(getSiteConfigInternal().photography);
+  return resolvePhotographyConfig(loadSiteConfig().photography);
 }
 
 /**
@@ -28,7 +28,7 @@ export function loadPhotography(): PhotographyPageConfig {
  * @throws Error if effects configuration is missing or invalid
  */
 export async function loadEffectsConfig(): Promise<SiteEffectsConfig> {
-  const effects = getSiteConfigInternal().effects;
+  const effects = loadSiteConfig().effects;
   if (!effects || typeof effects !== 'object' || Array.isArray(effects)) {
     throw new Error('Missing or invalid effects configuration');
   }

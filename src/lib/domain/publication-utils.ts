@@ -1,5 +1,6 @@
-import type { Publication } from '../../types';
+import type { Publication } from '../../types/site';
 import { assertString } from '../utils/assertions';
+import { wordsToTitle } from '../utils/content-normalize';
 
 interface RawPublication {
   title?: unknown;
@@ -87,12 +88,7 @@ export interface PublicationLinkEntry {
 }
 
 export function formatPublicationLinkLabel(name: string): string {
-  return name
-    .trim()
-    .split(/[\s_-]+/)
-    .filter(Boolean)
-    .map((segment) => segment[0].toUpperCase() + segment.slice(1))
-    .join(' ');
+  return wordsToTitle(name.trim().replace(/[\s_]+/g, '-').split('-'));
 }
 
 export function resolvePublicationLinks(publication: Publication): PublicationLinkEntry[] {

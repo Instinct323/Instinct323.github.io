@@ -1,6 +1,5 @@
 import type { ImageMetadata } from 'astro';
-import { getImage } from 'astro:assets';
-import { CONTENT_IMAGE_MODULES } from './astro-adapter';
+import { CONTENT_IMAGE_MODULES, optimizeImage } from './astro-adapter';
 
 import {
   filenameWithoutExt,
@@ -16,7 +15,7 @@ import type {
   ContentImage,
   ContentImageOptions,
   ContentImageResponsive,
-} from '../../types';
+} from '../../types/media';
 
 export interface ParsedMediaPath {
   album?: string;
@@ -117,6 +116,7 @@ function resolveContentImageAlt(path: string, alt?: string): string {
   return fallbackAltFromContentPath(path);
 }
 
+/** Scales the source image width so its longest edge does not exceed maxLongEdge, preserving aspect ratio. */
 function getMaxResponsiveWidth(source: ImageMetadata, maxLongEdge: number): number {
   const longEdge = Math.max(source.width, source.height);
   const scale = Math.min(1, maxLongEdge / longEdge);
@@ -139,6 +139,7 @@ function computeResponsiveWidths(source: ImageMetadata, options: ContentImageOpt
   return Array.from(new Set(widths.filter(width => width > 0))).sort((a, b) => a - b);
 }
 
+/** Builds responsive width metadata and validates format/quality before generating the responsive descriptor. */
 function createContentImageResponsive(source: ImageMetadata, options: ContentImageOptions): ContentImageResponsive {
   const widths = computeResponsiveWidths(source, options);
 
@@ -180,11 +181,13 @@ export function loadContentImageResolved(path: string, options: ContentImageOpti
   };
 }
 
+/** Caps explicit widths to the source image width. Falls back to the full source width when every explicit width is larger, so the responsive set is never empty. */
 function capWidthsBySourceWidth(widths: number[], sourceWidth: number): number[] {
   const bounded = widths.filter((width) => width <= sourceWidth);
   return bounded.length > 0 ? bounded : [sourceWidth];
 }
 
+/** Normalizes responsive widths, deduplicates, and falls back to the full image width when the set would otherwise be empty (e.g. all widths were filtered out as invalid or oversized). */
 function computeRenderableWidths(image: ContentImage): number[] {
   const responsiveWidths = image.responsive.widths
     .filter((width) => Number.isInteger(width) && width > 0 && width <= image.width);
@@ -197,7 +200,7 @@ export async function createImageVariantSet(image: ContentImage): Promise<ImageV
   const widths = computeRenderableWidths(image);
   const variants = await Promise.all(
     widths.map((width) =>
-      getImage({
+      optimizeImage({
         src: image.source,
         width,
         format: image.responsive.format,

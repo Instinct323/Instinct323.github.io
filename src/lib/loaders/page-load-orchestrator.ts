@@ -16,9 +16,17 @@ export function resolveControlImageLoading(priority: ControlImagePriority): Cont
   return { loading: 'lazy', decoding: 'async', fetchPriority: 'auto' };
 }
 
-export async function orchestratePageLoad<TFrame, TBackground = null, TControls = null>(
-  plan: PageLoadPlan<TFrame, TBackground, TControls>,
-): Promise<PageLoadResult<TFrame, TBackground, TControls>> {
+/**
+ * Executes a page-load plan in three sequential stages: frame, controls,
+ * background. Kept as a dedicated function so the orchestration order is
+ * defined in one place; future rules (parallel controls, timeouts,
+ * retries) can be added here without touching every page.
+ */
+export async function orchestratePageLoad<
+  TFrame,
+  TBackground = undefined,
+  TControls = null
+>(plan: PageLoadPlan<TFrame, TBackground, TControls>): Promise<PageLoadResult<TFrame, TBackground, TControls>> {
   const frame = await plan.frame();
   const controls = plan.controls ? await plan.controls({ frame }) : null;
   const background = plan.background ? await plan.background({ frame }) : null;

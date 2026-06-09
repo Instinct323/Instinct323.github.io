@@ -1,4 +1,4 @@
-import type { SiteImageConfig } from '../../types';
+import type { SiteImageConfig } from '../../types/image-config';
 import type {
   DeferredImageLazyLoadConfig,
   DeferredMountRuntimeConfig,
@@ -72,7 +72,7 @@ export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageC
 export function resolveDeferredMountRuntimeConfig(
   lazyLoad: DeferredImageLazyLoadConfig,
   isDev: boolean,
-): DeferredMountRuntimeConfig {
+): Omit<DeferredMountRuntimeConfig, 'selector'> {
   return {
     rootMargin: lazyLoad.rootMargin,
     mountDelayMs: isDev ? lazyLoad.localDebugDelayMs : 0,

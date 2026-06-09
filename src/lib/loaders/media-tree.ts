@@ -2,14 +2,8 @@ import type { ImageMetadata } from 'astro';
 
 import { compareNatural } from '../utils/content-normalize';
 import { PHOTOGRAPHY_FILTER, CONTENT_IMAGE_PATH_PREFIX } from './content-paths';
-import type {
-  ContentImageOptions,
-  MediaAlbum,
-  MediaCategory,
-  MediaConfig,
-  MediaImage,
-  MediaTree,
-} from '../../types';
+import type { ContentImageOptions, MediaAlbum, MediaCategory, MediaImage, MediaTree } from '../../types/media';
+import type { MediaConfig } from '../../types/site';
 import { parseMediaPath } from './media-loader-core';
 import { CONTENT_IMAGE_MODULES } from './astro-adapter';
 
@@ -78,6 +72,7 @@ export function compareMediaModuleEntries(
   return compareNatural(pathA, pathB);
 }
 
+/** Type guard for Vite glob results: Astro image imports are objects with a `default` export containing ImageMetadata, but the glob type is too broad to guarantee this at compile time. */
 function isImageModuleEntry(mod: unknown): mod is ImageModuleEntry {
   return mod !== null && typeof mod === 'object' && 'default' in mod;
 }

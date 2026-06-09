@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { HomePageConfig } from '../../src/types/home-config';
 import type { HomePageConfig as HomePageConfigFromHome } from '../../src/types/home';
-import type { HomePageConfig as HomePageConfigFromBarrel } from '../../src/types';
 
 describe('HomePageConfig type extraction', () => {
   it('has all required fields with correct types', () => {
@@ -75,39 +74,5 @@ describe('HomePageConfig type extraction', () => {
       },
     };
     expect(config).toBeDefined();
-  });
-
-  it('can be imported from barrel index.ts', () => {
-    const config: HomePageConfigFromBarrel = {
-      hero: { eyebrow: 'barrel' },
-      layout: {
-        contentWidth: 'compact',
-        sectionOrder: ['carousel'],
-        editorialGapVariant: 'tight',
-      },
-      editorialHero: {
-        deckFields: ['location', 'organization'],
-        showDeckDivider: true,
-      },
-      featuredMedia: {
-        items: ['a.jpg', 'b.jpg'],
-        carousel: {
-          ariaLabel: 'Gallery',
-          prevButtonAriaLabel: 'Prev',
-          nextButtonAriaLabel: 'Next',
-          emptyText: 'None',
-          showNavigationArrows: true,
-          showIndicator: true,
-          counterPadLength: 2,
-          visual: {
-            spaceBetween: 32,
-            slideWidth: { desktop: '50%', tablet: '50%', mobile: '100%' },
-            inactiveOpacity: 0.7,
-          },
-        },
-      },
-    };
-    expect(config).toBeDefined();
-    expect(config.hero.eyebrow).toBe('barrel');
   });
 });

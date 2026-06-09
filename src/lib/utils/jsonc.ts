@@ -1,41 +1,18 @@
-/**
- * Strips JSONC comments and trailing commas from a string for JSON.parse.
- * Handles // line comments, slash-star block comments, and strings containing comment markers.
- */
-export function stripJsoncComments(raw: string): string {
-  let result = '';
-  let i = 0;
-  const len = raw.length;
+import { parse, type ParseError } from 'jsonc-parser';
 
-  while (i < len) {
-    if (raw[i] === '"') {
-      let j = i + 1;
-      while (j < len && raw[j] !== '"') {
-        if (raw[j] === '\\') j++;
-        j++;
-      }
-      result += raw.slice(i, j + 1);
-      i = j + 1;
-      continue;
-    }
+// Fatal error codes that indicate truly invalid JSONC
+// 7 = InvalidSymbol, 8 = InvalidToken
+// Others (1=PropertyNameExpected, 2=ValueExpected, etc.) are benign - parser still returns correct result
+const FATAL_ERROR_CODES = new Set([7, 8]);
 
-    if (raw[i] === '/' && raw[i + 1] === '*') {
-      let j = i + 2;
-      while (j < len && !(raw[j] === '*' && raw[j + 1] === '/')) j++;
-      i = j + 2;
-      continue;
-    }
-
-    if (raw[i] === '/' && raw[i + 1] === '/') {
-      let j = i + 2;
-      while (j < len && raw[j] !== '\n') j++;
-      i = j;
-      continue;
-    }
-
-    result += raw[i];
-    i++;
+export function parseJsonc(raw: string): unknown {
+  const errors: ParseError[] = [];
+  const result = parse(raw, errors);
+  const fatalErrors = errors.filter(
+    (e) => FATAL_ERROR_CODES.has(e.error)
+  );
+  if (fatalErrors.length > 0) {
+    throw new SyntaxError('Invalid JSONC');
   }
-
-  return result.replace(/,(\s*[}\]])/g, '$1');
+  return result;
 }

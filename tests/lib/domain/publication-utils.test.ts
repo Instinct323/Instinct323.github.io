@@ -4,7 +4,7 @@ import {
   formatPublicationLinkLabel,
   resolvePublicationLinks,
 } from '../../../src/lib/domain/publication-utils';
-import type { Publication } from '../../../src/types';
+import type { Publication } from '../../../src/types/site';
 
 describe('normalizePublication', () => {
   const filePath = 'test/publication.yaml';

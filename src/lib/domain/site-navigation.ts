@@ -1,4 +1,4 @@
-import type { NavigationConfig } from '../../types';
+import type { NavigationConfig } from '../../types/site';
 
 export interface SiteNavRoute {
   key: string;

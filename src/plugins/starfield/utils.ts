@@ -33,7 +33,7 @@ export interface Star {
 export type CellGrid = Record<string, Record<string, Star[]>>;
 
 /** Returns white {255,255,255} for invalid hex strings. */
-export function parseHexColor(color: string): RgbColor {
+export function parseHexColorOrDefault(color: string): RgbColor {
   if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
     return { r: 255, g: 255, b: 255 };
   }
@@ -59,7 +59,7 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-/** Mutates the grid by creating empty arrays for missing cells. */
+/** Mutates the grid in place, creating empty row and column arrays on demand so spatial lookup never hits undefined. */
 export function getOrCreateCell(cells: CellGrid, cellX: number, cellY: number): Star[] {
   const cellXKey = String(cellX);
   const cellYKey = String(cellY);

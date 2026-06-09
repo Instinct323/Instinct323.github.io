@@ -1,5 +1,5 @@
 import { RESPONSIVE_VIEWPORT_WIDTHS, computeGridCellWidths } from '../utils/grid-width-utils';
-import type { MediaConfig } from '../../types';
+import type { MediaConfig } from '../../types/site';
 
 export const RESPONSIVE_WIDTH_STEPS = [320, 480, 640, 768, 960, 1200, 1600, 2000, 2400];
 
@@ -53,6 +53,7 @@ export function computeLayoutResponsiveWidths(
     .sort((a, b) => a - b);
 }
 
+/** Extracts a positive numeric percentage from a CSS-like string (e.g. "50%" or "33.3%"). Throws when the value is missing, non-numeric, or not positive, so invalid config surfaces early instead of producing broken responsive widths. */
 function parseResponsivePercentage(value: string, key: string): number {
   const match = value.match(/(\d+(?:\.\d+)?)/);
   if (!match) {
@@ -78,11 +79,9 @@ export function computeCarouselInferredWidths(slideWidth: ResponsiveSlideWidthPe
 }
 
 export function computeGalleryWidthsFromGrid(grid: MediaConfig['grid']): number[] {
-  const viewports = [
-    RESPONSIVE_VIEWPORT_WIDTHS.mobile,
-    RESPONSIVE_VIEWPORT_WIDTHS.tablet,
-    RESPONSIVE_VIEWPORT_WIDTHS.desktop,
-  ];
-
-  return computeGridCellWidths(grid, viewports);
+  return computeGridCellWidths(grid, {
+    mobile: RESPONSIVE_VIEWPORT_WIDTHS.mobile,
+    tablet: RESPONSIVE_VIEWPORT_WIDTHS.tablet,
+    desktop: RESPONSIVE_VIEWPORT_WIDTHS.desktop,
+  });
 }

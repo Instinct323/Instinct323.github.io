@@ -1,3 +1,8 @@
+/**
+ * Wires up click handlers for publication abstract expand/collapse toggles.
+ * Expects toggle buttons with `data-abstract-toggle` and `data-target` attributes
+ * pointing to panels controlled via the `hidden` attribute and `aria-expanded` state.
+ */
 export function initPublicationAbstractToggles(): void {
   const abstractToggles = document.querySelectorAll('[data-abstract-toggle]');
 

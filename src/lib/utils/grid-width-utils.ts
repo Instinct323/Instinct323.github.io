@@ -47,13 +47,16 @@ function computeGridCellWidth(viewportWidth: number, columns: number, gapPx: num
   return Math.round(contentWidth / columns);
 }
 
-export function computeGridCellWidths(grid: GridDefinition, viewports: number[]): number[] {
+export function computeGridCellWidths(
+  grid: GridDefinition,
+  { mobile, tablet, desktop }: { mobile: number; tablet: number; desktop: number }
+): number[] {
   const gapPx = parseGridGapToPx(grid.gap);
 
   return [
-    computeGridCellWidth(viewports[0], grid.columns.mobile, gapPx),
-    computeGridCellWidth(viewports[1], grid.columns.desktop, gapPx),
-    computeGridCellWidth(viewports[2], grid.columns.desktop, gapPx),
+    computeGridCellWidth(mobile, grid.columns.mobile, gapPx),
+    computeGridCellWidth(tablet, grid.columns.desktop, gapPx),
+    computeGridCellWidth(desktop, grid.columns.desktop, gapPx),
   ];
 }
 

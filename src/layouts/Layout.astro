@@ -1,6 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
-import { backgroundDesktopSource, backgroundMobileSource } from '../lib/loaders/content-modules';
+import { backgroundDesktopSource, backgroundMobileSource, optimizeImage } from '../lib/loaders/astro-adapter';
 import LayoutHead from '../components/layout/LayoutHead.astro';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
@@ -60,8 +59,8 @@ type LayoutFrameData = {
 };
 
 type LayoutBackgroundData = {
-  backgroundMobile: Awaited<ReturnType<typeof getImage>>;
-  backgroundDesktop: Awaited<ReturnType<typeof getImage>>;
+  backgroundMobile: Awaited<ReturnType<typeof optimizeImage>>;
+  backgroundDesktop: Awaited<ReturnType<typeof optimizeImage>>;
 };
 
 const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundData>({
@@ -108,7 +107,7 @@ const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundDa
         variant.source.width,
       );
 
-      const image = await getImage({
+      const image = await optimizeImage({
         src: variant.source,
         width,
         height: Math.ceil(width / variant.aspectRatio),
@@ -123,7 +122,7 @@ const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundDa
 
     const backgroundByVariant = Object.fromEntries(backgroundVariantEntries) as Record<
       BackgroundVariantKey,
-      Awaited<ReturnType<typeof getImage>>
+      Awaited<ReturnType<typeof optimizeImage>>
     >;
 
     return {

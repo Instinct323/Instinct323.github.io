@@ -1,13 +1,8 @@
-import { getSiteConfigInternal } from './config-cache';
+import { loadSiteConfig } from './config-cache';
 import { resolveFeaturedCarouselVisual } from '../domain/carousel-config';
 import { resolveSiteImageConfig } from '../domain/image-config';
-import type {
-  HomePageConfigGroup,
-  MediaConfig,
-  NavigationConfig,
-  SiteConfig,
-  SiteMetadata,
-} from '../../types';
+import type { HomePageConfigGroup } from '../../types/home';
+import type { MediaConfig, NavigationConfig, SiteConfig, SiteMetadata } from '../../types/site';
 
 export { loadSiteConfig, resetSiteConfig } from './config-cache';
 export { loadProfile, loadIntroduction } from './profile-loader';
@@ -17,13 +12,7 @@ function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia'])
   return {
     items: featured.items,
     carousel: {
-      ariaLabel: carousel.ariaLabel,
-      prevButtonAriaLabel: carousel.prevButtonAriaLabel,
-      nextButtonAriaLabel: carousel.nextButtonAriaLabel,
-      emptyText: carousel.emptyText,
-      showNavigationArrows: carousel.showNavigationArrows,
-      showIndicator: carousel.showIndicator,
-      counterPadLength: carousel.counterPadLength,
+      ...carousel,
       visual: resolveFeaturedCarouselVisual(carousel.visual),
     },
   };
@@ -35,12 +24,12 @@ function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia'])
  * internal config structure without affecting callers that only need navigation.
  */
 export function loadNavigationConfig(): NavigationConfig {
-  return getSiteConfigInternal().navigation;
+  return loadSiteConfig().navigation;
 }
 
 /** Builds the homepage view model by resolving featured media and carousel config. */
 export function loadHomepageConfig(): HomePageConfigGroup {
-  const { home } = getSiteConfigInternal();
+  const { home } = loadSiteConfig();
   const featuredMedia = buildFeaturedMediaConfig(home.featuredMedia);
 
   return {
@@ -54,7 +43,7 @@ export function loadHomepageConfig(): HomePageConfigGroup {
 
 /** Aggregates image settings and homepage media into a single config object. */
 export function loadMediaConfig(): MediaConfig {
-  const config = getSiteConfigInternal();
+  const config = loadSiteConfig();
   const featuredMedia = buildFeaturedMediaConfig(config.home.featuredMedia);
 
   return {
@@ -69,7 +58,7 @@ export function loadMediaConfig(): MediaConfig {
 
 /** Extracts SEO metadata slice for layout injection. */
 export function loadSiteMetadata(): SiteMetadata {
-  const { siteUrl, defaultTitle, defaultDescription, keyword } = getSiteConfigInternal().metadata;
+  const { siteUrl, defaultTitle, defaultDescription, keyword } = loadSiteConfig().metadata;
   return {
     siteUrl,
     defaultTitle,

@@ -24,11 +24,7 @@ export function buildDeferredMountGroupSelector(group: string): string {
   return `[${DEFERRED_MOUNT_DATA.group}="${group}"][${DEFERRED_MOUNT_DATA.mount}="true"]`;
 }
 
-export interface DeferredMountRuntimeConfig {
-  selector: string;
-  rootMargin: string;
-  mountDelayMs: number;
-}
+import type { DeferredMountRuntimeConfig } from '../../types/page-load';
 
 function setPlaceholderMessage(
   node: HTMLElement,
@@ -103,6 +99,8 @@ function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
 
   let remainingImages = pendingImages.length;
 
+  // Counts down as each image fires load or error; placeholder removal is gated
+  // on ALL images settling so the layout does not shift while images are still loading.
   const markImageReady = (): void => {
     remainingImages -= 1;
     if (remainingImages > 0) {
@@ -113,6 +111,7 @@ function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.loaded;
   };
 
+  // Treat both load and error as "settled" — a broken image should not block placeholder removal forever.
   pendingImages.forEach((image) => {
     image.addEventListener('load', markImageReady, { once: true });
     image.addEventListener('error', markImageReady, { once: true });

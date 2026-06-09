@@ -85,12 +85,14 @@ export function createMarkdownRenderer(): MarkdownRenderer {
 }
 
 // ============================================================================
-// Basic Markdown Renderer (without KaTeX)
+// Shared Markdown Rendering Helper
 // ============================================================================
 
-const renderer = createMarkdownRenderer();
-
-export function renderMarkdown(markdown: string, options?: RenderMarkdownOptions): string {
+function renderWithRenderer(
+  renderer: MarkdownRenderer,
+  markdown: string,
+  options?: RenderMarkdownOptions,
+): string {
   if (!markdown || typeof markdown !== 'string') {
     return '';
   }
@@ -102,6 +104,16 @@ export function renderMarkdown(markdown: string, options?: RenderMarkdownOptions
   }
 
   return html;
+}
+
+// ============================================================================
+// Basic Markdown Renderer (without KaTeX)
+// ============================================================================
+
+const renderer = createMarkdownRenderer();
+
+export function renderMarkdown(markdown: string, options?: RenderMarkdownOptions): string {
+  return renderWithRenderer(renderer, markdown, options);
 }
 
 // ============================================================================
@@ -117,17 +129,7 @@ const mdWithKatex = new MarkdownIt({
 }).use(katex);
 
 export function renderMarkdownWithKatex(markdown: string, options?: RenderMarkdownOptions): string {
-  if (!markdown || typeof markdown !== 'string') {
-    return '';
-  }
-
-  let html = mdWithKatex.render(markdown);
-
-  if (options?.fileURL) {
-    html = resolveRelativePaths(html, options.fileURL);
-  }
-
-  return html;
+  return renderWithRenderer(mdWithKatex, markdown, options);
 }
 
 // ============================================================================

@@ -5,9 +5,9 @@ export const ABOUT_DIR = `${CONTENT_ROOT}/about`;
 export const BACKGROUND_DIR = `${CONTENT_ROOT}/background`;
 export const PHOTOGRAPHY_DIR = `${CONTENT_ROOT}/photography`;
 export const PUBLICATION_DIR = `${ABOUT_DIR}/publication`;
-// NOTE: Hardcoded in astro-adapter.ts because Vite import.meta.glob requires string literals
-// CONTENT_IMAGES_GLOB: '../../../content/**/*.{jpg,jpeg,png,webp}'
-// PUBLICATION_GLOB: '../../../content/about/publication/*.json'
+// NOTE: Vite's import.meta.glob requires string literals at build time — dynamic
+// expressions like `${CONTENT_ROOT}/**/*.json` cannot be analyzed statically, so
+// glob patterns must be hardcoded here rather than derived from CONTENT_ROOT
 
 export const CONTENT_IMAGE_PATH_PREFIX = '../../../content/';
 

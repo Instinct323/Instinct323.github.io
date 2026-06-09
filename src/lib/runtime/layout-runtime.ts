@@ -1,4 +1,5 @@
-import { initStarfield } from '../../plugins/starfield';
+import { getEffectsResolver } from '../domain/effects-resolver';
+import { parseDatasetPayload } from '../utils/dataset';
 import { runWhenIdle, SHELL_BACKGROUND_TIMEOUT, SHELL_BACKGROUND_FALLBACK } from './scheduling';
 
 const ENABLE_STARFIELD = true;
@@ -24,20 +25,23 @@ function parseShellBackgroundPayload(): {
     throw new Error('Missing data-shell-background payload');
   }
 
-  const payload = JSON.parse(serializedPayload) as {
-    mobileSrc?: string;
-    desktopSrc?: string;
-  };
-
-  if (!payload.mobileSrc || !payload.desktopSrc) {
-    throw new Error('Invalid shell background payload');
-  }
+  const payload = parseDatasetPayload(
+    serializedPayload,
+    (raw) => {
+      const payload = raw as { mobileSrc?: string; desktopSrc?: string };
+      if (!payload.mobileSrc || !payload.desktopSrc) {
+        throw new Error('Invalid shell background payload');
+      }
+      return {
+        mobileSrc: payload.mobileSrc,
+        desktopSrc: payload.desktopSrc,
+      };
+    },
+    'Invalid shell background payload',
+  );
 
   return {
-    payload: {
-      mobileSrc: payload.mobileSrc,
-      desktopSrc: payload.desktopSrc,
-    },
+    payload,
     serializedPayload,
   };
 }
@@ -112,16 +116,21 @@ function initializeStarfield(): void {
 
     if (backgroundCanvas && starsCanvas) {
       try {
-      const serializedConfig = starsCanvas.dataset.starfield;
-      if (!serializedConfig) {
-        throw new Error('Missing data-starfield payload');
+        const serializedConfig = starsCanvas.dataset.starfield;
+        if (!serializedConfig) {
+          throw new Error('Missing data-starfield payload');
+        }
+        const config = JSON.parse(serializedConfig);
+        const initStarfield = getEffectsResolver('starfield-runtime') as (
+          _backgroundCanvas: HTMLCanvasElement,
+          _starsCanvas: HTMLCanvasElement,
+          _config: unknown
+        ) => void;
+        initStarfield(backgroundCanvas, starsCanvas, config);
+      } catch (e) {
+        console.error('Failed to initialize starfield:', e);
       }
-      const config = JSON.parse(serializedConfig);
-      initStarfield(backgroundCanvas, starsCanvas, config);
-    } catch (e) {
-      console.error('Failed to initialize starfield:', e);
     }
-  }
   }
 }
 

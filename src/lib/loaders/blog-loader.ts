@@ -10,6 +10,7 @@ export interface BlogPost {
   weight: number;
 }
 
+/** Extracts the blog post slug from a Vite glob path. Fails fast when the path does not match the expected `blog/{slug}/README.md` pattern, which happens if the glob pattern or file layout changes. */
 function extractSlugFromPath(filePath: string): string {
   const match = filePath.match(/blog\/([^/]+)\/README\.md$/);
   if (!match) {

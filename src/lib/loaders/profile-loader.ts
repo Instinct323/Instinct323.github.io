@@ -1,6 +1,6 @@
-import { introductionRaw, profile } from './content-modules';
+import { introductionRaw, profile } from './astro-adapter';
 import { trimProfileFacts } from '../utils/content-normalize';
-import type { ProfileData } from '../../types';
+import type { ProfileData } from '../../types/profile';
 
 function normalizeProfile(profileData: ProfileData): ProfileData {
   return {

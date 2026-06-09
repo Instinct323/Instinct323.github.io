@@ -14,11 +14,11 @@ describe('grid-width-utils', () => {
         columns: { desktop: 4, mobile: 2 },
         gap: '16px',
       };
-      const viewports = [
-        RESPONSIVE_VIEWPORT_WIDTHS.mobile,   // 375
-        RESPONSIVE_VIEWPORT_WIDTHS.tablet,    // 1024
-        RESPONSIVE_VIEWPORT_WIDTHS.desktop,   // 1440
-      ];
+      const viewports = {
+        mobile: RESPONSIVE_VIEWPORT_WIDTHS.mobile,   // 375
+        tablet: RESPONSIVE_VIEWPORT_WIDTHS.tablet,    // 1024
+        desktop: RESPONSIVE_VIEWPORT_WIDTHS.desktop,   // 1440
+      };
 
       const widths = computeGridCellWidths(grid, viewports);
 
@@ -35,7 +35,7 @@ describe('grid-width-utils', () => {
         columns: { desktop: 3, mobile: 1 },
         gap: '1rem', // 16px
       };
-      const viewports = [375, 1024, 1440];
+      const viewports = { mobile: 375, tablet: 1024, desktop: 1440 };
 
       const widths = computeGridCellWidths(grid, viewports);
 
@@ -52,7 +52,7 @@ describe('grid-width-utils', () => {
         columns: { desktop: 6, mobile: 3 },
         gap: '24px',
       };
-      const viewports = [375, 768, 1440];
+      const viewports = { mobile: 375, tablet: 768, desktop: 1440 };
 
       const widths = computeGridCellWidths(grid, viewports);
 
@@ -70,7 +70,7 @@ describe('grid-width-utils', () => {
         gap: 'invalid',
       };
 
-      expect(() => computeGridCellWidths(grid, [375, 1024, 1440])).toThrow(
+      expect(() => computeGridCellWidths(grid, { mobile: 375, tablet: 1024, desktop: 1440 })).toThrow(
         /Invalid photography.grid.gap/i,
       );
     });
@@ -81,7 +81,7 @@ describe('grid-width-utils', () => {
         gap: '100px',
       };
 
-      expect(() => computeGridCellWidths(grid, [375, 1024, 1440])).toThrow(
+      expect(() => computeGridCellWidths(grid, { mobile: 375, tablet: 1024, desktop: 1440 })).toThrow(
         /horizontal gaps exceed viewport/i,
       );
     });
@@ -92,7 +92,7 @@ describe('grid-width-utils', () => {
         gap: '16px',
       };
 
-      expect(() => computeGridCellWidths(grid, [375, 1024, 1440])).toThrow(
+      expect(() => computeGridCellWidths(grid, { mobile: 375, tablet: 1024, desktop: 1440 })).toThrow(
         /Invalid grid columns/i,
       );
     });
@@ -103,7 +103,7 @@ describe('grid-width-utils', () => {
         gap: '20px',
       };
       // Custom viewport widths
-      const viewports = [320, 800, 1920];
+      const viewports = { mobile: 320, tablet: 800, desktop: 1920 };
 
       const widths = computeGridCellWidths(grid, viewports);
 

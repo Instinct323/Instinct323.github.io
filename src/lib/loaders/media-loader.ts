@@ -2,14 +2,8 @@ import { loadMediaConfig } from './config-loader';
 import { ABOUT_AVATAR_SIZES } from './content-paths';
 import { createGridSizesString, MOBILE_BREAKPOINT } from '../utils/grid-width-utils';
 import { createCachedLoader } from '../utils/cache';
-import type {
-  ContentImage,
-  ContentImageOptions,
-  FeaturedSlide,
-  MediaConfig,
-  MediaImage,
-  MediaTree,
-} from '../../types';
+import type { ContentImage, ContentImageOptions, FeaturedSlide, MediaImage, MediaTree } from '../../types/media';
+import type { MediaConfig } from '../../types/site';
 import { loadContentImageResolved, createImageVariantSet } from './media-loader-core';
 import {
   computeGalleryWidthsFromGrid,
@@ -41,6 +35,7 @@ interface SurfaceSizingProfile {
   sizes: string;
 }
 
+/** Chooses between the about-page avatar profile and the photography gallery profile based on the surface name. */
 function resolveMediumSurfaceProfile(
   mediaConfig: MediaConfig,
   surface: string,
@@ -90,6 +85,7 @@ async function computeContentImageOptionsFromConfig(
   };
 }
 
+/** Assembles responsive image options for a non-homepage surface by combining the surface profile with config-driven width policies. */
 function buildMediumSurfaceOptions(
   mediaConfig: MediaConfig,
   surface: string,
@@ -118,8 +114,11 @@ export async function computeContentImageOptions(
   return computeContentImageOptionsFromConfig(mediaConfig, surface, overrides);
 }
 
-/** Resolves a content image through the cached media config pipeline. */
-export async function loadContentImage(path: string, options: ContentImageOptions): Promise<ContentImage | null> {
+/**
+ * Resolves a content image through the cached media config pipeline.
+ * Validates media config as a side effect before loading the image.
+ */
+export async function loadContentImageWithConfigValidation(path: string, options: ContentImageOptions): Promise<ContentImage | null> {
   await getMediaConfigCached();
   return loadContentImageResolved(path, options);
 }
@@ -129,7 +128,7 @@ export async function loadFeaturedSlides(): Promise<FeaturedSlide[]> {
   const homepageGalleryConfig = await getValidatedHomepageGalleryConfig(getMediaConfigCached);
   const homeImageOptions = await computeContentImageOptions('home', {});
 
-  return loadFeaturedSlidesForHomepage(homepageGalleryConfig.featured, homeImageOptions, loadContentImage);
+  return loadFeaturedSlidesForHomepage(homepageGalleryConfig.featured, homeImageOptions, loadContentImageWithConfigValidation);
 }
 
 export async function createFeaturedSlide(image: ContentImage): Promise<FeaturedSlide> {
@@ -165,6 +164,7 @@ export async function loadFeaturedSlidesForHomepage(
   return Promise.all(featuredImages.map((image) => createFeaturedSlide(image)));
 }
 
+/** Maps a content image path to the MediaImage shape expected by the gallery tree builder. Returns null when the image cannot be resolved. */
 function mapGalleryImage(path: string, options: ContentImageOptions): MediaImage | null {
   const imageAsset = loadContentImageResolved(path, options);
 

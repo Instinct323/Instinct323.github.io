@@ -2,10 +2,10 @@
 // GalleryImage.astro - Individual image card component
 // Image strategy: keep astro:assets <Image> for gallery cards to use build-time transforms and responsive variants.
 
-import { Image } from 'astro:assets';
+import { Image } from '../../lib/loaders/astro-adapter';
 import DeferredImage from '../common/DeferredImage.astro';
 
-import type { MediaImage } from '../../types';
+import type { MediaImage } from '../../types/media';
 import { resolveControlImageLoading } from '../../lib/loaders/page-load-orchestrator';
 
 interface Props {

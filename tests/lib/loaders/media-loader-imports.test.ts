@@ -5,7 +5,7 @@ import {
 } from '../../../src/lib/utils/image-width-utils';
 import {
   computeContentImageOptions,
-  loadContentImage,
+  loadContentImageWithConfigValidation,
   loadFeaturedSlides,
   loadMediaTree,
 } from '../../../src/lib/loaders/media-loader';
@@ -27,8 +27,8 @@ describe('media-loader import path changes', () => {
     expect(typeof computeContentImageOptions).toBe('function');
   });
 
-  it('media-loader exports loadContentImage', () => {
-    expect(typeof loadContentImage).toBe('function');
+  it('media-loader exports loadContentImageWithConfigValidation', () => {
+    expect(typeof loadContentImageWithConfigValidation).toBe('function');
   });
 
   it('media-loader exports loadFeaturedSlides', () => {

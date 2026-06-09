@@ -7,7 +7,9 @@ const ROOT_SELECTOR = '.home-carousel';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const SWIPER_INIT_FLAG = 'swiperInitialized';
 
-// Carousel configuration constants
+// Coverflow calibration for the 3D card stack look — depth/moderator values
+// are intentionally hardcoded (not runtime-configurable) to keep the visual
+// effect consistent and avoid per-instance tuning overhead
 const CAROUSEL_ANIMATION_SPEED_MS = 600;
 const CAROUSEL_COVERFLOW_DEPTH = 100;
 const CAROUSEL_COVERFLOW_MODIFIER = 2.5;
@@ -31,6 +33,7 @@ export interface CarouselConfig {
   counterPadLength: number;
 }
 
+/** Lazily creates and caches the reduced-motion media query so every carousel shares one instance. */
 function getReducedMotionQuery(): MediaQueryList {
   if (!state.reducedMotionQuery) {
     state.reducedMotionQuery = window.matchMedia(REDUCED_MOTION_QUERY);
@@ -39,6 +42,7 @@ function getReducedMotionQuery(): MediaQueryList {
   return state.reducedMotionQuery;
 }
 
+/** Checks whether the user has requested reduced motion via OS accessibility settings. */
 function prefersReducedMotion(): boolean {
   return getReducedMotionQuery().matches;
 }
@@ -96,6 +100,7 @@ function updatePaginationAria(swiper: SwiperInstance): void {
   });
 }
 
+/** Finds all carousel root elements in the DOM that are ready for Swiper initialization. */
 function getCarouselRoots(): SwiperRoot[] {
   return Array.from(document.querySelectorAll(ROOT_SELECTOR)).filter(
     (root): root is SwiperRoot => root instanceof HTMLElement
@@ -115,6 +120,7 @@ export function getSpaceBetween(root: HTMLElement): number {
   return parsed >= 0 ? parsed : 0;
 }
 
+/** Tries each selector in order and returns the first matching HTMLElement, or null if none match. Supports graceful degradation when markup uses legacy or current class names. */
 function getFirstOptionalHTMLElement(root: ParentNode, selectors: string[]): HTMLElement | null {
   for (const selector of selectors) {
     const el = root.querySelector(selector);
@@ -126,6 +132,7 @@ function getFirstOptionalHTMLElement(root: ParentNode, selectors: string[]): HTM
   return null;
 }
 
+/** Updates an existing Swiper instance when the user's motion preference changes at runtime. */
 function applyMotionSettings(swiper: SwiperInstance): void {
   const useReducedMotion = prefersReducedMotion();
   swiper.params.speed = useReducedMotion ? 0 : CAROUSEL_ANIMATION_SPEED_MS;

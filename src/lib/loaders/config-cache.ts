@@ -1,9 +1,9 @@
-import { siteConfigRaw } from './content-modules';
-import { stripJsoncComments } from '../utils/jsonc';
-import type { SiteConfig } from '../../types';
+import { siteConfigRaw } from './astro-adapter';
+import { parseJsonc } from '../utils/jsonc';
+import type { SiteConfig } from '../../types/site';
 
 export function parseSiteConfig(raw: string): SiteConfig {
-  const parsed = JSON.parse(stripJsoncComments(raw));
+  const parsed = parseJsonc(raw);
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     throw new Error('Invalid site config JSONC content');
   }
@@ -42,5 +42,3 @@ export function resetSiteConfig(): void {
 export function loadSiteConfig(): SiteConfig {
   return getSiteConfigInternal();
 }
-
-export { getSiteConfigInternal };

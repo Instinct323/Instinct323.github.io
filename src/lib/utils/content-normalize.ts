@@ -21,12 +21,15 @@ export function folderNameToSlug(name: string): string {
     .replace(/-+/g, '-');
 }
 
-export function slugToTitle(slug: string): string {
-  return slug
-    .split(/[-_]/)
+export function wordsToTitle(segments: string[]): string {
+  return segments
     .filter(Boolean)
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
+}
+
+export function slugToTitle(slug: string): string {
+  return wordsToTitle(slug.split(/[-_]/));
 }
 
 export function sanitizePositiveWidths(widths: number[] | undefined): number[] {
@@ -60,6 +63,7 @@ export interface ProfileFact {
   value: string;
 }
 
+/** Trims whitespace from profile fact IDs and values so downstream rendering does not inherit accidental padding from config files. */
 export function trimProfileFacts(facts: ProfileFact[]): ProfileFact[] {
   return facts.map((fact) => ({
     id: fact.id.trim(),

@@ -5,7 +5,7 @@ import {
   type SiteNavItem,
   type SiteNavModel,
 } from '../../../src/lib/domain/site-navigation';
-import type { NavigationConfig } from '../../../src/types';
+import type { NavigationConfig } from '../../../src/types/site';
 
 describe('formatPageLabel', () => {
   it("returns '' for empty string", () => {

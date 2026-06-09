@@ -1,6 +1,8 @@
 import { buildDeferredMountGroupSelector, initDeferredMounts } from './deferred-mount';
 import { assertString } from '../utils/assertions';
-import type { SiteImageConfig } from '../../types';
+import { parseDatasetPayload } from '../utils/dataset';
+import type { SiteImageConfig } from '../../types/image-config';
+import type { DeferredMountRuntimeConfig } from '../../types/page-load';
 import { resolveDeferredMountRuntimeConfig } from '../domain/image-config';
 
 export interface DeferredMountBootstrapOptions {
@@ -9,32 +11,26 @@ export interface DeferredMountBootstrapOptions {
   mountGroup: string;
 }
 
-interface DeferredMountBootstrapConfig {
-  rootMargin: string;
-  mountDelayMs: number;
-}
+type DeferredMountBootstrapConfig = Omit<DeferredMountRuntimeConfig, 'selector'>;
 
 function parseBootstrapConfig(serializedConfig: string): DeferredMountBootstrapConfig {
-  let rawConfig: unknown;
-  try {
-    rawConfig = JSON.parse(serializedConfig);
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      throw new Error(`Invalid deferred mount bootstrap config: ${e.message}`);
-    }
-    throw e;
-  }
-  const config = rawConfig as Record<string, unknown>;
-  const rootMargin = assertString(config?.rootMargin, 'deferred mount bootstrap rootMargin');
+  return parseDatasetPayload(
+    serializedConfig,
+    (rawConfig) => {
+      const config = rawConfig as Record<string, unknown>;
+      const rootMargin = assertString(config?.rootMargin, 'deferred mount bootstrap rootMargin');
 
-  if (typeof config?.mountDelayMs !== 'number' || config.mountDelayMs < 0) {
-    throw new Error('Invalid deferred mount bootstrap mountDelayMs.');
-  }
+      if (typeof config?.mountDelayMs !== 'number' || config.mountDelayMs < 0) {
+        throw new Error('Invalid deferred mount bootstrap mountDelayMs.');
+      }
 
-  return {
-    rootMargin,
-    mountDelayMs: config.mountDelayMs as number,
-  };
+      return {
+        rootMargin,
+        mountDelayMs: config.mountDelayMs as number,
+      };
+    },
+    'Invalid deferred mount bootstrap config',
+  );
 }
 
 export function bootstrapDeferredMounts(options: DeferredMountBootstrapOptions): void {
@@ -60,6 +56,11 @@ export function bootstrapDeferredMounts(options: DeferredMountBootstrapOptions):
   });
 }
 
+/**
+ * Serializes the deferred-mount runtime config into a JSON payload string
+ * suitable for embedding in a data attribute. Centralized here so pages do
+ * not repeat the resolve + stringify pair.
+ */
 export function buildDeferredMountRuntimePayload(
   lazyLoad: SiteImageConfig['lazyLoad'],
   isDev: boolean,
@@ -68,6 +69,11 @@ export function buildDeferredMountRuntimePayload(
   return JSON.stringify(runtimeConfig);
 }
 
+/**
+ * Packages selector, config key, and mount group into the options object
+ * expected by `bootstrapDeferredMounts`. Kept as a named helper so call
+ * sites read declaratively and remain easy to update if the shape changes.
+ */
 export function buildDeferredMountBootstrapOptions(
   containerSelector: string,
   configDataKey: string,
