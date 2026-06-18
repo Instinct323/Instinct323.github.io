@@ -1,10 +1,8 @@
 ---
-// PublicationsSection.astro - Academic publications display
-// Shows list of publications with title, authors, date, and links
-
 import type { Publication } from '../../types/site';
-import { resolvePublicationLinks } from '../../lib/domain/publication-utils';
+import { resolvePublicationLinks, buildVideoEmbedUrl } from '../../lib/domain/publication-utils';
 
+/** Props for the publications list section. */
 interface Props {
   publications: Publication[];
   highlightAuthor?: string;
@@ -19,51 +17,78 @@ const { publications, highlightAuthor } = Astro.props as Props;
     <p class="empty">No publications yet.</p>
   ) : (
     <ul class="publication-list">
-      {publications.map((publication, publicationIndex) => (
-        <li class="publication-item">
-          <h3 class="publication-title">{publication.title}</h3>
-          <p class="publication-authors">
-            {publication.authors.map((author, i) => (
-              <span class:list={[{ 'highlight-author': highlightAuthor && author === highlightAuthor }]}>
-                {author}{i < publication.authors.length - 1 ? ', ' : ''}
-              </span>
-            ))}
-          </p>
-          <p class="publication-meta">
-            <span class="date">{publication.date}</span>
-            {publication.source && <span class="source">{publication.source}</span>}
-          </p>
-          <div class="publication-links">
-            {publication.abstract && (
-              <button
-                type="button"
-                class="publication-link-button publication-abstract-toggle"
-                data-abstract-toggle
-                data-target={`publication-abstract-${publicationIndex}`}
-                aria-expanded="false"
-              >
-                Abstract
-              </button>
-            )}
-            {resolvePublicationLinks(publication).map((link) => (
-              <a
-                class="publication-link-button"
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-link-name={link.name}
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-          {publication.abstract && (
-            <p id={`publication-abstract-${publicationIndex}`} class="publication-abstract" hidden>
-              {publication.abstract}
+      {publications.map((publication, publicationIndex) => {
+        const embedUrl = publication.video ? buildVideoEmbedUrl(publication.video) : undefined;
+        return (
+          <li class="publication-item">
+            <h3 class="publication-title">{publication.title}</h3>
+            <p class="publication-authors">
+              {publication.authors.map((author, i) => (
+                <span class:list={[{ 'highlight-author': highlightAuthor && author === highlightAuthor }]}>
+                  {author}{i < publication.authors.length - 1 ? ', ' : ''}
+                </span>
+              ))}
             </p>
-          )}
-        </li>
-      ))}
+            <p class="publication-meta">
+              <span class="date">{publication.date}</span>
+              {publication.source && <span class="source">{publication.source}</span>}
+            </p>
+            <div class="publication-links">
+              {publication.abstract && (
+                // Using JS toggle instead of <details> because <details> creates an
+                // implicit container layer that breaks flex alignment with sibling buttons.
+                <button
+                  type="button"
+                  class="publication-link-button publication-abstract-toggle"
+                  data-abstract-toggle
+                  data-target={`publication-abstract-${publicationIndex}`}
+                  aria-expanded="false"
+                >
+                  Abstract
+                </button>
+              )}
+              {resolvePublicationLinks(publication).map((link) => (
+                <a
+                  class="publication-link-button"
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-link-name={link.name}
+                >
+                  {link.label}
+                </a>
+              ))}
+              {embedUrl && (
+                <button
+                  type="button"
+                  class="publication-link-button publication-video-toggle"
+                  data-video-toggle
+                  data-target={`publication-video-${publicationIndex}`}
+                  data-embed={embedUrl}
+                  aria-expanded="false"
+                >
+                  Video
+                </button>
+              )}
+            </div>
+            {publication.abstract && (
+              <p id={`publication-abstract-${publicationIndex}`} class="publication-abstract" hidden>
+                {publication.abstract}
+              </p>
+            )}
+            {embedUrl && (
+              <div id={`publication-video-${publicationIndex}`} class="publication-video" hidden>
+                <iframe
+                  title={`Video for ${publication.title}`}
+                  class="publication-video-iframe"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                />
+              </div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   )}
 </section>
@@ -90,7 +115,7 @@ const { publications, highlightAuthor } = Astro.props as Props;
 
   .publication-item {
     padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--surface-border, rgba(203, 213, 225, 0.42));
+    border-bottom: 1px solid var(--surface-border);
   }
 
   .publication-item:last-child {
@@ -133,7 +158,9 @@ const { publications, highlightAuthor } = Astro.props as Props;
 
   .publication-links {
     display: flex;
+    flex-wrap: nowrap;
     gap: 0.5rem;
+    align-items: center;
   }
 
   .publication-link-button {
@@ -149,9 +176,9 @@ const { publications, highlightAuthor } = Astro.props as Props;
     line-height: 1;
     cursor: pointer;
     transition:
-      background var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease),
-      transform var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease),
-      box-shadow var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease);
+      background var(--motion-duration-ui) var(--motion-ease-standard),
+      transform var(--motion-duration-ui) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-ui) var(--motion-ease-standard);
   }
 
   .publication-abstract-toggle {
@@ -162,7 +189,7 @@ const { publications, highlightAuthor } = Astro.props as Props;
 
   .publication-link-button:hover {
     background: var(--link-accent-bg-hover);
-    transform: var(--motion-lift-sm, translateY(-2px));
+    transform: var(--motion-lift-sm);
   }
 
   .publication-abstract-toggle:hover {
@@ -172,8 +199,8 @@ const { publications, highlightAuthor } = Astro.props as Props;
   .publication-link-button:focus-visible {
     outline: none;
     background: var(--link-accent-bg-hover);
-    box-shadow: var(--focus-ring, 0 0 0 2px rgba(43, 81, 182, 0.4));
-    transform: var(--motion-lift-sm, translateY(-2px));
+    box-shadow: var(--focus-ring);
+    transform: var(--motion-lift-sm);
   }
 
   .publication-abstract-toggle:focus-visible {
@@ -182,13 +209,50 @@ const { publications, highlightAuthor } = Astro.props as Props;
   }
 
   .publication-abstract {
-    margin: 0.75rem 0 0;
+    margin: 0.5rem 0 0;
     font-size: 0.8125rem;
     line-height: 1.6;
     color: var(--text-muted);
     text-align: justify;
-    padding-top: 0.75rem;
+    padding-top: 0.5rem;
     border-top: 1px dashed var(--surface-border);
+  }
+
+  .publication-video {
+    margin: 0.5rem 0 0;
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .publication-video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+  }
+
+  .publication-video-toggle {
+    color: var(--pub-video-toggle-color, #1a4a8a);
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(37, 99, 235, 0.3);
+  }
+
+  .publication-video-toggle:hover {
+    background: rgba(59, 130, 246, 0.25);
+  }
+
+  .publication-video-toggle:focus-visible {
+    background: rgba(59, 130, 235, 0.3);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
   }
 
   @media (max-width: 767px) {
@@ -199,6 +263,7 @@ const { publications, highlightAuthor } = Astro.props as Props;
 </style>
 
 <script>
-  import { initPublicationAbstractToggles } from '../../lib/runtime/publication-abstract-toggle';
-  initPublicationAbstractToggles();
+  // Wire up expand/collapse toggles for abstracts and videos.
+  import { initPublicationToggles } from '../../lib/runtime/publication-toggles';
+  initPublicationToggles();
 </script>

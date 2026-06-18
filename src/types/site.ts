@@ -47,6 +47,7 @@ export interface Publication {
   date: string;
   source?: string;
   links?: Record<string, string>;
+  video?: string;
   weight?: number;
 }
 

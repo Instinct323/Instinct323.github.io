@@ -2,10 +2,11 @@
   "title": "GCNGrasp-VP: Affordance-Guided View Planning for Efficient Task-Oriented Grasping",
   "abstract": "Task-oriented grasping performance degrades significantly when object views suffer from occlusions. Existing task-oriented grasping methods typically assume task-relevant regions are visible in the initial frame, while view planning approaches enable active perception but often ignore task semantics and rely on time-consuming scene reconstruction. To address these limitations, we present GCNGrasp-VP, an efficient framework integrating affordance field prediction with active view planning. Central to this framework is GCNGrasp-v2, a task-oriented grasp model that simultaneously supports grasp evaluation and affordance field prediction, achieving constant-time inference complexity. Leveraging this capability, our Affordance-guided View Planner (Affordance-VP) utilizes the affordance field as an information gain metric to guide camera observation of task-relevant regions without requiring scene reconstruction. View planning results show that our method significantly outperforms scene-uncertainty-driven baselines with only one view adjustment. Real-world validation further confirms substantial improvements in grasp success rates for single-object scenarios while maintaining millisecond-level computational latency. Code and models are available at https://github.com/Instinct323/GCNGrasp-VP",
   "authors": ["Zanjia Tong", "Wenlong Dong", "Chengjie Zhang", "Hong Zhang"],
-  "date": "2026-05",
+  "date": "2026-06",
   "source": "arXiv",
   "links": {
     "Code": "https://github.com/Instinct323/GCNGrasp-VP",
     "DOI": "https://doi.org/10.48550/arXiv.2606.19091"
-  }
+  },
+  "video": "https://www.bilibili.com/video/BV1ewjw6qEbY"
 }

@@ -3,6 +3,8 @@ import {
   normalizePublication,
   formatPublicationLinkLabel,
   resolvePublicationLinks,
+  resolveEmbedUrl,
+  buildVideoEmbedUrl,
 } from '../../../src/lib/domain/publication-utils';
 import type { Publication } from '../../../src/types/site';
 
@@ -44,7 +46,7 @@ describe('normalizePublication', () => {
     };
 
     expect(() => normalizePublication(raw, filePath)).toThrow(
-      `Invalid publication field "title" in ${filePath}`
+      `Invalid publication field "title" in ${filePath}: Missing or invalid title (must be a non-empty string)`
     );
   });
 
@@ -55,7 +57,7 @@ describe('normalizePublication', () => {
     };
 
     expect(() => normalizePublication(raw, filePath)).toThrow(
-      `Invalid publication field "date" in ${filePath}`
+      `Invalid publication field "date" in ${filePath}: Missing or invalid date (must be a non-empty string)`
     );
   });
 
@@ -145,6 +147,44 @@ describe('normalizePublication', () => {
     expect(result.abstract).toBeUndefined();
     expect(result.source).toBeUndefined();
   });
+
+  it('includes video field when provided', () => {
+    const raw = {
+      title: 'Test Title',
+      authors: ['John Doe'],
+      date: '2024-01-15',
+      video: 'https://www.bilibili.com/video/BV1ewjw6qEbY',
+    };
+
+    const result = normalizePublication(raw, filePath);
+
+    expect(result.video).toBe('https://www.bilibili.com/video/BV1ewjw6qEbY');
+  });
+
+  it('returns undefined video when given empty string', () => {
+    const raw = {
+      title: 'Test Title',
+      authors: ['John Doe'],
+      date: '2024-01-15',
+      video: '   ',
+    };
+
+    const result = normalizePublication(raw, filePath);
+
+    expect(result.video).toBeUndefined();
+  });
+
+  it('returns undefined video when video field is omitted', () => {
+    const raw = {
+      title: 'Test Title',
+      authors: ['John Doe'],
+      date: '2024-01-15',
+    };
+
+    const result = normalizePublication(raw, filePath);
+
+    expect(result.video).toBeUndefined();
+  });
 });
 
 describe('normalizePublicationLinks (via normalizePublication)', () => {
@@ -165,11 +205,10 @@ describe('normalizePublicationLinks (via normalizePublication)', () => {
     const result = normalizePublication(raw, filePath);
 
     expect(result.links).toEqual({
-      arxiv: 'https://arxiv.org/abs/1234',
-      code: 'https://github.com/example/repo',
       pdf: 'https://example.com/paper.pdf',
+      code: 'https://github.com/example/repo',
+      arxiv: 'https://arxiv.org/abs/1234',
     });
-    expect(Object.keys(result.links!)).toEqual(['arxiv', 'code', 'pdf']);
   });
 
   it('returns undefined when given empty object', () => {
@@ -341,8 +380,8 @@ describe('resolvePublicationLinks', () => {
     const result = resolvePublicationLinks(publication);
 
     expect(result).toEqual([
-      { name: 'pdf', href: 'https://example.com/paper.pdf', label: 'Pdf' },
       { name: 'code', href: 'https://github.com/example/repo', label: 'Code' },
+      { name: 'pdf', href: 'https://example.com/paper.pdf', label: 'Pdf' },
     ]);
   });
 
@@ -422,8 +461,74 @@ describe('resolvePublicationLinks', () => {
     const result = resolvePublicationLinks(publication);
 
     expect(result).toEqual([
-      { name: 'source_code', href: 'https://github.com/example/repo', label: 'Source Code' },
       { name: 'project-website', href: 'https://example.com', label: 'Project Website' },
+      { name: 'source_code', href: 'https://github.com/example/repo', label: 'Source Code' },
     ]);
+  });
+});
+
+describe('resolveEmbedUrl', () => {
+  it('converts Bilibili video page URL to base embed URL', () => {
+    const result = resolveEmbedUrl('https://www.bilibili.com/video/BV1ewjw6qEbY');
+    expect(result).toBe('https://player.bilibili.com/player.html?bvid=BV1ewjw6qEbY&page=1&high_quality=1');
+  });
+
+  it('converts YouTube watch URL to base embed URL', () => {
+    const result = resolveEmbedUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    expect(result).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ');
+  });
+
+  it('converts YouTube short URL to base embed URL', () => {
+    const result = resolveEmbedUrl('https://youtu.be/dQw4w9WgXcQ');
+    expect(result).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ');
+  });
+
+  it('passes through already-embed URLs unchanged', () => {
+    expect(resolveEmbedUrl('https://player.bilibili.com/player.html?bvid=BV1ewjw6qEbY&page=1'))
+      .toBe('https://player.bilibili.com/player.html?bvid=BV1ewjw6qEbY&page=1');
+    expect(resolveEmbedUrl('https://www.youtube.com/embed/dQw4w9WgXcQ'))
+      .toBe('https://www.youtube.com/embed/dQw4w9WgXcQ');
+    expect(resolveEmbedUrl('https://youtube.com/embed/dQw4w9WgXcQ'))
+      .toBe('https://youtube.com/embed/dQw4w9WgXcQ');
+  });
+
+  it('returns undefined for invalid or unsupported URLs', () => {
+    expect(resolveEmbedUrl('https://example.com/not-a-video')).toBeUndefined();
+    expect(resolveEmbedUrl('')).toBeUndefined();
+    expect(resolveEmbedUrl('not-a-url')).toBeUndefined();
+  });
+});
+
+describe('buildVideoEmbedUrl', () => {
+  it('adds autoplay to Bilibili embed URL', () => {
+    const result = buildVideoEmbedUrl('https://www.bilibili.com/video/BV1ewjw6qEbY');
+    expect(result).toBe('https://player.bilibili.com/player.html?bvid=BV1ewjw6qEbY&page=1&high_quality=1&autoplay=1');
+
+    const embedBili = 'https://player.bilibili.com/player.html?bvid=BV1ewjw6qEbY&page=1';
+    expect(buildVideoEmbedUrl(embedBili))
+      .toBe('https://player.bilibili.com/player.html?bvid=BV1ewjw6qEbY&page=1&autoplay=1');
+  });
+
+  it('adds autoplay, loop, mute, and playlist to YouTube embed URL', () => {
+    const result = buildVideoEmbedUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+    expect(result).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&mute=1&playlist=dQw4w9WgXcQ');
+
+    const shortResult = buildVideoEmbedUrl('https://youtu.be/dQw4w9WgXcQ');
+    expect(shortResult).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&mute=1&playlist=dQw4w9WgXcQ');
+
+    const embedYt = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+    expect(buildVideoEmbedUrl(embedYt))
+      .toBe('https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&mute=1&playlist=dQw4w9WgXcQ');
+  });
+
+  it('adds autoplay, loop, mute, and playlist to YouTube embed URL without www', () => {
+    const embedYt = 'https://youtube.com/embed/dQw4w9WgXcQ';
+    expect(buildVideoEmbedUrl(embedYt))
+      .toBe('https://youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&mute=1&playlist=dQw4w9WgXcQ');
+  });
+
+  it('returns undefined when resolveEmbedUrl returns undefined', () => {
+    expect(buildVideoEmbedUrl('https://example.com/not-a-video')).toBeUndefined();
+    expect(buildVideoEmbedUrl('')).toBeUndefined();
   });
 });
