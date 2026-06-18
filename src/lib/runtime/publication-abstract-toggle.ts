@@ -22,7 +22,7 @@ export function initPublicationAbstractToggles(): void {
       if (isCollapsed) {
         panel.removeAttribute('hidden');
         toggle.setAttribute('aria-expanded', 'true');
-        toggle.textContent = 'Hide abstract';
+        toggle.textContent = 'Hide Abstract';
       } else {
         panel.setAttribute('hidden', '');
         toggle.setAttribute('aria-expanded', 'false');
