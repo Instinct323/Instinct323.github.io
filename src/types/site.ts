@@ -1,9 +1,7 @@
-// IMPORTANT: Imports HomePageConfig from ./home-config.ts to avoid circular dependency with ./home.ts
-import type { HomePageConfig } from './home-config';
-import type { MediaGridConfig, SiteImageConfig } from './image-config';
 import type { SiteEffectsConfig } from './effects';
 import type { ResolvedProfileData } from './profile';
 import type { ContentImage } from './media';
+import type { HomePageConfig } from './home-config';
 
 export interface SiteMetadata {
   siteUrl: string;
@@ -12,19 +10,91 @@ export interface SiteMetadata {
   keyword?: string;
 }
 
+export interface SiteNavRoute {
+  key: string;
+  href: string;
+}
+
 export interface SiteNavigation {
   order: string[];
+  routes: Record<string, SiteNavRoute>;
 }
 
 export interface PhotographyPageConfig {
-  grid: MediaGridConfig;
+  grid: {
+    columns: { desktop: number; mobile: number };
+    gap: string;
+  };
+}
+
+export interface ShellTokenConfig {
+  overlayAccentPrimary: string;
+  overlayAccentSecondary: string;
+  surfaceBg: string;
+  cardSurfaceBg: string;
+  surfaceBorder: string;
+  pageCanvas: string;
+  textStrong: string;
+  textBody: string;
+  textMuted: string;
+}
+
+export interface ShellsConfig {
+  home: ShellTokenConfig;
+  about: ShellTokenConfig;
+  photography: ShellTokenConfig;
+}
+
+export interface DeferredMountConfig {
+  containerSelector: string;
+  configDataKey: string;
+  mountGroup: string;
+  errorContext: string;
 }
 
 export interface SiteConfig {
   metadata: SiteMetadata;
   navigation: SiteNavigation;
-  home: HomePageConfig;
-  image: SiteImageConfig;
+  home: {
+    hero: HomePageConfig['hero'];
+    layout: HomePageConfig['layout'];
+    editorialHero: HomePageConfig['editorialHero'];
+    featuredMedia: {
+      items: string[];
+      carousel: {
+        ariaLabel: string;
+        prevButtonAriaLabel: string;
+        nextButtonAriaLabel: string;
+        emptyText: string;
+        showNavigationArrows: boolean;
+        showIndicator: boolean;
+        counterPadLength: number;
+        visual: {
+          spaceBetween: number;
+          slideWidth: { desktop: string; tablet: string; mobile: string };
+          inactiveOpacity: number;
+        };
+      };
+    };
+  };
+  image: {
+    format: string;
+    quality: number;
+    widths: {
+      medium: number[];
+      high: number[];
+    };
+    dprScale: {
+      low: number;
+      medium: number;
+      high: number;
+    };
+    lazyLoad: {
+      rootMargin: string;
+      localDebugDelayMs: number;
+    };
+    placeholderEffect: string;
+  };
   photography: PhotographyPageConfig;
   effects: SiteEffectsConfig;
 }

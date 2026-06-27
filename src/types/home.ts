@@ -1,7 +1,5 @@
-// IMPORTANT: HomePageConfig is defined in ./home-config.ts to avoid circular dependency with ./site.ts
-
 import type { ResolvedProfileData } from './profile';
-import type { SiteConfig } from './site';
+import type { SiteConfig, SiteMetadata, SiteNavigation } from './site';
 import type { HomePageConfig, HomePageHero } from './home-config';
 
 export type {
@@ -13,6 +11,13 @@ export type {
   HomePageFeaturedMediaConfig,
 } from './home-config';
 
+export interface HomePageSiteInfo {
+  metadata: SiteMetadata;
+  navigation: SiteNavigation;
+  image: SiteConfig['image'];
+  home: HomePageConfigGroup;
+}
+
 export interface HomePageConfigGroup {
   hero: HomePageConfig['hero'];
   layout: HomePageConfig['layout'];
@@ -23,6 +28,6 @@ export interface HomePageConfigGroup {
 
 export interface HomePageData {
   profile: ResolvedProfileData;
-  site: SiteConfig;
+  site: HomePageSiteInfo;
   home: HomePageHero;
 }

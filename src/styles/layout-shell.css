@@ -66,8 +66,8 @@ body {
 .site-frame::after {
   z-index: 2;
   background:
-    var(--page-overlay-accent-primary),
-    var(--page-overlay-accent-secondary),
+    var(--page-overlay-accent-primary, none),
+    var(--page-overlay-accent-secondary, none),
     var(--page-overlay);
 }
 

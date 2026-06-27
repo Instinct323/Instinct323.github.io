@@ -69,11 +69,10 @@ function getAttribute(attrs, name) {
 }
 
 function assertHasTestId(html, testId) {
-  const pattern = new RegExp(`\\bdata-testid=(['"])${escapeRegExp(testId)}\\1`, 'i');
-  assert.match(html, pattern, `Missing data-testid="${testId}"`);
+  getStartTagAttrsByTestId(html, testId);
 }
 
-function assertCarouselHooks(homeHtml, _carouselConfig) {
+function assertCarouselHooks(homeHtml) {
   const attrs = getStartTagAttrsByTestId(homeHtml, 'home-carousel');
 
   assert.ok(getAttribute(attrs, 'aria-label'), 'Carousel aria-label should exist');
@@ -162,6 +161,8 @@ function main() {
   const homeHtml = htmlByRoute['/'];
   const aboutHtml = htmlByRoute['/about/'];
   const photographyHtml = htmlByRoute['/photography/'];
+  readStylesheetBundles(homeHtml, '/');
+  readStylesheetBundles(aboutHtml, '/about/');
   readStylesheetBundles(photographyHtml, '/photography/');
 
   assertHasTestId(homeHtml, 'home-editorial-hero');
@@ -172,11 +173,12 @@ function main() {
 
   assertShellStyleOutput(homeHtml, '/', 'home');
   assertShellStyleOutput(aboutHtml, '/about/', 'about');
+  assertHasTestId(aboutHtml, 'about-links');
   assertShellStyleOutput(photographyHtml, '/photography/', 'photography');
 
   assertPhotographyPageCompleteness(photographyHtml);
   assertCarouselControlAria(homeHtml, cfg);
-  assertCarouselHooks(homeHtml, cfg.home.featuredMedia.carousel);
+  assertCarouselHooks(homeHtml);
   assertNoSourceModulePreload(homeHtml);
 
   const summary = {

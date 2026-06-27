@@ -50,3 +50,11 @@ export function assertObject<T extends object = Record<string, unknown>>(value: 
 
   return value as T;
 }
+
+export function assertPositiveScale(value: unknown, key: string): number {
+  const num = assertFiniteNumber(value, key);
+  if (num <= 0) {
+    throw new Error(`Invalid ${key}: expected a positive number.`);
+  }
+  return num;
+}

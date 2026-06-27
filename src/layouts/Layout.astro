@@ -1,5 +1,5 @@
 ---
-import { backgroundDesktopSource, backgroundMobileSource, optimizeImage } from '../lib/loaders/astro-adapter';
+import { backgroundDesktopSource, backgroundMobileSource, getImage } from '../lib/loaders/astro-adapter';
 import LayoutHead from '../components/layout/LayoutHead.astro';
 import Footer from '../components/layout/Footer.astro';
 import Header from '../components/layout/Header.astro';
@@ -13,9 +13,9 @@ import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
 import {
   LAYOUT_MOBILE_HEIGHT,
   LAYOUT_DESKTOP_HEIGHT,
-  selectBackgroundWidth,
   inferCoverWidth,
 } from '../lib/utils/layout-utils';
+import { IMAGE_HIGH_WIDTHS_KEY, selectCandidateWidthsByPolicy } from '../lib/utils/image-width-utils';
 import { assertString } from '../lib/utils/assertions';
 import '../styles/layout-shell.css';
 import '../styles/tokens.css';
@@ -59,8 +59,8 @@ type LayoutFrameData = {
 };
 
 type LayoutBackgroundData = {
-  backgroundMobile: Awaited<ReturnType<typeof optimizeImage>>;
-  backgroundDesktop: Awaited<ReturnType<typeof optimizeImage>>;
+  backgroundMobile: Awaited<ReturnType<typeof getImage>>;
+  backgroundDesktop: Awaited<ReturnType<typeof getImage>>;
 };
 
 const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundData>({
@@ -99,15 +99,15 @@ const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundDa
     ];
 
     const backgroundVariantEntries = await Promise.all(variants.map(async (variant) => {
-      const width = selectBackgroundWidth(
-        backgroundWidths,
-        variant.inferredWidth,
-        backgroundDprScale,
-        `${variant.key}.medium`,
-        variant.source.width,
-      );
+      const width = selectCandidateWidthsByPolicy({
+        candidateWidths: backgroundWidths,
+        inferredWidths: [variant.inferredWidth],
+        dprScale: backgroundDprScale,
+        key: `${IMAGE_HIGH_WIDTHS_KEY}.${variant.key}.medium`,
+        maxSelectableWidth: variant.source.width,
+      })[0];
 
-      const image = await optimizeImage({
+      const image = await getImage({
         src: variant.source,
         width,
         height: Math.ceil(width / variant.aspectRatio),
@@ -122,7 +122,7 @@ const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundDa
 
     const backgroundByVariant = Object.fromEntries(backgroundVariantEntries) as Record<
       BackgroundVariantKey,
-      Awaited<ReturnType<typeof optimizeImage>>
+      Awaited<ReturnType<typeof getImage>>
     >;
 
     return {
@@ -154,10 +154,10 @@ const resolvedTitle = title !== undefined ? title : assertString(siteMetadata.de
 const resolvedDescription = description !== undefined ? description : assertString(siteMetadata.defaultDescription, 'siteMetadata.defaultDescription');
 const keyword = siteMetadata.keyword;
 
-const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
-const sitemapUrl = new URL('/sitemap-index.xml', siteUrl).toString();
-const shellStyle = buildShellStyle(shell, contentWidth);
-const starfieldConfig = effectsConfig.starfield;
+  const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+  const sitemapUrl = new URL('/sitemap-index.xml', siteUrl).toString();
+  const shellStyle = buildShellStyle(shell, contentWidth);
+  const starfieldConfig = effectsConfig.starfield;
 ---
 
 <!doctype html>
@@ -173,6 +173,12 @@ const starfieldConfig = effectsConfig.starfield;
       type={type}
       noindex={noindex}
     />
+    <style is:inline set:html={`
+      :root {
+        --page-bg-image-mobile: url('${backgroundMobile.src}');
+        --page-bg-image-desktop: url('${backgroundDesktop.src}');
+      }
+    `} />
   </head>
   <body data-shell={shell} style={shellStyle}>
     <div

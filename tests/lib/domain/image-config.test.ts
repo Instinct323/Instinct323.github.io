@@ -2,11 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   resolveSiteImageConfig,
   resolveImageLazyLoadConfig,
-  resolveDeferredMountRuntimeConfig,
   resolveImagePlaceholderEffectConfig,
 } from '../../../src/lib/domain/image-config';
 import type { SiteImageConfig } from '../../../src/types/image-config';
-import type { DeferredImageLazyLoadConfig } from '../../../src/types/page-load';
 
 describe('resolveSiteImageConfig', () => {
   const validConfig: SiteImageConfig = {
@@ -228,51 +226,6 @@ describe('resolveImageLazyLoadConfig', () => {
 
     const result = resolveImageLazyLoadConfig(configWithZeroDelay);
     expect(result.localDebugDelayMs).toBe(0);
-  });
-});
-
-describe('resolveDeferredMountRuntimeConfig', () => {
-  const mockLazyLoad: DeferredImageLazyLoadConfig = {
-    rootMargin: '200px',
-    localDebugDelayMs: 1000,
-  };
-
-  it('uses localDebugDelayMs when dev=true', () => {
-    const result = resolveDeferredMountRuntimeConfig(mockLazyLoad, true);
-
-    expect(result).toEqual({
-      rootMargin: '200px',
-      mountDelayMs: 1000,
-    });
-  });
-
-  it('uses 0 when dev=false', () => {
-    const result = resolveDeferredMountRuntimeConfig(mockLazyLoad, false);
-
-    expect(result).toEqual({
-      rootMargin: '200px',
-      mountDelayMs: 0,
-    });
-  });
-
-  it('handles different localDebugDelayMs values in dev mode', () => {
-    const fastLazyLoad: DeferredImageLazyLoadConfig = {
-      rootMargin: '100px',
-      localDebugDelayMs: 100,
-    };
-
-    const result = resolveDeferredMountRuntimeConfig(fastLazyLoad, true);
-    expect(result.mountDelayMs).toBe(100);
-  });
-
-  it('always uses 0 mountDelayMs in production regardless of localDebugDelayMs', () => {
-    const slowLazyLoad: DeferredImageLazyLoadConfig = {
-      rootMargin: '300px',
-      localDebugDelayMs: 5000,
-    };
-
-    const result = resolveDeferredMountRuntimeConfig(slowLazyLoad, false);
-    expect(result.mountDelayMs).toBe(0);
   });
 });
 

@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "astro dev --host",
     "check": "bun run typecheck && bun run lint && bun run build",
-    "build": "bun scripts/copy-content-assets.js && astro build",
+    "build": "bun scripts/copy-content-assets.js && astro build --silent",
     "preview": "astro preview --host",
-    "typecheck": "astro check",
+    "typecheck": "astro check --silent",
     "lint": "bun tests/verify-no-media-json-refs.js && bun tests/verify-no-unused-tokens.js && eslint . --ext .js,.ts,.astro",
     "test:site": "node tests/assert-site-output.js",
     "test": "vitest run"
@@ -25,10 +25,10 @@
     "markdown-it": "^14.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "swiper": "^12.2.0",
-    "typescript": "^6.0.3"
+    "swiper": "^12.2.0"
   },
   "devDependencies": {
+    "typescript": "^6.0.3",
     "@astrojs/check": "^0.9.9",
     "@typescript-eslint/parser": "^8.60.1",
     "eslint": "^10.4.1",

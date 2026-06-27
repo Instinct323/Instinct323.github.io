@@ -2,31 +2,23 @@
  * Effects resolver registry — domain-level dependency inversion for effect configs.
  *
  * Plugins register their own resolvers at initialization time.
- * Config loaders call resolveEffectsConfig by name without knowing concrete plugin imports.
+ * Config loaders call getEffectsResolver by name without knowing concrete plugin imports.
  */
 
-export type EffectsResolver = (_config: unknown) => unknown;
+const registry = new Map<string, (_config: unknown) => unknown>();
 
-const registry = new Map<string, unknown>();
-
-export function registerEffectsResolver(name: string, resolver: EffectsResolver): void {
-  registry.set(name, resolver);
+export function registerEffectsResolver<T>(name: string, resolver: (_config: unknown) => T): void {
+  registry.set(name, resolver as (_config: unknown) => unknown);
 }
 
-export function resolveEffectsConfig(name: string, config: unknown): unknown {
-  const resolver = registry.get(name) as EffectsResolver | undefined;
-  if (!resolver) {
-    throw new Error(`No effects resolver registered for "${name}"`);
-  }
-  return resolver(config);
-}
-
-export function getEffectsResolver(name: string): unknown {
+export function getEffectsResolver<T>(name: string): (_config: unknown) => T {
   const resolver = registry.get(name);
   if (!resolver) {
-    throw new Error(`No effects resolver registered for "${name}"`);
+    throw new Error(
+      `No effects resolver registered for "${name}". Available: [${Array.from(registry.keys()).join(', ')}]`,
+    );
   }
-  return resolver;
+  return resolver as (_config: unknown) => T;
 }
 
 export function resetEffectsRegistry(): void {

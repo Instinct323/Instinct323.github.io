@@ -1,7 +1,4 @@
 ---
-// ContentSection.astro - Markdown content rendering
-// Renders introduction markdown with proper styling
-
 interface Props {
   introductionHtml: string;
 }
@@ -9,6 +6,7 @@ interface Props {
 const { introductionHtml } = Astro.props;
 ---
 
+<!-- `.card` is styled by the parent about page; kept as a layout hook. -->
 <article data-testid="about-markdown" class="card markdown-content" set:html={introductionHtml} />
 
 <style>
@@ -27,6 +25,7 @@ const { introductionHtml } = Astro.props;
     padding-bottom: 0.5rem;
   }
 
+  /* Remove extra top margin when an h2 is the first element in the markdown block. */
   .markdown-content :global(h2:first-child) {
     margin-top: 0;
   }
@@ -65,21 +64,6 @@ const { introductionHtml } = Astro.props;
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
     font-size: 0.9em;
-  }
-
-  /* Badge images (shields.io) */
-  .markdown-content :global(img) {
-    display: inline-block;
-    vertical-align: middle;
-    height: 20px;
-    margin-right: 0.25rem;
-  }
-
-  .markdown-content :global(p:first-child) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    margin-bottom: 1.5rem;
   }
 
   @media (max-width: 767px) {

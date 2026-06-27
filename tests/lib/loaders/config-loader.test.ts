@@ -48,14 +48,14 @@ describe('parseSiteConfig', () => {
   });
 
   it('throws for non-object root', () => {
-    expect(() => parseSiteConfig('null')).toThrow('Invalid site config JSONC content');
-    expect(() => parseSiteConfig('42')).toThrow('Invalid site config JSONC content');
-    expect(() => parseSiteConfig('"string"')).toThrow('Invalid site config JSONC content');
+    expect(() => parseSiteConfig('null')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
+    expect(() => parseSiteConfig('42')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
+    expect(() => parseSiteConfig('"string"')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
   });
 
   it('throws for array root', () => {
-    expect(() => parseSiteConfig('[]')).toThrow('Invalid site config JSONC content');
-    expect(() => parseSiteConfig('[1, 2, 3]')).toThrow('Invalid site config JSONC content');
+    expect(() => parseSiteConfig('[]')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
+    expect(() => parseSiteConfig('[1, 2, 3]')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
   });
 
   it('throws for invalid JSON', () => {

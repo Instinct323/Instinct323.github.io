@@ -1,41 +1,7 @@
 import type { LayoutProps } from '../../types/page';
+import type { ShellsConfig } from '../../types/site';
 
 export type { LayoutProps };
-
-interface ShellTokenConfig {
-  overlayAccentPrimary: string;
-  overlayAccentSecondary: string;
-  surfaceBg: string;
-  cardSurfaceBg: string;
-  surfaceBorder: string;
-  pageCanvas: string;
-  textStrong: string;
-  textBody: string;
-  textMuted: string;
-}
-
-const ELEVATED_SHELL_TOKENS: ShellTokenConfig = {
-  overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
-  overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
-  surfaceBg: 'var(--shell-elevated-surface-bg)',
-  cardSurfaceBg: 'var(--shell-elevated-card-bg)',
-  surfaceBorder: 'var(--shell-elevated-surface-border)',
-  pageCanvas: 'var(--shell-elevated-canvas)',
-  textStrong: 'var(--shell-home-text-strong)',
-  textBody: 'var(--shell-home-text-body)',
-  textMuted: 'var(--shell-home-text-muted)',
-};
-
-const shellTokens: Partial<Record<string, ShellTokenConfig>> = {
-  home: ELEVATED_SHELL_TOKENS,
-  about: ELEVATED_SHELL_TOKENS,
-  photography: {
-    ...ELEVATED_SHELL_TOKENS,
-    textStrong: 'var(--shell-text-strong-photography)',
-    textBody: 'var(--shell-text-body-photography)',
-    textMuted: 'var(--shell-text-muted-photography)',
-  },
-};
 
 const contentWidthTokens: Record<string, string> = {
   compact: 'var(--page-width-compact)',
@@ -43,6 +9,11 @@ const contentWidthTokens: Record<string, string> = {
   wide: 'var(--page-width-wide)',
 };
 
+/**
+ * Resolves a content-width token to its CSS custom property value.
+ * Unknown tokens are passed through as-is so callers can inject raw CSS
+ * values without changing the shell contract.
+ */
 function resolveContentWidth(contentWidth: string): string {
   if (contentWidth in contentWidthTokens) {
     return contentWidthTokens[contentWidth];
@@ -53,11 +24,53 @@ function resolveContentWidth(contentWidth: string): string {
 
 const PAGE_OVERLAY = 'var(--page-overlay)';
 
+const SHELLS_CONFIG: ShellsConfig = {
+  home: {
+    overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
+    overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
+    surfaceBg: 'var(--shell-elevated-surface-bg)',
+    cardSurfaceBg: 'var(--shell-elevated-card-bg)',
+    surfaceBorder: 'var(--shell-elevated-surface-border)',
+    pageCanvas: 'var(--shell-elevated-canvas)',
+    textStrong: 'var(--shell-home-text-strong)',
+    textBody: 'var(--shell-home-text-body)',
+    textMuted: 'var(--shell-home-text-muted)',
+  },
+  about: {
+    overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
+    overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
+    surfaceBg: 'var(--shell-elevated-surface-bg)',
+    cardSurfaceBg: 'var(--shell-elevated-card-bg)',
+    surfaceBorder: 'var(--shell-elevated-surface-border)',
+    pageCanvas: 'var(--shell-elevated-canvas)',
+    textStrong: 'var(--shell-home-text-strong)',
+    textBody: 'var(--shell-home-text-body)',
+    textMuted: 'var(--shell-home-text-muted)',
+  },
+  photography: {
+    overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
+    overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
+    surfaceBg: 'var(--shell-elevated-surface-bg)',
+    cardSurfaceBg: 'var(--shell-elevated-card-bg)',
+    surfaceBorder: 'var(--shell-elevated-surface-border)',
+    pageCanvas: 'var(--shell-elevated-canvas)',
+    textStrong: 'var(--shell-text-strong-photography)',
+    textBody: 'var(--shell-text-body-photography)',
+    textMuted: 'var(--shell-text-muted-photography)',
+  },
+};
+
+/**
+ * Builds the inline style string for a page shell by mapping semantic
+ * shell tokens from config to CSS custom properties. Unknown pages fall
+ * back to the base overlay and content-width tokens only.
+ */
 export function buildShellStyle(
   shell: string,
   contentWidth: string,
+  shellsConfig?: ShellsConfig,
 ): string {
-  const shellConfig = shellTokens[shell];
+  const shellConfig = (shellsConfig ?? SHELLS_CONFIG)[shell as keyof ShellsConfig];
   const layoutContentWidth = resolveContentWidth(contentWidth);
 
   const shellStyleTokens: Record<string, string> = {

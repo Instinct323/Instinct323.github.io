@@ -1,10 +1,7 @@
 import matter from 'gray-matter';
 import { katex } from '@mdit/plugin-katex';
 import MarkdownIt from 'markdown-it';
-
-// ============================================================================
-// Types
-// ============================================================================
+import { getDateTime } from './content-normalize';
 
 export interface RenderMarkdownOptions {
   fileURL?: string;
@@ -21,10 +18,7 @@ export interface MarkdownRenderer {
   render(_markdown: string): string;
 }
 
-// ============================================================================
-// Shared Utilities
-// ============================================================================
-
+/** Resolves relative src/href paths in rendered markdown HTML against a base file URL. */
 export function resolveRelativePaths(html: string, fileURL: string): string {
   try {
     const baseURL = new URL('.', fileURL).href;
@@ -66,27 +60,22 @@ export function resolveRelativePaths(html: string, fileURL: string): string {
   }
 }
 
-// ============================================================================
-// Renderer Factory
-// ============================================================================
+const BASE_MARKDOWN_IT_OPTIONS = {
+  html: false,
+  xhtmlOut: false,
+  breaks: false,
+  linkify: false,
+  typographer: false,
+};
 
+/** Creates a standard MarkdownIt renderer with safe defaults (no HTML, no linkify). */
 export function createMarkdownRenderer(): MarkdownRenderer {
-  const md = new MarkdownIt({
-    html: false,
-    xhtmlOut: false,
-    breaks: false,
-    linkify: false,
-    typographer: false,
-  });
+  const md = new MarkdownIt(BASE_MARKDOWN_IT_OPTIONS);
 
   return {
     render: (_markdown: string): string => md.render(_markdown),
   };
 }
-
-// ============================================================================
-// Shared Markdown Rendering Helper
-// ============================================================================
 
 function renderWithRenderer(
   renderer: MarkdownRenderer,
@@ -106,60 +95,26 @@ function renderWithRenderer(
   return html;
 }
 
-// ============================================================================
-// Basic Markdown Renderer (without KaTeX)
-// ============================================================================
-
 const renderer = createMarkdownRenderer();
 
+/** Renders markdown to HTML using the shared default renderer. */
 export function renderMarkdown(markdown: string, options?: RenderMarkdownOptions): string {
   return renderWithRenderer(renderer, markdown, options);
 }
 
-// ============================================================================
-// Markdown with KaTeX Support
-// ============================================================================
+const mdWithKatex = new MarkdownIt(BASE_MARKDOWN_IT_OPTIONS).use(katex);
 
-const mdWithKatex = new MarkdownIt({
-  html: false,
-  xhtmlOut: false,
-  breaks: false,
-  linkify: false,
-  typographer: false,
-}).use(katex);
-
+/** Renders markdown to HTML with KaTeX math support. */
 export function renderMarkdownWithKatex(markdown: string, options?: RenderMarkdownOptions): string {
   return renderWithRenderer(mdWithKatex, markdown, options);
 }
 
-// ============================================================================
-// Frontmatter Parser
-// ============================================================================
-
 function parseDateFromFrontmatter(data: Record<string, unknown> | undefined): Date | null {
-  if (!data?.date) {
-    return null;
-  }
-
-  const raw = data.date;
-
-  if (raw instanceof Date) {
-    return isNaN(raw.getTime()) ? null : raw;
-  }
-
-  if (typeof raw === 'string') {
-    const parsed = new Date(raw);
-    return isNaN(parsed.getTime()) ? null : parsed;
-  }
-
-  if (typeof raw === 'number') {
-    const parsed = new Date(raw);
-    return isNaN(parsed.getTime()) ? null : parsed;
-  }
-
-  return null;
+  const time = getDateTime(data?.date as Date | string | null);
+  return time !== null ? new Date(time) : null;
 }
 
+/** Parses a markdown string and extracts frontmatter (title, date, and custom data). */
 export function parseMarkdownWithFrontmatter(markdown: string): ParseMarkdownResult {
   if (!markdown || typeof markdown !== 'string') {
     throw new Error('Invalid markdown input');

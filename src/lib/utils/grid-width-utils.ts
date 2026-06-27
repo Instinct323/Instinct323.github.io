@@ -47,6 +47,7 @@ function computeGridCellWidth(viewportWidth: number, columns: number, gapPx: num
   return Math.round(contentWidth / columns);
 }
 
+/** Computes grid cell widths for mobile, tablet, and desktop viewports. */
 export function computeGridCellWidths(
   grid: GridDefinition,
   { mobile, tablet, desktop }: { mobile: number; tablet: number; desktop: number }
@@ -60,6 +61,7 @@ export function computeGridCellWidths(
   ];
 }
 
+/** Builds a responsive `sizes` attribute for grid images from column counts. */
 export function createGridSizesString(grid: GridDefinition): string {
   const mobileColumns = assertPositiveInteger(
     grid.columns.mobile,

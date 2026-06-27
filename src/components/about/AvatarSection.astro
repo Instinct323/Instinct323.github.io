@@ -1,43 +1,35 @@
 ---
 // AvatarSection.astro - Left rail avatar display
-// Image strategy: reuse shared deferred image placeholder/mount flow for cross-page consistency.
 // Responsive variant generation is centralized in media-loader-core for cross-surface consistency.
 
-import DeferredImage from '../common/DeferredImage.astro';
 import type { ContentImage } from '../../types/media';
 import { createImageVariantSet } from '../../lib/loaders/media-loader-core';
 import { resolveControlImageLoading } from '../../lib/loaders/page-load-orchestrator';
 
 interface Props {
   avatarImage: ContentImage;
-  placeholderEffectName: string;
 }
 
-const { avatarImage, placeholderEffectName } = Astro.props;
+const { avatarImage } = Astro.props;
 const { alt, responsive } = avatarImage;
 const variantSet = await createImageVariantSet(avatarImage);
 const criticalImageLoading = resolveControlImageLoading('critical');
 ---
 
 <div data-testid="about-avatar">
-  <div class="avatar-frame image-deferred-frame">
-    <DeferredImage
-      group="about-avatar-image"
-      placeholderEffectName={placeholderEffectName}
-    >
-      <img
-        class="avatar-image"
-        src={variantSet.src}
-        srcset={variantSet.srcset}
-        sizes={responsive.sizes}
-        alt={alt}
-        width={variantSet.width}
-        height={variantSet.height}
-        loading={criticalImageLoading.loading}
-        decoding={criticalImageLoading.decoding}
-        fetchpriority={criticalImageLoading.fetchPriority}
-      />
-    </DeferredImage>
+  <div class="avatar-frame">
+    <img
+      class="avatar-image"
+      src={variantSet.src}
+      srcset={variantSet.srcset}
+      sizes={responsive.sizes}
+      alt={alt}
+      width={variantSet.width}
+      height={variantSet.height}
+      loading={criticalImageLoading.loading}
+      decoding={criticalImageLoading.decoding}
+      fetchpriority={criticalImageLoading.fetchPriority}
+    />
   </div>
 </div>
 

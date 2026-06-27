@@ -1,7 +1,8 @@
 import Swiper from 'swiper';
 import type { Swiper as SwiperInstance } from 'swiper';
+import type { SwiperOptions } from 'swiper/types';
 import { EffectCoverflow, Keyboard, Navigation, Pagination } from 'swiper/modules';
-import { parseNumericAttr } from '../utils/content-normalize';
+import { parseNumericAttr } from '../../lib/utils/content-normalize';
 
 const ROOT_SELECTOR = '.home-carousel';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
@@ -139,16 +140,7 @@ function applyMotionSettings(swiper: SwiperInstance): void {
   swiper.params.effect = useReducedMotion ? 'slide' : 'coverflow';
 }
 
-function initSwiper(root: SwiperRoot, slideCount: number, config?: Partial<CarouselConfig>): void {
-  if (root.dataset[SWIPER_INIT_FLAG] === 'true') {
-    return;
-  }
-
-  const slides = root.querySelectorAll('.swiper-slide');
-  if (slides.length === 0) {
-    return;
-  }
-
+function createSwiperConfig(root: SwiperRoot, slideCount: number, config?: Partial<CarouselConfig>): SwiperOptions {
   // Accept both old/new control selectors during incremental component cleanup.
   const prevEl = getFirstOptionalHTMLElement(root, ['.nav-arrow--prev', '.swiper-nav-btn--prev']);
   const nextEl = getFirstOptionalHTMLElement(root, ['.nav-arrow--next', '.swiper-nav-btn--next']);
@@ -157,7 +149,7 @@ function initSwiper(root: SwiperRoot, slideCount: number, config?: Partial<Carou
   const spaceBetween = config?.spaceBetween ?? getSpaceBetween(root);
   const counterPadLength = config?.counterPadLength ?? getCounterPadLength(root);
 
-  const swiper = new Swiper(root, {
+  return {
     modules: [Navigation, Pagination, EffectCoverflow, Keyboard],
     effect: useReducedMotion ? 'slide' : 'coverflow',
     coverflowEffect: {
@@ -207,9 +199,26 @@ function initSwiper(root: SwiperRoot, slideCount: number, config?: Partial<Carou
         hideSwipeHint(root);
       },
     },
-  });
+  };
+}
 
+function initSwiper(
+  root: SwiperRoot,
+  slideCount: number,
+  config?: Partial<CarouselConfig>,
+): { success: boolean; reason?: string } {
+  if (root.dataset[SWIPER_INIT_FLAG] === 'true') {
+    return { success: false, reason: 'already-initialized' };
+  }
+
+  const slides = root.querySelectorAll('.swiper-slide');
+  if (slides.length === 0) {
+    return { success: false, reason: 'no-slides' };
+  }
+
+  const swiper = new Swiper(root, createSwiperConfig(root, slideCount, config));
   root.swiperApi = swiper;
+  return { success: true };
 }
 
 /**

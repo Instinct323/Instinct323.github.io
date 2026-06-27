@@ -2,11 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 import AvatarSection from '../components/about/AvatarSection.astro';
 import ContentSection from '../components/about/ContentSection.astro';
+import LinksSection from '../components/about/LinksSection.astro';
 import ProfileCard from '../components/about/ProfileCard.astro';
 import PublicationsSection from '../components/about/PublicationsSection.astro';
 import { loadAboutAvatarImage, loadAboutPageFrame } from '../lib/loaders/content-loader';
 import { loadMediaConfig } from '../lib/loaders/config-loader';
-import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
 
 const aboutLoad = await orchestratePageLoad({
@@ -24,12 +24,9 @@ const aboutLoad = await orchestratePageLoad({
   controls: ({ frame }) => loadAboutAvatarImage(frame.profile),
 });
 
-const { introductionHtml, profile, publications, mediaConfig } = aboutLoad.frame;
+const { introductionHtml, profile, publications } = aboutLoad.frame;
 const avatarImage = aboutLoad.controls;
-const avatarPlaceholderEffectName = mediaConfig.image.placeholderEffect;
-const avatarLazyRuntimePayload = buildDeferredMountRuntimePayload(mediaConfig.image.lazyLoad, import.meta.env.DEV);
-
-const profileName = profile.facts.find(({ id }) => id === 'name')?.value;
+const profileName = profile.name;
 ---
 
 <Layout
@@ -38,18 +35,17 @@ const profileName = profile.facts.find(({ id }) => id === 'name')?.value;
 >
   <section
     class="about-page page-container layout-content-container"
-    data-about-avatar-lazy-config={avatarLazyRuntimePayload}
   >
     <div class="about-container">
       <aside class="left-rail">
         <AvatarSection
           avatarImage={avatarImage}
-          placeholderEffectName={avatarPlaceholderEffectName}
         />
         <ProfileCard facts={profile.facts} />
       </aside>
 
       <div class="about-content">
+        <LinksSection links={profile.links} />
         <ContentSection introductionHtml={introductionHtml} />
         <PublicationsSection publications={publications} highlightAuthor={profileName} />
       </div>
@@ -58,26 +54,14 @@ const profileName = profile.facts.find(({ id }) => id === 'name')?.value;
 </Layout>
 
 <script>
-  import {
-    buildDeferredMountBootstrapOptions,
-    initDeferredMountGroupSafely,
-  } from '../lib/runtime/deferred-mount-init';
+  import { initDeferredMounts } from '../lib/deferred-mount-page';
 
-  initDeferredMountGroupSafely(
-    buildDeferredMountBootstrapOptions(
-      '.about-page[data-about-avatar-lazy-config]',
-      'aboutAvatarLazyConfig',
-      'about-avatar-image',
-    ),
-    'about avatar',
-  );
+  if (import.meta.env.SSR === false) {
+    initDeferredMounts();
+  }
 </script>
 
 <style>
-  .about-page {
-    /* Uses .page-container from layout-shell.css for padding */
-  }
-
   .about-container {
     display: grid;
     grid-template-columns: 260px 1fr;

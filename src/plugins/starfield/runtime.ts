@@ -29,7 +29,7 @@ interface StarfieldState {
   isVisible: boolean;
 }
 
-interface StarfieldContext {
+export interface StarfieldContext {
   backgroundCanvas: HTMLCanvasElement;
   starsCanvas: HTMLCanvasElement;
   config: StarfieldEffectConfig;
@@ -37,49 +37,6 @@ interface StarfieldContext {
   ctxSt: CanvasRenderingContext2D;
   starRgb: { r: number; g: number; b: number };
   cellSize: number;
-}
-
-function hideCanvases(backgroundCanvas: HTMLCanvasElement, starsCanvas: HTMLCanvasElement): void {
-  backgroundCanvas.style.display = 'none';
-  starsCanvas.style.display = 'none';
-}
-
-/**
- * Initializes the starfield canvas animation if enabled and motion is not reduced.
- * Returns a cleanup function so the caller can properly dispose event listeners
- * and animation frames to avoid memory leaks.
- */
-export function initStarfield(
-  backgroundCanvas: HTMLCanvasElement,
-  starsCanvas: HTMLCanvasElement,
-  config: StarfieldEffectConfig,
-): () => void {
-  if (!config.enabled) {
-    hideCanvases(backgroundCanvas, starsCanvas);
-    return () => {};
-  }
-
-  const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (reduceMotionQuery.matches) {
-    hideCanvases(backgroundCanvas, starsCanvas);
-    return () => {};
-  }
-
-  const ctxBg = backgroundCanvas.getContext('2d');
-  const ctxSt = starsCanvas.getContext('2d');
-
-  if (!ctxBg || !ctxSt) {
-    hideCanvases(backgroundCanvas, starsCanvas);
-    return () => {};
-  }
-
-  try {
-    return initStarfieldCore(backgroundCanvas, starsCanvas, config, ctxBg, ctxSt);
-  } catch (e) {
-    console.error('Starfield initialization failed, falling back to static background:', e);
-    hideCanvases(backgroundCanvas, starsCanvas);
-    return () => {};
-  }
 }
 
 function createStar(x: number, y: number, config: StarfieldEffectConfig): Star {
@@ -384,7 +341,7 @@ function removeEventListeners(handlers: ReturnType<typeof createEventHandlers>) 
   document.removeEventListener('visibilitychange', handlers.handleVisibilityChange);
 }
 
-function initStarfieldCore(
+export function initStarfieldCore(
   backgroundCanvas: HTMLCanvasElement,
   starsCanvas: HTMLCanvasElement,
   config: StarfieldEffectConfig,

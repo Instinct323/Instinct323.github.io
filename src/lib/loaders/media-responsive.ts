@@ -15,6 +15,7 @@ interface ResponsiveSlideWidthPercent {
   mobile: string;
 }
 
+/** Generates responsive width steps for a carousel slide up to its effective max width. */
 export function computeCarouselResponsiveWidths(
   viewportWidth: number,
   cssPercentage: number,
@@ -36,6 +37,7 @@ export function computeCarouselResponsiveWidths(
   return Array.from(new Set(widths.filter(width => width > 0))).sort((a, b) => a - b);
 }
 
+/** Merges responsive widths across desktop, tablet, and mobile profiles. */
 export function computeLayoutResponsiveWidths(
   profile: ResponsiveWidthProfile,
   maxLongEdge: number
@@ -68,6 +70,7 @@ function parseResponsivePercentage(value: string, key: string): number {
   return parsed;
 }
 
+/** Parses slide-width percentages and resolves inferred responsive widths. */
 export function computeCarouselInferredWidths(slideWidth: ResponsiveSlideWidthPercent): number[] {
   const profile: ResponsiveWidthProfile = {
     desktop: parseResponsivePercentage(slideWidth.desktop, 'carousel.slideWidth.desktop'),
@@ -78,6 +81,7 @@ export function computeCarouselInferredWidths(slideWidth: ResponsiveSlideWidthPe
   return computeLayoutResponsiveWidths(profile, Number.POSITIVE_INFINITY);
 }
 
+/** Derives gallery cell widths from the grid definition at standard breakpoints. */
 export function computeGalleryWidthsFromGrid(grid: MediaConfig['grid']): number[] {
   return computeGridCellWidths(grid, {
     mobile: RESPONSIVE_VIEWPORT_WIDTHS.mobile,

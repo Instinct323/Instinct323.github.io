@@ -3,16 +3,16 @@ export interface ProfileFact {
   value: string;
 }
 
+export interface ProfileLink {
+  key: string;
+  value: string;
+}
+
 export interface ProfileData {
   facts: ProfileFact[];
   email?: string;
   website?: string;
-  social?: {
-    github?: string;
-    orcid?: string;
-    googlescholar?: string;
-    csdn?: string;
-  };
+  links?: ProfileLink[];
 }
 
 export interface ResolvedProfileData extends ProfileData {

@@ -4,8 +4,9 @@ import GallerySection from '../components/photography/GallerySection.astro';
 import { loadPhotography } from '../lib/loaders/photography-effects-loader';
 import { loadMediaTree } from '../lib/loaders/media-loader';
 import { loadMediaConfig } from '../lib/loaders/config-loader';
-import { buildDeferredMountRuntimePayload } from '../lib/runtime/deferred-mount-init';
+import { resolveDeferredMountRuntimeConfig } from '../lib/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
+import '../styles/pills.css';
 
 const photographyLoad = await orchestratePageLoad({
   frame: async () => {
@@ -32,7 +33,7 @@ const {
 const { categories } = mediaTree;
 const { grid } = photographyConfig;
 const imageConfig = mediaConfig.image;
-const galleryLazyRuntimePayload = buildDeferredMountRuntimePayload(imageConfig.lazyLoad, import.meta.env.DEV);
+const galleryLazyRuntimePayload = JSON.stringify(resolveDeferredMountRuntimeConfig(imageConfig.lazyLoad, import.meta.env.DEV));
 ---
 
 <Layout
@@ -45,7 +46,7 @@ const galleryLazyRuntimePayload = buildDeferredMountRuntimePayload(imageConfig.l
         {categories.map((category) => (
           <a
             href={`#${category.id}`}
-            class="nav-chip"
+            class="pill"
             data-testid={`photography-chip-${category.id}`}
           >
             {category.title}
@@ -75,29 +76,22 @@ const galleryLazyRuntimePayload = buildDeferredMountRuntimePayload(imageConfig.l
 </Layout>
 
 <script>
-  import {
-    buildDeferredMountBootstrapOptions,
-    initDeferredMountGroupSafely,
-  } from '../lib/runtime/deferred-mount-init';
+  import { initDeferredMounts } from '../lib/deferred-mount-page';
 
-  initDeferredMountGroupSafely(
-    buildDeferredMountBootstrapOptions(
-      '.gallery-container[data-gallery-lazy-config]',
-      'galleryLazyConfig',
-      'gallery-image',
-    ),
-    'gallery',
-  );
+  if (import.meta.env.SSR === false) {
+    initDeferredMounts();
+  }
 </script>
 
 <style>
   /*
-    Photography page spacing system (defined on :root for global access)
+    Photography page spacing system (scoped to .photography-page so tokens
+    only affect this route's subtree).
     Base gap unit = 1rem:
     - gap-sm: gap between header and nav (sticky position), and gap between nav and section on anchor jump
     - gap-section: space between sections (2 * gap-sm + nav-height) ensures nav fits between sections
   */
-  :root {
+  .photography-page {
     --photo-gap-sm: 1rem;
     --photo-nav-height: 2rem;
 
@@ -134,36 +128,6 @@ const galleryLazyRuntimePayload = buildDeferredMountRuntimePayload(imageConfig.l
     height: var(--photo-nav-height);
   }
 
-  .nav-chip {
-    display: inline-flex;
-    align-items: center;
-    min-height: var(--photo-nav-height);
-    box-sizing: border-box;
-    padding: 0.375rem 0.875rem;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--nav-chip-text);
-    text-decoration: none;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--nav-chip-radius);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    transition: 
-      background var(--motion-duration-sm) var(--motion-ease-smooth),
-      transform var(--motion-duration-sm) var(--motion-ease-smooth);
-  }
-
-  .nav-chip:hover {
-    background: var(--nav-chip-hover-bg);
-    transform: translateY(-1px);
-  }
-
-  .nav-chip:focus-visible {
-    outline: var(--focus-ring);
-    outline-offset: 2px;
-  }
-
   @media (max-width: 767px) {
     .sticky-nav {
       /* Keep same gap-sm on mobile */
@@ -182,13 +146,6 @@ const galleryLazyRuntimePayload = buildDeferredMountRuntimePayload(imageConfig.l
 
     .nav-inner::-webkit-scrollbar {
       display: none;
-    }
-
-    .nav-chip {
-      flex-shrink: 0;
-      padding: 0.375rem 0.8125rem;
-      font-size: 0.8125rem;
-      scroll-snap-align: start;
     }
   }
 </style>

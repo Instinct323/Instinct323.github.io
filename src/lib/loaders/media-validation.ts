@@ -1,8 +1,9 @@
-import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, IMAGE_HIGH_WIDTHS_KEY, assertPositiveScale, selectCandidateWidthsByPolicy } from '../utils/image-width-utils';
+import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, IMAGE_HIGH_WIDTHS_KEY, selectCandidateWidthsByPolicy } from '../utils/image-width-utils';
+import { assertPositiveScale } from '../utils/assertions';
 import type { MediaConfig } from '../../types/site';
 import type { HomePageImageConfig } from '../../types/image-config';
 import type { HomePageCarouselConfig } from '../../types/carousel';
-import { normalizeContentImagePath, resolveContentImageMetadata } from './media-loader-core';
+import { normalizeContentImagePath } from './media-loader-core';
 import { computeCarouselInferredWidths } from './media-responsive';
 
 export interface ValidatedHomepageGalleryConfig {
@@ -34,10 +35,6 @@ function validateHomepageFeaturedPath(entry: unknown, index: number): string {
 
   if (!normalizedPath || !normalizedPath.startsWith('photography/')) {
     throw new Error(`Invalid homepage.featured[${index}]: "${rawPath}" is not a valid content/photography image path.`);
-  }
-
-  if (!resolveContentImageMetadata(normalizedPath)) {
-    throw new Error(`Invalid homepage.featured[${index}]: "${rawPath}" does not resolve to an existing image under content/photography/.`);
   }
 
   return normalizedPath;

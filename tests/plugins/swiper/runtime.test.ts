@@ -6,7 +6,7 @@ import {
   getSpaceBetween,
   getSlideCount,
   getCounterPadLength,
-} from '../../../src/lib/runtime/carousel';
+} from '../../../src/plugins/swiper/runtime';
 
 interface MockSwiperInstance {
   el: HTMLElement;

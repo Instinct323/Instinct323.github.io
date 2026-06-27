@@ -8,7 +8,7 @@ const primaryNavigation = buildPrimaryNavModel(loadNavigationConfig());
 
 <header class="is-sticky" data-testid="primary-header" data-sticky="true">
   <nav class="header-nav" aria-label={primaryNavigation.ariaLabel}>
-    {primaryNavigation.items.map(({ href, label, navTestId }) => {
+    {primaryNavigation.items.map(({ href, label, testId }) => {
       const isActive = currentRoutePath === href;
 
       return (
@@ -16,7 +16,7 @@ const primaryNavigation = buildPrimaryNavModel(loadNavigationConfig());
           href={href === '/' ? href : `${href}/`}
           class:list={{ 'is-active': isActive }}
           aria-current={isActive ? 'page' : undefined}
-          data-testid={navTestId}
+          data-testid={testId}
           data-active={isActive ? 'true' : 'false'}
         >
           {label}

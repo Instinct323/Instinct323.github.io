@@ -4,8 +4,7 @@ import { resolveSiteImageConfig } from '../domain/image-config';
 import type { HomePageConfigGroup } from '../../types/home';
 import type { MediaConfig, NavigationConfig, SiteConfig, SiteMetadata } from '../../types/site';
 
-export { loadSiteConfig, resetSiteConfig } from './config-cache';
-export { loadProfile, loadIntroduction } from './profile-loader';
+export { loadProfile } from './profile-loader';
 export { loadPhotography, loadEffectsConfig } from './photography-effects-loader';
 function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia']): SiteConfig['home']['featuredMedia'] {
   const carousel = featured.carousel;
@@ -18,11 +17,7 @@ function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia'])
   };
 }
 
-/**
- * Extracts the navigation slice from the full site config.
- * Kept as a stable public API entry point to allow future changes to the
- * internal config structure without affecting callers that only need navigation.
- */
+/** Extracts the navigation slice from the full site config. */
 export function loadNavigationConfig(): NavigationConfig {
   return loadSiteConfig().navigation;
 }

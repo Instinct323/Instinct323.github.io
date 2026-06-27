@@ -147,7 +147,7 @@ export function resolvePublicationLinks(publication: Publication): PublicationLi
  * @returns The base embed URL, or `undefined` if the URL is unsupported or malformed.
  */
 export function resolveEmbedUrl(videoUrl: string): string | undefined {
-  if (!videoUrl || typeof videoUrl !== 'string') {
+  if (!videoUrl) {
     return undefined;
   }
 
@@ -207,24 +207,20 @@ export function buildVideoEmbedUrl(videoUrl: string): string | undefined {
   const baseUrl = resolveEmbedUrl(videoUrl);
   if (!baseUrl) return undefined;
 
-  try {
-    const url = new URL(baseUrl);
-    if (url.hostname === 'player.bilibili.com') {
-      url.searchParams.set('autoplay', '1');
-      return url.toString();
-    }
-    if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
-      const videoId = url.pathname.split('/embed/')[1];
-      url.searchParams.set('autoplay', '1');
-      url.searchParams.set('loop', '1');
-      url.searchParams.set('mute', '1');
-      if (videoId) {
-        url.searchParams.set('playlist', videoId);
-      }
-      return url.toString();
-    }
-    return baseUrl;
-  } catch {
-    return baseUrl;
+  const url = new URL(baseUrl);
+  if (url.hostname === 'player.bilibili.com') {
+    url.searchParams.set('autoplay', '1');
+    return url.toString();
   }
+  if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
+    const videoId = url.pathname.split('/embed/')[1];
+    url.searchParams.set('autoplay', '1');
+    url.searchParams.set('loop', '1');
+    url.searchParams.set('mute', '1');
+    if (videoId) {
+      url.searchParams.set('playlist', videoId);
+    }
+    return url.toString();
+  }
+  return baseUrl;
 }

@@ -11,6 +11,28 @@
     {
       "id": "organization",
       "value": "SUSTech"
+    },
+    {
+      "id": "email",
+      "value": "tongzanjia@qq.com"
+    }
+  ],
+  "links": [
+    {
+      "key": "GitHub",
+      "value": "https://github.com/Instinct323"
+    },
+    {
+      "key": "Google Scholar",
+      "value": "https://scholar.google.com/citations?user=Zanjia_Tong"
+    },
+    {
+      "key": "CSDN",
+      "value": "https://blog.csdn.net/qq_55745968"
+    },
+    {
+      "key": "Channels",
+      "value": "#"
     }
   ]
 }

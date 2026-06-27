@@ -9,6 +9,13 @@ import type {
 export { PAGE_LOAD_PRIORITY } from '../../types/page-load';
 export type { PageLoadStage };
 
+/**
+ * Maps an image loading priority to the corresponding HTML attribute set.
+ * Critical images (e.g. hero, first viewport content) use eager+sync+high
+ * to block rendering until decoded and to win the network race. All other
+ * images default to lazy+async+auto so they do not compete for bandwidth
+ * or main-thread decoding time during initial load.
+ */
 export function resolveControlImageLoading(priority: ControlImagePriority): ControlImageLoadingAttrs {
   if (priority === 'critical') {
     return { loading: 'eager', decoding: 'sync', fetchPriority: 'high' };
@@ -16,12 +23,7 @@ export function resolveControlImageLoading(priority: ControlImagePriority): Cont
   return { loading: 'lazy', decoding: 'async', fetchPriority: 'auto' };
 }
 
-/**
- * Executes a page-load plan in three sequential stages: frame, controls,
- * background. Kept as a dedicated function so the orchestration order is
- * defined in one place; future rules (parallel controls, timeouts,
- * retries) can be added here without touching every page.
- */
+/** Executes a page-load plan in three sequential stages: frame, controls, background. */
 export async function orchestratePageLoad<
   TFrame,
   TBackground = undefined,

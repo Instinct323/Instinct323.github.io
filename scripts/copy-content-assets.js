@@ -25,10 +25,11 @@ function copyContentAssets() {
 
     mkdirSync(dirname(targetPath), { recursive: true });
     cpSync(dirPath, targetPath, { recursive: true });
-    console.warn(`Copied: ${relativePath} → public/${relativePath}`);
   }
 
-  console.warn(`Content assets copied successfully (${dirsWithMarkdown.length} directories)`);
+  if (dirsWithMarkdown.length > 0) {
+    console.warn(`Content assets copied (${dirsWithMarkdown.length} directories)`);
+  }
 }
 
 function findDirectoriesWithMarkdown(startDir) {

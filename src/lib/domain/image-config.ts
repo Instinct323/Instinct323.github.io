@@ -1,8 +1,4 @@
 import type { SiteImageConfig } from '../../types/image-config';
-import type {
-  DeferredImageLazyLoadConfig,
-  DeferredMountRuntimeConfig,
-} from '../../types/page-load';
 import {
   assertFiniteNumber,
   assertObject,
@@ -62,21 +58,6 @@ export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageC
   }
 
   return effectName;
-}
-
-/**
- * Derives the runtime deferred mount config from lazy-load settings.
- * In development we add an artificial delay so developers can observe
- * the loading behavior; in production we mount immediately for speed.
- */
-export function resolveDeferredMountRuntimeConfig(
-  lazyLoad: DeferredImageLazyLoadConfig,
-  isDev: boolean,
-): Omit<DeferredMountRuntimeConfig, 'selector'> {
-  return {
-    rootMargin: lazyLoad.rootMargin,
-    mountDelayMs: isDev ? lazyLoad.localDebugDelayMs : 0,
-  };
 }
 
 /**

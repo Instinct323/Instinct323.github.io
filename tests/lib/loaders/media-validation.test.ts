@@ -3,12 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('./media-loader-core', () => ({
   normalizeContentImagePath: vi.fn((p: string) => p),
   resolveContentImageMetadata: vi.fn(() => null),
-  assertPositiveScale: vi.fn((v: unknown, key: string) => {
-    if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0) {
-      throw new Error(`Invalid ${key}: expected a positive number.`);
-    }
-    return v;
-  }),
 }));
 
 import { assertMediaConfigShape } from '../../../src/lib/loaders/media-validation';

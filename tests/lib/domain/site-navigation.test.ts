@@ -7,6 +7,15 @@ import {
 } from '../../../src/lib/domain/site-navigation';
 import type { NavigationConfig } from '../../../src/types/site';
 
+function buildRoutes(): NavigationConfig['routes'] {
+  return {
+    home: { key: 'home', href: '/' },
+    about: { key: 'about', href: '/about' },
+    photography: { key: 'photography', href: '/photography' },
+    blog: { key: 'blog', href: '/blog' },
+  };
+}
+
 describe('formatPageLabel', () => {
   it("returns '' for empty string", () => {
     expect(formatPageLabel('')).toBe('');
@@ -29,10 +38,11 @@ describe('formatPageLabel', () => {
   });
 });
 
-describe('NAV_ROUTES', () => {
+describe('navigation.routes', () => {
   it("contains 'home', 'about', 'photography', 'blog' keys via buildPrimaryNavModel", () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about', 'photography', 'blog'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -47,6 +57,7 @@ describe('NAV_ROUTES', () => {
   it('each entry has path and label properties via buildPrimaryNavModel', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -54,11 +65,11 @@ describe('NAV_ROUTES', () => {
     result.items.forEach((item) => {
       expect(item).toHaveProperty('key');
       expect(item).toHaveProperty('href');
-      expect(item).toHaveProperty('navTestId');
+      expect(item).toHaveProperty('testId');
       expect(item).toHaveProperty('label');
       expect(typeof item.key).toBe('string');
       expect(typeof item.href).toBe('string');
-      expect(typeof item.navTestId).toBe('string');
+      expect(typeof item.testId).toBe('string');
       expect(typeof item.label).toBe('string');
     });
   });
@@ -66,6 +77,7 @@ describe('NAV_ROUTES', () => {
   it('has correct route configurations', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about', 'photography', 'blog'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -73,25 +85,25 @@ describe('NAV_ROUTES', () => {
     expect(result.items[0]).toEqual({
       key: 'home',
       href: '/',
-      navTestId: 'nav-home',
+      testId: 'nav-home',
       label: 'Home',
     });
     expect(result.items[1]).toEqual({
       key: 'about',
       href: '/about',
-      navTestId: 'nav-about',
+      testId: 'nav-about',
       label: 'About',
     });
     expect(result.items[2]).toEqual({
       key: 'photography',
       href: '/photography',
-      navTestId: 'nav-photography',
+      testId: 'nav-photography',
       label: 'Photography',
     });
     expect(result.items[3]).toEqual({
       key: 'blog',
       href: '/blog',
-      navTestId: 'nav-blog',
+      testId: 'nav-blog',
       label: 'Blog',
     });
   });
@@ -101,6 +113,7 @@ describe('buildPrimaryNavModel', () => {
   it('returns nav items with correct labels and paths for valid navigation config', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about', 'photography'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -108,27 +121,24 @@ describe('buildPrimaryNavModel', () => {
     expect(result.ariaLabel).toBe('Primary navigation');
     expect(result.items).toHaveLength(3);
 
-    // Check first item (home)
     expect(result.items[0]).toEqual({
       key: 'home',
       href: '/',
-      navTestId: 'nav-home',
+      testId: 'nav-home',
       label: 'Home',
     });
 
-    // Check second item (about)
     expect(result.items[1]).toEqual({
       key: 'about',
       href: '/about',
-      navTestId: 'nav-about',
+      testId: 'nav-about',
       label: 'About',
     });
 
-    // Check third item (photography)
     expect(result.items[2]).toEqual({
       key: 'photography',
       href: '/photography',
-      navTestId: 'nav-photography',
+      testId: 'nav-photography',
       label: 'Photography',
     });
   });
@@ -136,6 +146,7 @@ describe('buildPrimaryNavModel', () => {
   it('returns empty items array when order is empty', () => {
     const navigation: NavigationConfig = {
       order: [],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -147,6 +158,7 @@ describe('buildPrimaryNavModel', () => {
   it('handles single item in order', () => {
     const navigation: NavigationConfig = {
       order: ['blog'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -155,7 +167,7 @@ describe('buildPrimaryNavModel', () => {
     expect(result.items[0]).toEqual({
       key: 'blog',
       href: '/blog',
-      navTestId: 'nav-blog',
+      testId: 'nav-blog',
       label: 'Blog',
     });
   });
@@ -163,6 +175,7 @@ describe('buildPrimaryNavModel', () => {
   it('handles all routes in order', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about', 'photography', 'blog'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -179,6 +192,7 @@ describe('buildPrimaryNavModel', () => {
   it('preserves order from navigation config', () => {
     const navigation: NavigationConfig = {
       order: ['blog', 'photography', 'about', 'home'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
@@ -190,31 +204,41 @@ describe('buildPrimaryNavModel', () => {
       'home',
     ]);
   });
+
+  it('throws when an order key is missing from routes', () => {
+    const navigation: NavigationConfig = {
+      order: ['home', 'missing-key'],
+      routes: buildRoutes(),
+    };
+
+    expect(() => buildPrimaryNavModel(navigation)).toThrow(
+      'buildNavItems: key "missing-key" not found in navigation.routes',
+    );
+  });
 });
 
 describe('buildNavItems (via buildPrimaryNavModel)', () => {
   it('verify output structure matches type contract', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
 
-    // Verify SiteNavModel structure
     expect(result).toHaveProperty('ariaLabel');
     expect(result).toHaveProperty('items');
     expect(typeof result.ariaLabel).toBe('string');
     expect(Array.isArray(result.items)).toBe(true);
 
-    // Verify each SiteNavItem structure
     result.items.forEach((item: SiteNavItem) => {
       expect(item).toHaveProperty('key');
       expect(item).toHaveProperty('href');
-      expect(item).toHaveProperty('navTestId');
+      expect(item).toHaveProperty('testId');
       expect(item).toHaveProperty('label');
       expect(typeof item.key).toBe('string');
       expect(typeof item.href).toBe('string');
-      expect(typeof item.navTestId).toBe('string');
+      expect(typeof item.testId).toBe('string');
       expect(typeof item.label).toBe('string');
     });
   });
@@ -222,6 +246,7 @@ describe('buildNavItems (via buildPrimaryNavModel)', () => {
   it('generates correct label from formatPageLabel', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about'],
+      routes: buildRoutes(),
     };
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);

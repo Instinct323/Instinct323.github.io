@@ -1,13 +1,9 @@
-import type { NavigationConfig } from '../../types/site';
-
-export interface SiteNavRoute {
-  key: string;
-  href: string;
-  navTestId: string;
-}
+import type { NavigationConfig, SiteNavRoute } from '../../types/site';
+import { wordsToTitle } from '../utils/content-normalize';
 
 export interface SiteNavItem extends SiteNavRoute {
   label: string;
+  testId: string;
 }
 
 export interface SiteNavModel {
@@ -15,52 +11,29 @@ export interface SiteNavModel {
   items: SiteNavItem[];
 }
 
-const NAV_ROUTES: Record<string, SiteNavRoute> = {
-  home: {
-    key: 'home',
-    href: '/',
-    navTestId: 'nav-home',
-  },
-  about: {
-    key: 'about',
-    href: '/about',
-    navTestId: 'nav-about',
-  },
-  photography: {
-    key: 'photography',
-    href: '/photography',
-    navTestId: 'nav-photography',
-  },
-  blog: {
-    key: 'blog',
-    href: '/blog',
-    navTestId: 'nav-blog',
-  },
-};
-
-
 export function formatPageLabel(key: string): string {
-  return key.charAt(0).toUpperCase() + key.slice(1);
+  return wordsToTitle([key]);
 }
 
-function buildNavItems(routeKeys: string[]): SiteNavItem[] {
-  return routeKeys.map((key) => {
-    const route = NAV_ROUTES[key];
+function buildNavItems(navigation: NavigationConfig): SiteNavItem[] {
+  return navigation.order.map((key) => {
+    const route = navigation.routes[key];
     if (!route) {
-      throw new Error(`buildNavItems: key "${key}" not found in NAV_ROUTES`);
+      throw new Error(`buildNavItems: key "${key}" not found in navigation.routes`);
     }
     return {
-      key,
+      key: route.key,
       href: route.href,
-      navTestId: route.navTestId,
-      label: formatPageLabel(key),
+      testId: 'nav-' + route.key,
+      label: formatPageLabel(route.key),
     };
   });
 }
 
+/** Builds the primary navigation model from the configured route order. */
 export function buildPrimaryNavModel(navigation: NavigationConfig): SiteNavModel {
   return {
     ariaLabel: 'Primary navigation',
-    items: buildNavItems(navigation.order),
+    items: buildNavItems(navigation),
   };
 }

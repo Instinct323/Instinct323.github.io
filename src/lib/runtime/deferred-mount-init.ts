@@ -1,9 +1,22 @@
 import { buildDeferredMountGroupSelector, initDeferredMounts } from './deferred-mount';
 import { assertString } from '../utils/assertions';
 import { parseDatasetPayload } from '../utils/dataset';
-import type { SiteImageConfig } from '../../types/image-config';
-import type { DeferredMountRuntimeConfig } from '../../types/page-load';
-import { resolveDeferredMountRuntimeConfig } from '../domain/image-config';
+import type { DeferredImageLazyLoadConfig, DeferredMountRuntimeConfig } from '../../types/page-load';
+
+/**
+ * Derives the runtime deferred mount config from lazy-load settings.
+ * In development we add an artificial delay so developers can observe
+ * the loading behavior; in production we mount immediately for speed.
+ */
+export function resolveDeferredMountRuntimeConfig(
+  lazyLoad: DeferredImageLazyLoadConfig,
+  isDev: boolean,
+): Omit<DeferredMountRuntimeConfig, 'selector'> {
+  return {
+    rootMargin: lazyLoad.rootMargin,
+    mountDelayMs: isDev ? lazyLoad.localDebugDelayMs : 0,
+  };
+}
 
 export interface DeferredMountBootstrapOptions {
   containerSelector: string;
@@ -57,36 +70,6 @@ export function bootstrapDeferredMounts(options: DeferredMountBootstrapOptions):
 }
 
 /**
- * Serializes the deferred-mount runtime config into a JSON payload string
- * suitable for embedding in a data attribute. Centralized here so pages do
- * not repeat the resolve + stringify pair.
- */
-export function buildDeferredMountRuntimePayload(
-  lazyLoad: SiteImageConfig['lazyLoad'],
-  isDev: boolean,
-): string {
-  const runtimeConfig = resolveDeferredMountRuntimeConfig(lazyLoad, isDev);
-  return JSON.stringify(runtimeConfig);
-}
-
-/**
- * Packages selector, config key, and mount group into the options object
- * expected by `bootstrapDeferredMounts`. Kept as a named helper so call
- * sites read declaratively and remain easy to update if the shape changes.
- */
-export function buildDeferredMountBootstrapOptions(
-  containerSelector: string,
-  configDataKey: string,
-  mountGroup: string,
-): DeferredMountBootstrapOptions {
-  return {
-    containerSelector,
-    configDataKey,
-    mountGroup,
-  };
-}
-
-/**
  * Wraps deferred mount initialization in a try/catch so one failed group
  * does not crash the page or block other groups. Deferred mounts are
  * non-critical; graceful degradation keeps the rest of the page usable.
@@ -102,18 +85,3 @@ export function initDeferredMountGroupSafely(
   }
 }
 
-/**
- * Convenience wrapper that bootstraps deferred mounts for the home carousel
- * image group. Encapsulates the specific selector and config key pairing
- * so page-level code does not repeat them.
- */
-export function initHomeCarouselDeferredMounts(): void {
-  initDeferredMountGroupSafely(
-    buildDeferredMountBootstrapOptions(
-      '.home-carousel[data-carousel-lazy-config]',
-      'carouselLazyConfig',
-      'home-carousel-image',
-    ),
-    'home carousel',
-  );
-}

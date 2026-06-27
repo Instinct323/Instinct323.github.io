@@ -1,13 +1,29 @@
-import { runWhenIdle, CAROUSEL_PREWARM_TIMEOUT, CAROUSEL_PREWARM_FALLBACK } from './scheduling';
+import { runWhenIdle } from '../../lib/runtime/scheduling';
 
+const CAROUSEL_PREWARM_TIMEOUT = 1200;
+const CAROUSEL_PREWARM_FALLBACK = 250;
+
+/**
+ * Initializes the carousel with a four-tier prewarm strategy, ranked by
+ * urgency:
+ * 1. idle-time prewarm (requestIdleCallback) — starts the module download
+ *    when the browser is idle so the bundle is likely cached before interaction.
+ * 2. intent-based prewarm (pointermove/touchstart) — warms when the user
+ *    shows intent but before they commit to an interaction.
+ * 3. eager load (pointerenter/focusin) — initializes immediately when the
+ *    user hovers or focuses the carousel, keeping controls responsive.
+ * 4. viewport-based lazy init (IntersectionObserver) — the fallback path
+ *    when none of the above fire first; starts when the carousel is near
+ *    the viewport so off-screen carousels do not consume resources.
+ */
 export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
   // Keep one shared import promise so pointer/focus/viewport triggers never double-init.
   let initPromise: Promise<void> | null = null;
-  let carouselModulePromise: Promise<typeof import('./carousel')> | null = null;
+  let carouselModulePromise: Promise<typeof import('./runtime')> | null = null;
 
   const prewarmCarouselModule = () => {
     if (!carouselModulePromise) {
-      carouselModulePromise = import('./carousel');
+      carouselModulePromise = import('./runtime');
     }
 
     return carouselModulePromise;

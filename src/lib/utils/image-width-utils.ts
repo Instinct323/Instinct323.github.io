@@ -1,4 +1,4 @@
-import { assertFiniteNumber, assertPositiveIntegerArray } from './assertions';
+import { assertPositiveIntegerArray, assertPositiveScale } from './assertions';
 
 export const IMAGE_MEDIUM_WIDTHS_KEY = 'image.widths.medium';
 export const IMAGE_HIGH_WIDTHS_KEY = 'image.widths.high';
@@ -9,14 +9,6 @@ export interface CandidateWidthPolicyInput {
   dprScale: number;
   key: string;
   maxSelectableWidth?: number;
-}
-
-export function assertPositiveScale(value: unknown, key: string): number {
-  const num = assertFiniteNumber(value, key);
-  if (num <= 0) {
-    throw new Error(`Invalid ${key}: expected a positive number.`);
-  }
-  return num;
 }
 
 export function assertStrictlyIncreasingPositiveWidths(widths: unknown, key: string): number[] {
@@ -71,6 +63,7 @@ function normalizeCandidateWidths(
   throw new Error(`Invalid ${key}: no candidate width is <= maxSelectableWidth (${normalizedMax}).`);
 }
 
+/** Selects the best candidate width for each inferred width using DPR-scaled bucket matching. */
 export function selectCandidateWidthsByPolicy(input: CandidateWidthPolicyInput): number[] {
   const {
     candidateWidths,

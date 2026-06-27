@@ -3,8 +3,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
-import '../../styles/carousel.css';
-import DeferredImage from '../common/DeferredImage.astro';
+import './styles.css';
+import DeferredImage from '../../components/common/DeferredImage.astro';
 import type { FeaturedSlide } from '../../types/media';
 import type { HomePageConfigGroup as HomepageConfig } from '../../types/home';
 import { resolveControlImageLoading } from '../../lib/loaders/page-load-orchestrator';
@@ -131,17 +131,15 @@ const nextIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
 )}
 
 {hasSlides && <script>
-  import { initHomeCarouselDeferredMounts } from '../../lib/runtime/deferred-mount-init';
-  initHomeCarouselDeferredMounts();
+  import { initCarouselDeferredMounts } from './deferred-mount';
+  initCarouselDeferredMounts();
 </script>}
 
 {hasMultiSlides && <script>
-  import { initCarouselWithPrewarm } from '../../lib/runtime/carousel-prewarm';
+  import { initCarouselWithPrewarm } from './prewarm';
 
   const carouselRoot = document.querySelector('.home-carousel');
   if (carouselRoot instanceof HTMLElement) {
     initCarouselWithPrewarm(carouselRoot);
   }
 </script>}
-
-

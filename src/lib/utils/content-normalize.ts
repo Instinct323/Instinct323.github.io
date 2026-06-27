@@ -64,7 +64,7 @@ export interface WeightedContent {
   slug: string;
 }
 
-function getDateTime(date: Date | string | null): number | null {
+export function getDateTime(date: Date | string | null): number | null {
   if (date === null) return null;
   if (date instanceof Date) return date.getTime();
   const parsed = new Date(date);

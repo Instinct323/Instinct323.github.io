@@ -16,6 +16,7 @@ export const DEFERRED_MOUNT_STATE = {
   error: 'error',
 } as const;
 
+/** Builds a CSS selector for deferred-mount nodes belonging to a given group. */
 export function buildDeferredMountGroupSelector(group: string): string {
   if (typeof group !== 'string' || group.trim().length === 0) {
     throw new Error('Missing or invalid deferred mount group selector input.');
@@ -80,26 +81,23 @@ function mountDeferredNode(node: HTMLElement): void {
  * shift and a flash of unstyled content.
  */
 function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
-  // Detect images that may still be loading so we can gate the placeholder removal.
+  // Detect images that may still be loading so we can gate the placeholder fade-out.
   const mountedImages = Array.from(host.querySelectorAll<HTMLImageElement>('img'));
-  const placeholder = node.querySelector<HTMLElement>(`[${DEFERRED_MOUNT_DATA.placeholder}]`);
 
   if (mountedImages.length === 0) {
-    placeholder?.remove();
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.loaded;
     return;
   }
 
   const pendingImages = mountedImages.filter((image) => !image.complete);
   if (pendingImages.length === 0) {
-    placeholder?.remove();
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.loaded;
     return;
   }
 
   let remainingImages = pendingImages.length;
 
-  // Counts down as each image fires load or error; placeholder removal is gated
+  // Counts down as each image fires load or error; placeholder fade-out is gated
   // on ALL images settling so the layout does not shift while images are still loading.
   const markImageReady = (): void => {
     remainingImages -= 1;
@@ -107,11 +105,10 @@ function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
       return;
     }
 
-    placeholder?.remove();
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.loaded;
   };
 
-  // Treat both load and error as "settled" — a broken image should not block placeholder removal forever.
+  // Treat both load and error as "settled" — a broken image should not block placeholder fade-out forever.
   pendingImages.forEach((image) => {
     image.addEventListener('load', markImageReady, { once: true });
     image.addEventListener('error', markImageReady, { once: true });
@@ -175,11 +172,7 @@ export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
           continue;
         }
 
-        const node = entry.target;
-        if (!(node instanceof HTMLElement)) {
-          continue;
-        }
-
+        const node = entry.target as HTMLElement;
         mountWithDelay(node, mountDelayMs);
         observer.unobserve(node);
       }

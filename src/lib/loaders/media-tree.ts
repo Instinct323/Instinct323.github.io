@@ -65,13 +65,6 @@ export function appendImageToCategoryMap(
   category.images.push(image);
 }
 
-export function compareMediaModuleEntries(
-  [pathA]: [string, ImageModuleEntry],
-  [pathB]: [string, ImageModuleEntry]
-): number {
-  return compareNatural(pathA, pathB);
-}
-
 /** Type guard for Vite glob results: Astro image imports are objects with a `default` export containing ImageMetadata, but the glob type is too broad to guarantee this at compile time. */
 function isImageModuleEntry(mod: unknown): mod is ImageModuleEntry {
   return mod !== null && typeof mod === 'object' && 'default' in mod;
@@ -98,7 +91,7 @@ export async function loadMediaTreeFromGallery(
   const categoryMap = new Map<string, CategoryAccumulator>();
 
   const entries = Object.entries(CONTENT_IMAGE_MODULES) as [string, ImageModuleEntry][];
-  for (const [path, mod] of entries.sort(compareMediaModuleEntries)) {
+  for (const [path, mod] of entries.sort(([pathA], [pathB]) => compareNatural(pathA, pathB))) {
     if (!path.includes(PHOTOGRAPHY_FILTER) || !isImageModuleEntry(mod)) {
       continue;
     }

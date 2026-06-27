@@ -9,7 +9,9 @@ export const PUBLICATION_DIR = `${ABOUT_DIR}/publication`;
 // expressions like `${CONTENT_ROOT}/**/*.json` cannot be analyzed statically, so
 // glob patterns must be hardcoded here rather than derived from CONTENT_ROOT
 
-export const CONTENT_IMAGE_PATH_PREFIX = '../../../content/';
+export const CONTENT_IMAGE_PATH_PREFIX = '../../../../content/';
+export const CONTENT_MODULE_KEY_TEMPLATE = '../../../../content/';
+export const PHOTOGRAPHY_MODULE_KEY_PREFIX = 'photography/';
 
 // Config files
 export const CONFIG_FILE = `${CONTENT_ROOT}/config.jsonc`;
@@ -23,6 +25,7 @@ export const PHOTOGRAPHY_FILTER = '/content/photography/';
 // Specific files
 export const PROFILE_JSON = `${ABOUT_DIR}/profile.json`;
 export const AVATAR_JPG = `${ABOUT_DIR}/avatar.jpg`;
+export const AVATAR_RELATIVE_PATH = 'about/avatar.jpg';
 export const DESKTOP_BG_JPG = `${BACKGROUND_DIR}/desktop.jpg`;
 export const MOBILE_BG_JPG = `${BACKGROUND_DIR}/mobile.jpg`;
 

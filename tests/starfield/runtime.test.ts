@@ -159,23 +159,17 @@ describe('starfield-runtime', () => {
       cleanup();
     });
 
-    it('hides canvases when config.enabled is false', () => {
+    it('throws when config.enabled is false', () => {
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
       const config = createTestConfig({ enabled: false });
-      initStarfield(backgroundCanvas, starsCanvas, config);
-
-      expect(backgroundCanvas.style.display).toBe('none');
-      expect(starsCanvas.style.display).toBe('none');
+      expect(() => initStarfield(backgroundCanvas, starsCanvas, config)).toThrow('Starfield disabled by config');
     });
 
-    it('hides canvases when prefers-reduced-motion is enabled', () => {
+    it('throws when prefers-reduced-motion is enabled', () => {
       mockMatchMedia.mockReturnValue({ matches: true });
       const { backgroundCanvas, starsCanvas } = createMockCanvases();
       const config = createTestConfig({ enabled: true });
-      initStarfield(backgroundCanvas, starsCanvas, config);
-
-      expect(backgroundCanvas.style.display).toBe('none');
-      expect(starsCanvas.style.display).toBe('none');
+      expect(() => initStarfield(backgroundCanvas, starsCanvas, config)).toThrow('Starfield skipped: prefers-reduced-motion is enabled');
     });
 
     it('sets up canvas dimensions correctly', () => {
@@ -189,7 +183,7 @@ describe('starfield-runtime', () => {
   });
 
   describe('edge cases', () => {
-    it('handles canvas without valid 2d context', () => {
+    it('throws when canvas has no valid 2d context', () => {
       const bgCanvas = {
         getContext: vi.fn(() => null),
         style: { display: '' } as unknown as CSSStyleDeclaration,
@@ -201,11 +195,7 @@ describe('starfield-runtime', () => {
       } as unknown as HTMLCanvasElement;
 
       const config = createTestConfig();
-      const cleanup = initStarfield(bgCanvas, starsCanvas, config);
-
-      expect(typeof cleanup).toBe('function');
-      expect(bgCanvas.style.display).toBe('none');
-      cleanup();
+      expect(() => initStarfield(bgCanvas, starsCanvas, config)).toThrow('Starfield skipped: failed to acquire 2D canvas context');
     });
 
     it('handles empty starShapes array gracefully', () => {

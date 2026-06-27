@@ -8,7 +8,13 @@
   },
   // Owned by IA/accessibility editors; consumed by header nav.
   "navigation": {
-    "order": ["home", "about", "blog", "photography"]
+    "order": ["home", "about", "blog", "photography"],
+    "routes": {
+      "home": { "key": "home", "href": "/" },
+      "about": { "key": "about", "href": "/about" },
+      "photography": { "key": "photography", "href": "/photography" },
+      "blog": { "key": "blog", "href": "/blog" }
+    }
   },
   // Owned by homepage editors; consumed by src/lib/content-loader.ts and home components.
   "home": {
