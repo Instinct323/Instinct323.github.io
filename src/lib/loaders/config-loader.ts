@@ -6,15 +6,22 @@ import type { MediaConfig, NavigationConfig, SiteConfig, SiteMetadata } from '..
 
 export { loadProfile } from './profile-loader';
 export { loadPhotography, loadEffectsConfig } from './photography-effects-loader';
+const featuredMediaCache = new WeakMap<SiteConfig['home']['featuredMedia'], SiteConfig['home']['featuredMedia']>();
+
 function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia']): SiteConfig['home']['featuredMedia'] {
+  const cached = featuredMediaCache.get(featured);
+  if (cached) return cached;
+
   const carousel = featured.carousel;
-  return {
+  const result = {
     items: featured.items,
     carousel: {
       ...carousel,
       visual: resolveFeaturedCarouselVisual(carousel.visual),
     },
   };
+  featuredMediaCache.set(featured, result);
+  return result;
 }
 
 /** Extracts the navigation slice from the full site config. */
@@ -53,11 +60,5 @@ export function loadMediaConfig(): MediaConfig {
 
 /** Extracts SEO metadata slice for layout injection. */
 export function loadSiteMetadata(): SiteMetadata {
-  const { siteUrl, defaultTitle, defaultDescription, keyword } = loadSiteConfig().metadata;
-  return {
-    siteUrl,
-    defaultTitle,
-    defaultDescription,
-    keyword,
-  };
+  return loadSiteConfig().metadata;
 }

@@ -3,9 +3,6 @@ import {
   initFeaturedMediaCarousels,
   registerFeaturedMediaCarouselReducedMotion,
   resetCarouselState,
-  getSpaceBetween,
-  getSlideCount,
-  getCounterPadLength,
 } from '../../../src/plugins/swiper/runtime';
 
 interface MockSwiperInstance {
@@ -194,6 +191,22 @@ describe('carousel runtime', () => {
       expect(createdInstances[0].params.spaceBetween).toBe(32);
     });
 
+    it('falls back to 0 for invalid spaceBetween attribute', () => {
+      createCarouselRoot({ spaceBetween: 'invalid' });
+
+      initFeaturedMediaCarousels();
+
+      expect(createdInstances[0].params.spaceBetween).toBe(0);
+    });
+
+    it('falls back to 0 for negative spaceBetween attribute', () => {
+      createCarouselRoot({ spaceBetween: '-10' });
+
+      initFeaturedMediaCarousels();
+
+      expect(createdInstances[0].params.spaceBetween).toBe(0);
+    });
+
     it('passes correct counterPadLength from data attribute', () => {
       const root = createCarouselRoot({ counterPadLength: '3' });
       const currentEl = document.createElement('span');
@@ -205,6 +218,28 @@ describe('carousel runtime', () => {
       expect(currentEl.textContent).toBe('001');
     });
 
+    it('falls back to pad length of 2 for invalid counterPadLength attribute', () => {
+      const root = createCarouselRoot({ counterPadLength: 'invalid' });
+      const currentEl = document.createElement('span');
+      currentEl.className = 'swiper-counter-current';
+      root.appendChild(currentEl);
+
+      initFeaturedMediaCarousels();
+
+      expect(currentEl.textContent).toBe('01');
+    });
+
+    it('falls back to pad length of 2 when counterPadLength attribute is missing', () => {
+      const root = createCarouselRoot();
+      const currentEl = document.createElement('span');
+      currentEl.className = 'swiper-counter-current';
+      root.appendChild(currentEl);
+
+      initFeaturedMediaCarousels();
+
+      expect(currentEl.textContent).toBe('01');
+    });
+
     it('updates progress bar on init', () => {
       const root = createCarouselRoot({ slideCount: 4 });
       const progressBar = document.createElement('div');
@@ -214,6 +249,58 @@ describe('carousel runtime', () => {
       initFeaturedMediaCarousels();
 
       expect(progressBar.style.width).toBe('25%');
+    });
+
+    it('falls back to slide count of 1 for invalid counter total', () => {
+      const root = createCarouselRoot({ slideCount: 3 });
+      const totalEl = root.querySelector('.swiper-counter-total')!;
+      totalEl.textContent = 'invalid';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'swiper-progress-bar';
+      root.appendChild(progressBar);
+
+      initFeaturedMediaCarousels();
+
+      expect(progressBar.style.width).toBe('100%');
+    });
+
+    it('falls back to slide count of 1 for zero counter total', () => {
+      const root = createCarouselRoot({ slideCount: 3 });
+      const totalEl = root.querySelector('.swiper-counter-total')!;
+      totalEl.textContent = '0';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'swiper-progress-bar';
+      root.appendChild(progressBar);
+
+      initFeaturedMediaCarousels();
+
+      expect(progressBar.style.width).toBe('100%');
+    });
+
+    it('falls back to slide count of 1 for negative counter total', () => {
+      const root = createCarouselRoot({ slideCount: 3 });
+      const totalEl = root.querySelector('.swiper-counter-total')!;
+      totalEl.textContent = '-3';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'swiper-progress-bar';
+      root.appendChild(progressBar);
+
+      initFeaturedMediaCarousels();
+
+      expect(progressBar.style.width).toBe('100%');
+    });
+
+    it('falls back to slide count of 1 when counter total element is missing', () => {
+      const root = createCarouselRoot({ slideCount: 3 });
+      const totalEl = root.querySelector('.swiper-counter-total')!;
+      totalEl.remove();
+      const progressBar = document.createElement('div');
+      progressBar.className = 'swiper-progress-bar';
+      root.appendChild(progressBar);
+
+      initFeaturedMediaCarousels();
+
+      expect(progressBar.style.width).toBe('100%');
     });
   });
 
@@ -275,126 +362,6 @@ describe('carousel runtime', () => {
       const instance = createdInstances[0];
       expect(instance.params.speed).toBe(600);
       expect(instance.params.effect).toBe('coverflow');
-    });
-  });
-
-  describe('getSpaceBetween', () => {
-    it('returns parsed integer from data-space-between', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-space-between', '24');
-      expect(getSpaceBetween(root)).toBe(24);
-    });
-
-    it('returns parsed float from data-space-between', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-space-between', '12.5');
-      expect(getSpaceBetween(root)).toBe(12.5);
-    });
-
-    it('returns 0 when attribute is missing', () => {
-      const root = document.createElement('div');
-      expect(getSpaceBetween(root)).toBe(0);
-    });
-
-    it('returns 0 for invalid value', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-space-between', 'abc');
-      expect(getSpaceBetween(root)).toBe(0);
-    });
-
-    it('returns 0 for negative value', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-space-between', '-10');
-      expect(getSpaceBetween(root)).toBe(0);
-    });
-  });
-
-  describe('getSlideCount', () => {
-    it('returns parsed integer from swiper-counter-total text', () => {
-      const root = document.createElement('div');
-      const totalEl = document.createElement('span');
-      totalEl.className = 'swiper-counter-total';
-      totalEl.textContent = '5';
-      root.appendChild(totalEl);
-      expect(getSlideCount(root)).toBe(5);
-    });
-
-    it('returns 1 when element is missing', () => {
-      const root = document.createElement('div');
-      expect(getSlideCount(root)).toBe(1);
-    });
-
-    it('returns 1 for invalid text content', () => {
-      const root = document.createElement('div');
-      const totalEl = document.createElement('span');
-      totalEl.className = 'swiper-counter-total';
-      totalEl.textContent = 'abc';
-      root.appendChild(totalEl);
-      expect(getSlideCount(root)).toBe(1);
-    });
-
-    it('returns 1 for zero text content', () => {
-      const root = document.createElement('div');
-      const totalEl = document.createElement('span');
-      totalEl.className = 'swiper-counter-total';
-      totalEl.textContent = '0';
-      root.appendChild(totalEl);
-      expect(getSlideCount(root)).toBe(1);
-    });
-
-    it('returns 1 for negative text content', () => {
-      const root = document.createElement('div');
-      const totalEl = document.createElement('span');
-      totalEl.className = 'swiper-counter-total';
-      totalEl.textContent = '-3';
-      root.appendChild(totalEl);
-      expect(getSlideCount(root)).toBe(1);
-    });
-  });
-
-  describe('getCounterPadLength', () => {
-    it('returns parsed integer from data-counter-pad-length', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-counter-pad-length', '3');
-      expect(getCounterPadLength(root)).toBe(3);
-    });
-
-    it('returns default 2 when attribute is missing', () => {
-      const root = document.createElement('div');
-      expect(getCounterPadLength(root)).toBe(2);
-    });
-
-    it('returns default 2 for invalid value', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-counter-pad-length', 'abc');
-      expect(getCounterPadLength(root)).toBe(2);
-    });
-
-    it('returns default 2 for zero value', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-counter-pad-length', '0');
-      expect(getCounterPadLength(root)).toBe(2);
-    });
-
-    it('returns default 2 for negative value', () => {
-      const root = document.createElement('div');
-      root.setAttribute('data-counter-pad-length', '-1');
-      expect(getCounterPadLength(root)).toBe(2);
-    });
-
-    it('uses config parameter when provided', () => {
-      const root = document.createElement('div');
-      expect(getCounterPadLength(root, 4)).toBe(4);
-    });
-
-    it('falls back to 2 when config parameter is zero', () => {
-      const root = document.createElement('div');
-      expect(getCounterPadLength(root, 0)).toBe(2);
-    });
-
-    it('falls back to 2 when config parameter is negative', () => {
-      const root = document.createElement('div');
-      expect(getCounterPadLength(root, -1)).toBe(2);
     });
   });
 });

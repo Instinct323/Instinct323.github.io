@@ -4,10 +4,10 @@ import { compareNatural } from '../utils/content-normalize';
 import { PHOTOGRAPHY_FILTER, CONTENT_IMAGE_PATH_PREFIX } from './content-paths';
 import type { ContentImageOptions, MediaAlbum, MediaCategory, MediaImage, MediaTree } from '../../types/media';
 import type { MediaConfig } from '../../types/site';
-import { parseMediaPath } from './media-loader-core';
-import { CONTENT_IMAGE_MODULES } from './astro-adapter';
+import { parseMediaPath } from '../media/resolution';
+import { CONTENT_IMAGE_MODULES } from './astro-adapter/images';
 
-export type { ParsedMediaPath } from './media-loader-core';
+export type { ParsedMediaPath } from '../media/resolution';
 
 export interface CategoryAccumulator {
   id: string;
@@ -21,7 +21,7 @@ interface ImageModuleEntry {
   default: ImageMetadata;
 }
 
-export function appendImageToCategoryMap(
+function appendImageToCategoryMap(
   categoryMap: Map<string, CategoryAccumulator>,
   path: string,
   image: MediaImage

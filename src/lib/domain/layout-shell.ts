@@ -24,25 +24,24 @@ function resolveContentWidth(contentWidth: string): string {
 
 const PAGE_OVERLAY = 'var(--page-overlay)';
 
+const BASE_SHELL_TOKENS = {
+  overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
+  overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
+  surfaceBg: 'var(--shell-elevated-surface-bg)',
+  cardSurfaceBg: 'var(--shell-elevated-card-bg)',
+  surfaceBorder: 'var(--shell-elevated-surface-border)',
+  pageCanvas: 'var(--shell-elevated-canvas)',
+};
+
 const SHELLS_CONFIG: ShellsConfig = {
   home: {
-    overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
-    overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
-    surfaceBg: 'var(--shell-elevated-surface-bg)',
-    cardSurfaceBg: 'var(--shell-elevated-card-bg)',
-    surfaceBorder: 'var(--shell-elevated-surface-border)',
-    pageCanvas: 'var(--shell-elevated-canvas)',
+    ...BASE_SHELL_TOKENS,
     textStrong: 'var(--shell-home-text-strong)',
     textBody: 'var(--shell-home-text-body)',
     textMuted: 'var(--shell-home-text-muted)',
   },
   about: {
-    overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
-    overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
-    surfaceBg: 'var(--shell-elevated-surface-bg)',
-    cardSurfaceBg: 'var(--shell-elevated-card-bg)',
-    surfaceBorder: 'var(--shell-elevated-surface-border)',
-    pageCanvas: 'var(--shell-elevated-canvas)',
+    ...BASE_SHELL_TOKENS,
     textStrong: 'var(--shell-home-text-strong)',
     textBody: 'var(--shell-home-text-body)',
     textMuted: 'var(--shell-home-text-muted)',

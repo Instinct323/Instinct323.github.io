@@ -1,4 +1,4 @@
-import { profile } from './astro-adapter';
+import { profile } from './astro-adapter/config';
 import { trimProfileFacts } from '../utils/content-normalize';
 import type { ProfileData } from '../../types/profile';
 

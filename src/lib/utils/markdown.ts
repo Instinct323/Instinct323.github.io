@@ -14,50 +14,52 @@ export interface ParseMarkdownResult {
   data: Record<string, unknown>;
 }
 
-export interface MarkdownRenderer {
-  render(_markdown: string): string;
-}
-
 /** Resolves relative src/href paths in rendered markdown HTML against a base file URL. */
-export function resolveRelativePaths(html: string, fileURL: string): string {
+function resolveRelativePaths(html: string, fileURL: string): string {
+  let baseURL: string;
   try {
-    const baseURL = new URL('.', fileURL).href;
+    baseURL = new URL('.', fileURL).href;
+  } catch {
+    throw new Error(`resolveRelativePaths: invalid fileURL "${fileURL}"`);
+  }
 
-    return html.replace(
-      /(?:src|href)=["']([^"']+)["']/g,
-      (match, path) => {
-        if (
-          path.startsWith('http://') ||
-          path.startsWith('https://') ||
-          path.startsWith('data:') ||
-          path.startsWith('#') ||
-          path.startsWith('mailto:') ||
-          path.startsWith('tel:')
-        ) {
-          return match;
-        }
+  return html.replace(
+    /(?:src|href)=["']([^"']+)["']/g,
+    (match, path) => {
+      if (
+        path.startsWith('http://') ||
+        path.startsWith('https://') ||
+        path.startsWith('data:') ||
+        path.startsWith('#') ||
+        path.startsWith('mailto:') ||
+        path.startsWith('tel:')
+      ) {
+        return match;
+      }
 
-        const resolved = new URL(path, baseURL);
-        let resolvedPath = resolved.href;
+      let resolved: URL;
+      try {
+        resolved = new URL(path, baseURL);
+      } catch {
+        throw new Error(`resolveRelativePaths: malformed relative path "${path}" in fileURL "${fileURL}"`);
+      }
+      let resolvedPath = resolved.href;
 
-        if (resolvedPath.startsWith('file://')) {
-          const contentMatch = resolvedPath.match(/\/content\/([^/]+)\/([^/]+)/);
-          if (contentMatch) {
-            const section = contentMatch[1];
-            const slug = contentMatch[2];
-            const assetMatch = resolvedPath.match(/\/assets\/(.+)$/);
-            if (assetMatch) {
-              resolvedPath = `/${section}/${slug}/assets/${assetMatch[1]}`;
-            }
+      if (resolvedPath.startsWith('file://')) {
+        const contentMatch = resolvedPath.match(/\/content\/([^/]+)\/([^/]+)/);
+        if (contentMatch) {
+          const section = contentMatch[1];
+          const slug = contentMatch[2];
+          const assetMatch = resolvedPath.match(/\/assets\/(.+)$/);
+          if (assetMatch) {
+            resolvedPath = `/${section}/${slug}/assets/${assetMatch[1]}`;
           }
         }
-
-        return match.replace(path, resolvedPath);
       }
-    );
-  } catch {
-    return html;
-  }
+
+      return match.replace(path, resolvedPath);
+    }
+  );
 }
 
 const BASE_MARKDOWN_IT_OPTIONS = {
@@ -68,20 +70,9 @@ const BASE_MARKDOWN_IT_OPTIONS = {
   typographer: false,
 };
 
-/** Creates a standard MarkdownIt renderer with safe defaults (no HTML, no linkify). */
-export function createMarkdownRenderer(): MarkdownRenderer {
-  const md = new MarkdownIt(BASE_MARKDOWN_IT_OPTIONS);
+const md = new MarkdownIt(BASE_MARKDOWN_IT_OPTIONS);
 
-  return {
-    render: (_markdown: string): string => md.render(_markdown),
-  };
-}
-
-function renderWithRenderer(
-  renderer: MarkdownRenderer,
-  markdown: string,
-  options?: RenderMarkdownOptions,
-): string {
+function renderWithMd(renderer: MarkdownIt, markdown: string, options?: RenderMarkdownOptions): string {
   if (!markdown || typeof markdown !== 'string') {
     return '';
   }
@@ -95,18 +86,15 @@ function renderWithRenderer(
   return html;
 }
 
-const renderer = createMarkdownRenderer();
-
-/** Renders markdown to HTML using the shared default renderer. */
 export function renderMarkdown(markdown: string, options?: RenderMarkdownOptions): string {
-  return renderWithRenderer(renderer, markdown, options);
+  return renderWithMd(md, markdown, options);
 }
 
+// Module-level singleton: MarkdownIt instance with KaTeX. Intentionally reused across calls for performance.
 const mdWithKatex = new MarkdownIt(BASE_MARKDOWN_IT_OPTIONS).use(katex);
 
-/** Renders markdown to HTML with KaTeX math support. */
 export function renderMarkdownWithKatex(markdown: string, options?: RenderMarkdownOptions): string {
-  return renderWithRenderer(mdWithKatex, markdown, options);
+  return renderWithMd(mdWithKatex, markdown, options);
 }
 
 function parseDateFromFrontmatter(data: Record<string, unknown> | undefined): Date | null {
@@ -114,7 +102,6 @@ function parseDateFromFrontmatter(data: Record<string, unknown> | undefined): Da
   return time !== null ? new Date(time) : null;
 }
 
-/** Parses a markdown string and extracts frontmatter (title, date, and custom data). */
 export function parseMarkdownWithFrontmatter(markdown: string): ParseMarkdownResult {
   if (!markdown || typeof markdown !== 'string') {
     throw new Error('Invalid markdown input');

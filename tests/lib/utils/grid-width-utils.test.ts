@@ -5,7 +5,7 @@ import {
   MOBILE_BREAKPOINT,
   RESPONSIVE_VIEWPORT_WIDTHS,
   type GridDefinition,
-} from '../../../src/lib/utils/grid-width-utils';
+} from '../../../src/lib/media/responsive';
 
 describe('grid-width-utils', () => {
   describe('computeGridCellWidths', () => {

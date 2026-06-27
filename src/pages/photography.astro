@@ -1,34 +1,22 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import GallerySection from '../components/photography/GallerySection.astro';
-import { loadPhotography } from '../lib/loaders/photography-effects-loader';
-import { loadMediaTree } from '../lib/loaders/media-loader';
-import { loadMediaConfig } from '../lib/loaders/config-loader';
 import { resolveDeferredMountRuntimeConfig } from '../lib/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
+import { getPageLoader } from '../lib/loaders/page-loader-registry';
+import type { MediaTree } from '../types/media';
+import type { PhotographyPageConfig, MediaConfig } from '../types/site';
 import '../styles/pills.css';
 
 const photographyLoad = await orchestratePageLoad({
-  frame: async () => {
-    const [mediaTree, photographyConfig, mediaConfig] = await Promise.all([
-      loadMediaTree(),
-      loadPhotography(),
-      loadMediaConfig(),
-    ]);
-
-    return {
-      mediaTree,
-      photographyConfig,
-      mediaConfig,
-    };
-  },
+  frame: getPageLoader('photography').frame,
 });
 
 const {
   mediaTree,
   photographyConfig,
   mediaConfig,
-} = photographyLoad.frame;
+} = photographyLoad.frame as { mediaTree: MediaTree; photographyConfig: PhotographyPageConfig; mediaConfig: MediaConfig };
 
 const { categories } = mediaTree;
 const { grid } = photographyConfig;

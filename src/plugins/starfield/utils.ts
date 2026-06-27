@@ -55,6 +55,7 @@ export function randomRange(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
+/** @internal */
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }

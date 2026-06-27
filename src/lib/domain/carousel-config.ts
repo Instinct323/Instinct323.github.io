@@ -1,5 +1,5 @@
 import type { HomePageCarouselVisualConfig } from '../../types/carousel';
-import { assertFiniteNumber } from '../utils/assertions';
+import { assertFiniteNumber, assertObject } from '../utils/assertions';
 
 /**
  * Validates and normalizes the carousel visual configuration.
@@ -9,9 +9,7 @@ import { assertFiniteNumber } from '../utils/assertions';
  * @throws When slideWidth breakpoints or spaceBetween are missing/invalid.
  */
 export function resolveFeaturedCarouselVisual(visual: unknown): HomePageCarouselVisualConfig {
-  const source = visual && typeof visual === 'object' && !Array.isArray(visual)
-    ? (visual as Partial<HomePageCarouselVisualConfig>)
-    : {};
+  const source = assertObject<Partial<HomePageCarouselVisualConfig>>(visual, 'carousel visual');
 
   const slideWidth = source.slideWidth;
   if (!slideWidth || typeof slideWidth !== 'object') {

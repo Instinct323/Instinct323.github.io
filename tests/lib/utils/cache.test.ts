@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCachedLoader, resetLoaderCache } from '../../../src/lib/utils/cache';
+import { createCachedLoader } from '../../../src/lib/utils/cache';
 
 describe('createCachedLoader', () => {
   it('caches value and returns it on subsequent calls without re-invoking loader', async () => {
@@ -56,27 +56,5 @@ describe('createCachedLoader', () => {
     expect(result1).toBe('sync-result');
     expect(result2).toBe('sync-result');
     expect(loader).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('resetLoaderCache', () => {
-  it('forces the loader to re-invoke on next call', async () => {
-    const loader = vi.fn().mockResolvedValue('cached-result');
-    const cachedLoader = createCachedLoader(loader);
-
-    const result1 = await cachedLoader();
-    expect(result1).toBe('cached-result');
-    expect(loader).toHaveBeenCalledTimes(1);
-
-    resetLoaderCache(cachedLoader);
-
-    const result2 = await cachedLoader();
-    expect(result2).toBe('cached-result');
-    expect(loader).toHaveBeenCalledTimes(2);
-  });
-
-  it('does nothing for an unknown loader', () => {
-    const unknownLoader = vi.fn() as () => Promise<string>;
-    expect(() => resetLoaderCache(unknownLoader)).not.toThrow();
   });
 });

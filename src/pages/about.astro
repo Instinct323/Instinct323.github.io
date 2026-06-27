@@ -5,14 +5,18 @@ import ContentSection from '../components/about/ContentSection.astro';
 import LinksSection from '../components/about/LinksSection.astro';
 import ProfileCard from '../components/about/ProfileCard.astro';
 import PublicationsSection from '../components/about/PublicationsSection.astro';
-import { loadAboutAvatarImage, loadAboutPageFrame } from '../lib/loaders/content-loader';
+import '../lib/loaders/content-loader';
 import { loadMediaConfig } from '../lib/loaders/config-loader';
 import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
+import { getPageLoader } from '../lib/loaders/page-loader-registry';
+import type { AboutPageData, MediaConfig } from '../types/site';
+import type { ContentImage } from '../types/media';
 
+const aboutLoader = getPageLoader('about');
 const aboutLoad = await orchestratePageLoad({
   frame: async () => {
     const [aboutFrame, mediaConfig] = await Promise.all([
-      loadAboutPageFrame(),
+      aboutLoader.frame() as Promise<Omit<AboutPageData, 'avatarImage'>>,
       loadMediaConfig(),
     ]);
 
@@ -21,11 +25,11 @@ const aboutLoad = await orchestratePageLoad({
       mediaConfig,
     };
   },
-  controls: ({ frame }) => loadAboutAvatarImage(frame.profile),
+  controls: aboutLoader.controls,
 });
 
-const { introductionHtml, profile, publications } = aboutLoad.frame;
-const avatarImage = aboutLoad.controls;
+const { introductionHtml, profile, publications } = aboutLoad.frame as Omit<AboutPageData, 'avatarImage'> & { mediaConfig: MediaConfig };
+const avatarImage = aboutLoad.controls as ContentImage;
 const profileName = profile.name;
 ---
 

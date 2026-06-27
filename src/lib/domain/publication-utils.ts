@@ -1,5 +1,5 @@
 import type { Publication } from '../../types/site';
-import { assertFiniteNumber, assertString } from '../utils/assertions';
+import { assertFiniteNumber, assertObject, assertString } from '../utils/assertions';
 import { slugToTitle } from '../utils/content-normalize';
 
 interface RawPublication {
@@ -11,15 +11,6 @@ interface RawPublication {
   links?: unknown;
   video?: unknown;
   weight?: unknown;
-}
-
-function assertNonEmptyString(value: unknown, key: string, filePath: string): string {
-  try {
-    return assertString(value, key);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    throw new Error(`Invalid publication field "${key}" in ${filePath}: ${message}`);
-  }
 }
 
 function assertAuthors(value: unknown, filePath: string): string[] {
@@ -73,13 +64,15 @@ function normalizePublicationLinks(raw: RawPublication): Record<string, string> 
  * @throws {Error} When required fields are missing or invalid.
  */
 export function normalizePublication(rawValue: unknown, filePath: string): Publication {
-  if (!rawValue || typeof rawValue !== 'object' || Array.isArray(rawValue)) {
+  try {
+    assertObject(rawValue, 'publication content');
+  } catch {
     throw new Error(`Invalid publication content in ${filePath}`);
   }
 
   const raw = rawValue as RawPublication;
-  const title = assertNonEmptyString(raw.title, 'title', filePath);
-  const date = assertNonEmptyString(raw.date, 'date', filePath);
+  const title = assertString(raw.title, 'title');
+  const date = assertString(raw.date, 'date');
 
   const publication: Publication = {
     title,

@@ -70,6 +70,10 @@ function initShellBackground(): void {
       console.warn('SessionStorage unavailable:', e);
     }
   } catch (e) {
+    if (import.meta.env.DEV) {
+      console.error('[SHELL BACKGROUND FAILURE]', e);
+      throw e;
+    }
     console.error('Failed to apply shell background images:', e);
   }
 }

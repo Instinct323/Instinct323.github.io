@@ -185,19 +185,19 @@ describe('resolveFeaturedCarouselVisual', () => {
 
   it('throws when visual is not an object', () => {
     expect(() => resolveFeaturedCarouselVisual(null)).toThrow(
-      'Missing carousel visual.slideWidth configuration'
+      'Missing or invalid carousel visual configuration object'
     );
     expect(() => resolveFeaturedCarouselVisual('string')).toThrow(
-      'Missing carousel visual.slideWidth configuration'
+      'Missing or invalid carousel visual configuration object'
     );
     expect(() => resolveFeaturedCarouselVisual(42)).toThrow(
-      'Missing carousel visual.slideWidth configuration'
+      'Missing or invalid carousel visual configuration object'
     );
   });
 
   it('throws when visual is an array', () => {
     expect(() => resolveFeaturedCarouselVisual([validConfig])).toThrow(
-      'Missing carousel visual.slideWidth configuration'
+      'Missing or invalid carousel visual configuration object'
     );
   });
 });

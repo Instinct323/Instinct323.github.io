@@ -26,12 +26,9 @@ function isImageLoadingEffectName(value: string): value is ImageLoadingEffectNam
 export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['lazyLoad'] {
   const source = assertObject<Partial<SiteImageConfig['lazyLoad']>>(config, 'image.lazyLoad');
   const rootMargin = assertString(source.rootMargin, 'image.lazyLoad.rootMargin');
-  const localDebugDelayMs = assertFiniteNumber(
-    source.localDebugDelayMs,
-    'image.lazyLoad.localDebugDelayMs',
-  );
+  const localDebugDelayMs = source.localDebugDelayMs;
 
-  if (!Number.isInteger(localDebugDelayMs) || localDebugDelayMs < 0) {
+  if (typeof localDebugDelayMs !== 'number' || !Number.isInteger(localDebugDelayMs) || localDebugDelayMs < 0) {
     throw new Error('Missing or invalid image.lazyLoad.localDebugDelayMs (must be a non-negative integer)');
   }
 
@@ -70,9 +67,9 @@ export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageC
 export function resolveSiteImageConfig(config: unknown): SiteImageConfig {
   const source = assertObject<Partial<SiteImageConfig>>(config, 'image');
   const format = assertString(source.format, 'image.format');
-  const quality = assertFiniteNumber(source.quality, 'image.quality');
+  const quality = source.quality;
 
-  if (!Number.isInteger(quality) || quality < 1 || quality > 100) {
+  if (typeof quality !== 'number' || !Number.isInteger(quality) || quality < 1 || quality > 100) {
     throw new Error('Missing or invalid image.quality (must be an integer in [1, 100])');
   }
 

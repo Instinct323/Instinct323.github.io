@@ -4,7 +4,7 @@ import {
   selectCandidateWidthsByPolicy,
   IMAGE_MEDIUM_WIDTHS_KEY,
   IMAGE_HIGH_WIDTHS_KEY,
-} from '../../../src/lib/utils/image-width-utils';
+} from '../../../src/lib/media/responsive';
 
 describe('assertStrictlyIncreasingPositiveWidths', () => {
   it('accepts a valid strictly increasing array of positive numbers', () => {

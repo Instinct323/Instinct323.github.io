@@ -1,9 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { loadBlogPosts } from '../lib/loaders/blog-loader';
+import '../lib/loaders/blog-loader';
 import { renderMarkdownWithKatex } from '../lib/utils/markdown';
+import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
+import { getPageLoader } from '../lib/loaders/page-loader-registry';
 
-const posts = loadBlogPosts();
+const blogLoad = await orchestratePageLoad({
+  frame: getPageLoader('blog').frame,
+});
+
+const { posts } = blogLoad.frame as { posts: import('../lib/loaders/blog-loader').BlogPost[] };
 const initialPost = posts[0];
 const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileURL: initialPost.baseUrl });
 ---

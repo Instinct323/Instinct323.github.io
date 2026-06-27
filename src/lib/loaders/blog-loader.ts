@@ -1,6 +1,7 @@
 import { parseMarkdownWithFrontmatter } from '../utils/markdown';
 import { compareByWeightAndDate } from '../utils/content-normalize';
-import { BLOG_POST_MODULES } from './astro-adapter';
+import { BLOG_POST_MODULES } from './astro-adapter/blog';
+import { registerPageLoader } from './page-loader-registry';
 
 export interface BlogPost {
   title: string;
@@ -26,7 +27,6 @@ function extractSlugFromPath(filePath: string): string {
  * Returns null if no recognizable date pattern is found.
  */
 export function extractDateFromSlug(slug: string): Date | null {
-  // Match YYYY-MM-DD pattern anywhere in the slug
   const dateMatch = slug.match(/(\d{4})-(\d{2})-(\d{2})/);
   if (dateMatch) {
     const [, year, month, day] = dateMatch;
@@ -39,8 +39,7 @@ export function extractDateFromSlug(slug: string): Date | null {
   return null;
 }
 
-export const compareBlogPosts = compareByWeightAndDate;
-
+/** @deprecated Use `getPageLoader('blog').frame` instead. */
 export function loadBlogPosts(): BlogPost[] {
   const entries = Object.entries(BLOG_POST_MODULES);
 
@@ -69,7 +68,13 @@ export function loadBlogPosts(): BlogPost[] {
     });
   }
 
-  posts.sort(compareBlogPosts);
+  posts.sort(compareByWeightAndDate);
 
   return posts;
 }
+
+export async function loadBlogPage(): Promise<{ posts: BlogPost[] }> {
+  return { posts: loadBlogPosts() };
+}
+
+registerPageLoader('blog', { frame: loadBlogPage });

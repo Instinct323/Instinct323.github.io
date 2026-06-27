@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('./media-loader-core', () => ({
+vi.mock('../../../src/lib/media/resolution', () => ({
   normalizeContentImagePath: vi.fn((p: string) => p),
   resolveContentImageMetadata: vi.fn(() => null),
 }));
 
-import { assertMediaConfigShape } from '../../../src/lib/loaders/media-validation';
+import { assertMediaConfigShape } from '../../../src/lib/media/config';
 import type { MediaConfig } from '../../../src/types/site';
 
 describe('assertMediaConfigShape', () => {

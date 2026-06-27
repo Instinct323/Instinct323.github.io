@@ -46,7 +46,7 @@ describe('normalizePublication', () => {
     };
 
     expect(() => normalizePublication(raw, filePath)).toThrow(
-      `Invalid publication field "title" in ${filePath}: Missing or invalid title (must be a non-empty string)`
+      'Missing or invalid title (must be a non-empty string)'
     );
   });
 
@@ -57,7 +57,7 @@ describe('normalizePublication', () => {
     };
 
     expect(() => normalizePublication(raw, filePath)).toThrow(
-      `Invalid publication field "date" in ${filePath}: Missing or invalid date (must be a non-empty string)`
+      'Missing or invalid date (must be a non-empty string)'
     );
   });
 

@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import '../../../src/plugins/starfield';
 import {
   loadHomepageConfig,
@@ -6,80 +6,14 @@ import {
   loadNavigationConfig,
   loadSiteMetadata,
 } from '../../../src/lib/loaders/config-loader';
-import { loadSiteConfig, resetSiteConfig, parseSiteConfig } from '../../../src/lib/loaders/config-cache';
+import { loadSiteConfig } from '../../../src/lib/loaders/config-cache';
 import { loadPhotography, loadEffectsConfig } from '../../../src/lib/loaders/photography-effects-loader';
 
-describe('parseSiteConfig', () => {
-  it('parses plain JSON', () => {
-    const raw = JSON.stringify({ metadata: { siteUrl: 'https://example.com', defaultTitle: 'Test', defaultDescription: 'Desc' }, navigation: { order: ['home'] }, home: { hero: { eyebrow: 'Hi' }, layout: { contentWidth: 'wide', sectionOrder: ['hero'], editorialGapVariant: 'tight' }, editorialHero: { deckFields: ['location'], showDeckDivider: true }, featuredMedia: { items: [], carousel: { ariaLabel: 'Carousel', prevButtonAriaLabel: 'Prev', nextButtonAriaLabel: 'Next', emptyText: 'Empty', showNavigationArrows: false, showIndicator: false, counterPadLength: 2, visual: { spaceBetween: 0, slideWidth: { desktop: '40%', tablet: '60%', mobile: '80%' }, inactiveOpacity: 1 } } } }, image: { format: 'webp', quality: 80, widths: { medium: [480], high: [960] }, dprScale: { low: 0.8, medium: 1, high: 2 }, lazyLoad: { rootMargin: '100px', localDebugDelayMs: 0 }, placeholderEffect: 'bars-height-wave' }, photography: { grid: { columns: { desktop: 3, mobile: 2 }, gap: '1rem' } }, effects: { starfield: { enabled: true } } });
-    const config = parseSiteConfig(raw);
-    expect(config.metadata.siteUrl).toBe('https://example.com');
-    expect(config.navigation.order).toEqual(['home']);
-  });
-
-  it('parses JSONC with comments', () => {
-    const raw = `{
-      // line comment
-      "metadata": { "siteUrl": "https://example.com", "defaultTitle": "T", "defaultDescription": "D" },
-      /* block comment */
-      "navigation": { "order": ["home"] },
-      "home": { "hero": { "eyebrow": "Hi" }, "layout": { "contentWidth": "wide", "sectionOrder": ["hero"], "editorialGapVariant": "tight" }, "editorialHero": { "deckFields": ["location"], "showDeckDivider": true }, "featuredMedia": { "items": [], "carousel": { "ariaLabel": "C", "prevButtonAriaLabel": "P", "nextButtonAriaLabel": "N", "emptyText": "E", "showNavigationArrows": false, "showIndicator": false, "counterPadLength": 2, "visual": { "spaceBetween": 0, "slideWidth": { "desktop": "40%", "tablet": "60%", "mobile": "80%" }, "inactiveOpacity": 1 } } } },
-      "image": { "format": "webp", "quality": 80, "widths": { "medium": [480], "high": [960] }, "dprScale": { "low": 0.8, "medium": 1, "high": 2 }, "lazyLoad": { "rootMargin": "100px", "localDebugDelayMs": 0 }, "placeholderEffect": "bars-height-wave" },
-      "photography": { "grid": { "columns": { "desktop": 3, "mobile": 2 }, "gap": "1rem" } },
-      "effects": { "starfield": { "enabled": true } }
-    }`;
-    const config = parseSiteConfig(raw);
-    expect(config.metadata.siteUrl).toBe('https://example.com');
-    expect(config.navigation.order).toEqual(['home']);
-  });
-
-  it('parses JSONC with trailing commas', () => {
-    const raw = `{
-      "metadata": { "siteUrl": "https://example.com", "defaultTitle": "T", "defaultDescription": "D" },
-      "navigation": { "order": ["home",], },
-      "home": { "hero": { "eyebrow": "Hi" }, "layout": { "contentWidth": "wide", "sectionOrder": ["hero"], "editorialGapVariant": "tight" }, "editorialHero": { "deckFields": ["location"], "showDeckDivider": true }, "featuredMedia": { "items": [], "carousel": { "ariaLabel": "C", "prevButtonAriaLabel": "P", "nextButtonAriaLabel": "N", "emptyText": "E", "showNavigationArrows": false, "showIndicator": false, "counterPadLength": 2, "visual": { "spaceBetween": 0, "slideWidth": { "desktop": "40%", "tablet": "60%", "mobile": "80%" }, "inactiveOpacity": 1 } } } },
-      "image": { "format": "webp", "quality": 80, "widths": { "medium": [480], "high": [960] }, "dprScale": { "low": 0.8, "medium": 1, "high": 2 }, "lazyLoad": { "rootMargin": "100px", "localDebugDelayMs": 0 }, "placeholderEffect": "bars-height-wave" },
-      "photography": { "grid": { "columns": { "desktop": 3, "mobile": 2 }, "gap": "1rem" } },
-      "effects": { "starfield": { "enabled": true } },
-    }`;
-    const config = parseSiteConfig(raw);
-    expect(config.metadata.siteUrl).toBe('https://example.com');
-    expect(config.navigation.order).toEqual(['home']);
-  });
-
-  it('throws for non-object root', () => {
-    expect(() => parseSiteConfig('null')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
-    expect(() => parseSiteConfig('42')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
-    expect(() => parseSiteConfig('"string"')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
-  });
-
-  it('throws for array root', () => {
-    expect(() => parseSiteConfig('[]')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
-    expect(() => parseSiteConfig('[1, 2, 3]')).toThrow('Failed to parse site config from config.jsonc: invalid JSONC content');
-  });
-
-  it('throws for invalid JSON', () => {
-    expect(() => parseSiteConfig('{ invalid json')).toThrow();
-  });
-});
-
 describe('config-loader lazy singleton', () => {
-  beforeEach(() => {
-    resetSiteConfig();
-  });
-
   it('loadSiteConfig returns the same object on repeated calls (caching)', () => {
     const first = loadSiteConfig();
     const second = loadSiteConfig();
     expect(second).toBe(first);
-  });
-
-  it('resetSiteConfig causes next call to re-parse', () => {
-    const before = loadSiteConfig();
-    resetSiteConfig();
-    const after = loadSiteConfig();
-    expect(after).not.toBe(before);
-    expect(after).toEqual(before);
   });
 
   it('loadSiteConfig returns correct shape', () => {

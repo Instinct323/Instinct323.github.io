@@ -20,7 +20,3 @@ export function getEffectsResolver<T>(name: string): (_config: unknown) => T {
   }
   return resolver as (_config: unknown) => T;
 }
-
-export function resetEffectsRegistry(): void {
-  registry.clear();
-}

@@ -58,3 +58,21 @@ export function assertPositiveScale(value: unknown, key: string): number {
   }
   return num;
 }
+
+export function parseNumericMatch(
+  value: string,
+  pattern: RegExp,
+  errorMessage: string,
+): { numeric: number; match: RegExpMatchArray } {
+  const match = value.match(pattern);
+  if (!match) {
+    throw new Error(errorMessage);
+  }
+
+  const numeric = Number.parseFloat(match[1]);
+  if (!Number.isFinite(numeric)) {
+    throw new Error(errorMessage);
+  }
+
+  return { numeric, match };
+}

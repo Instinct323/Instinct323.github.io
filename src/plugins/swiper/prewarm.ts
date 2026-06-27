@@ -17,7 +17,6 @@ const CAROUSEL_PREWARM_FALLBACK = 250;
  *    the viewport so off-screen carousels do not consume resources.
  */
 export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
-  // Keep one shared import promise so pointer/focus/viewport triggers never double-init.
   let initPromise: Promise<void> | null = null;
   let carouselModulePromise: Promise<typeof import('./runtime')> | null = null;
 
@@ -48,7 +47,6 @@ export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
     return initPromise;
   };
 
-  // Prewarm carousel module during idle time or early user intent.
   runWhenIdle(() => {
     void prewarmCarouselModule().catch((error) => {
       console.error('[carousel] Idle prewarm failed:', error);
@@ -67,7 +65,6 @@ export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
   carouselRoot.addEventListener('pointermove', prewarmOnIntent, { once: true, passive: true });
   carouselRoot.addEventListener('touchstart', prewarmOnIntent, { once: true, passive: true });
 
-  // Intent-based eager load keeps controls responsive when users hover/focus before intersecting.
   const eagerLoad = () => {
     cleanup();
     void initCarousel();
@@ -81,7 +78,6 @@ export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
   carouselRoot.addEventListener('pointerenter', eagerLoad, { once: true, passive: true });
   carouselRoot.addEventListener('focusin', eagerLoad, { once: true });
 
-  // Viewport-based lazy init remains the primary path, with idle-time preference on capable browsers.
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) {
@@ -90,7 +86,6 @@ export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
 
       observer.disconnect();
 
-      // Initialize immediately for faster response; idle-time preference removed.
       void initCarousel();
     }, { rootMargin: '100px 0px' });
 

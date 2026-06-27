@@ -8,18 +8,17 @@ const ROOT_SELECTOR = '.home-carousel';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const SWIPER_INIT_FLAG = 'swiperInitialized';
 
-// Coverflow calibration for the 3D card stack look — depth/moderator values
-// are intentionally hardcoded (not runtime-configurable) to keep the visual
-// effect consistent and avoid per-instance tuning overhead
 const CAROUSEL_ANIMATION_SPEED_MS = 600;
 const CAROUSEL_COVERFLOW_DEPTH = 100;
 const CAROUSEL_COVERFLOW_MODIFIER = 2.5;
 
+// Module-level state: intentional cross-call cache. Reset via resetCarouselState().
 const state = {
   reducedMotionQuery: null as MediaQueryList | null,
   reducedMotionListenerBound: false,
 };
 
+/** @internal */
 export function resetCarouselState(): void {
   state.reducedMotionQuery = null;
   state.reducedMotionListenerBound = false;
@@ -65,7 +64,7 @@ function updateProgress(swiper: SwiperInstance, slideCount: number): void {
   progressBar.style.width = `${progress}%`;
 }
 
-export function getCounterPadLength(root: HTMLElement, configPadLength?: number): number {
+function getCounterPadLength(root: HTMLElement, configPadLength?: number): number {
   if (configPadLength !== undefined) {
     return configPadLength > 0 ? configPadLength : 2;
   }
@@ -75,7 +74,6 @@ export function getCounterPadLength(root: HTMLElement, configPadLength?: number)
 }
 
 function updateCounter(swiper: SwiperInstance, counterPadLength?: number): void {
-  // Support both legacy and current markup so loader behavior stays backward-compatible.
   const currentEl = swiper.el.querySelector<HTMLElement>('.count-current') ||
     swiper.el.querySelector<HTMLElement>('.swiper-counter-current');
 
@@ -108,14 +106,14 @@ function getCarouselRoots(): SwiperRoot[] {
   );
 }
 
-export function getSlideCount(root: HTMLElement): number {
+function getSlideCount(root: HTMLElement): number {
   const totalEl = root.querySelector('.swiper-counter-total');
   const parsed = Number.parseInt(totalEl?.textContent ?? '1', 10);
 
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
-export function getSpaceBetween(root: HTMLElement): number {
+function getSpaceBetween(root: HTMLElement): number {
   const raw = root.getAttribute('data-space-between');
   const parsed = parseNumericAttr(raw, 0, { float: true });
   return parsed >= 0 ? parsed : 0;
@@ -141,7 +139,6 @@ function applyMotionSettings(swiper: SwiperInstance): void {
 }
 
 function createSwiperConfig(root: SwiperRoot, slideCount: number, config?: Partial<CarouselConfig>): SwiperOptions {
-  // Accept both old/new control selectors during incremental component cleanup.
   const prevEl = getFirstOptionalHTMLElement(root, ['.nav-arrow--prev', '.swiper-nav-btn--prev']);
   const nextEl = getFirstOptionalHTMLElement(root, ['.nav-arrow--next', '.swiper-nav-btn--next']);
   const paginationEl = getFirstOptionalHTMLElement(root, ['.swiper-pagination']);
@@ -247,7 +244,6 @@ export function registerFeaturedMediaCarouselReducedMotion(): void {
     return;
   }
 
-  // Keep one media-query listener globally and fan updates to already-mounted instances.
   state.reducedMotionListenerBound = true;
   getReducedMotionQuery().addEventListener('change', () => {
     getCarouselRoots().forEach((root) => {

@@ -1,3 +1,5 @@
+import type { DeferredMountRuntimeConfig } from '../../types/page-load';
+
 export const DEFERRED_MOUNT_DATA = {
   mount: 'data-deferred-mount',
   state: 'data-deferred-state',
@@ -24,8 +26,6 @@ export function buildDeferredMountGroupSelector(group: string): string {
 
   return `[${DEFERRED_MOUNT_DATA.group}="${group}"][${DEFERRED_MOUNT_DATA.mount}="true"]`;
 }
-
-import type { DeferredMountRuntimeConfig } from '../../types/page-load';
 
 function setPlaceholderMessage(
   node: HTMLElement,
@@ -64,7 +64,6 @@ function mountDeferredNode(node: HTMLElement): void {
     template.remove();
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.mounted;
     waitForMountedContent(node, host);
-  // Deferred mount failed — error logged but UI state already handled (error state set below)
   } catch (error) {
     console.error('[deferred-mount]', error);
     node.dataset.deferredState = DEFERRED_MOUNT_STATE.error;
@@ -81,7 +80,6 @@ function mountDeferredNode(node: HTMLElement): void {
  * shift and a flash of unstyled content.
  */
 function waitForMountedContent(node: HTMLElement, host: HTMLElement): void {
-  // Detect images that may still be loading so we can gate the placeholder fade-out.
   const mountedImages = Array.from(host.querySelectorAll<HTMLImageElement>('img'));
 
   if (mountedImages.length === 0) {
@@ -140,18 +138,6 @@ function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
  */
 export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
   const { selector, rootMargin, mountDelayMs } = config;
-
-  if (typeof selector !== 'string' || selector.trim().length === 0) {
-    throw new Error('Missing or invalid deferred mount selector.');
-  }
-
-  if (typeof rootMargin !== 'string' || rootMargin.trim().length === 0) {
-    throw new Error('Missing or invalid deferred mount rootMargin.');
-  }
-
-  if (!Number.isFinite(mountDelayMs) || mountDelayMs < 0) {
-    throw new Error('Missing or invalid deferred mount mountDelayMs.');
-  }
 
   const nodes = Array.from(document.querySelectorAll<HTMLElement>(selector));
   if (nodes.length === 0) {

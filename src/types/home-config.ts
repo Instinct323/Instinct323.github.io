@@ -1,4 +1,4 @@
-// IMPORTANT: HomePageConfig is defined here to avoid circular dependency with ./site.ts
+// Separated from site.ts to avoid circular dependency.
 
 import type { HomePageCarouselConfig } from './carousel';
 
