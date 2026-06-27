@@ -5,8 +5,7 @@ import type { HomePageConfigGroup } from '../../types/home';
 import type { MediaConfig, NavigationConfig, SiteConfig, SiteMetadata } from '../../types/site';
 
 export { loadProfile } from './profile-loader';
-export { loadPhotography, loadEffectsConfig } from './photography-effects-loader';
-const featuredMediaCache = new WeakMap<SiteConfig['home']['featuredMedia'], SiteConfig['home']['featuredMedia']>();
+const featuredMediaCache = new Map<SiteConfig['home']['featuredMedia'], SiteConfig['home']['featuredMedia']>();
 
 function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia']): SiteConfig['home']['featuredMedia'] {
   const cached = featuredMediaCache.get(featured);

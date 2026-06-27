@@ -11,7 +11,7 @@ interface CacheState<T> {
  *   preventing redundant async work (p-memoize and memoizee do not guarantee this)
  * - init callback: called exactly once when the value is ready
  *
- * If a future library provides all three semantics, this can be replaced.
+ * If a future library provides both semantics, this can be replaced.
  */
 export function createCachedLoader<T>(
   loader: () => T | Promise<T>,
@@ -20,23 +20,25 @@ export function createCachedLoader<T>(
   const state: CacheState<T> = { value: null, promise: null };
 
   const cachedLoader = (): Promise<T> => {
-    if (state.value) {
+    if (state.value !== null) {
       return Promise.resolve(state.value);
     }
 
     if (!state.promise) {
-      state.promise = Promise.resolve(loader()).then((result) => {
-        options?.init?.(result);
-        state.value = result;
-        return result;
-      });
+      state.promise = Promise.resolve(loader())
+        .then((result) => {
+          options?.init?.(result);
+          state.value = result;
+          return result;
+        })
+        .catch((err) => {
+          state.promise = null;
+          throw err;
+        });
     }
 
     return state.promise;
   };
 
   return cachedLoader;
-}
-
-function _resetLoaderCache<T>(_loader: () => Promise<T>): void {
 }

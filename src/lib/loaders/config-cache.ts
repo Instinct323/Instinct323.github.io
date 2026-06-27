@@ -1,27 +1,19 @@
 import { siteConfigRaw } from './astro-adapter/config';
 import { parseJsonc } from '../utils/jsonc';
+import { assertObject } from '../utils/assertions';
 import type { SiteConfig } from '../../types/site';
 
 /** Parses raw JSONC into a SiteConfig object, rejecting non-object values. */
 function parseSiteConfig(raw: string): SiteConfig {
   const parsed = parseJsonc(raw);
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('Failed to parse site config from config.jsonc: invalid JSONC content');
-  }
-
-  return parsed as SiteConfig;
+  return assertObject<SiteConfig>(parsed, 'site config from config.jsonc');
 }
 
-// Module-level mutable state: caches parsed site config. Reset via _resetSiteConfig() for tests.
+// Module-level mutable state: caches parsed site config.
 let siteConfig: SiteConfig | null = null;
 
-/** Allows tests to reset the cached site config between runs. */
-function _resetSiteConfig(): void {
-  siteConfig = null;
-}
-
 export function loadSiteConfig(): SiteConfig {
-  if (!siteConfig) {
+  if (siteConfig === null) {
     siteConfig = parseSiteConfig(siteConfigRaw);
   }
   return siteConfig;

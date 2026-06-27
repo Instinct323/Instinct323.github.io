@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import '../../../src/plugins/starfield';
+import '../../../src/plugins/starfield'; // registers starfield effect resolver for loadEffectsConfig
 import {
   loadHomepageConfig,
   loadMediaConfig,
@@ -7,7 +7,7 @@ import {
   loadSiteMetadata,
 } from '../../../src/lib/loaders/config-loader';
 import { loadSiteConfig } from '../../../src/lib/loaders/config-cache';
-import { loadPhotography, loadEffectsConfig } from '../../../src/lib/loaders/photography-effects-loader';
+import { loadPhotographyPage, loadEffectsConfig } from '../../../src/lib/loaders/photography-effects-loader';
 
 describe('config-loader lazy singleton', () => {
   it('loadSiteConfig returns the same object on repeated calls (caching)', () => {
@@ -88,8 +88,9 @@ describe('config-loader lazy singleton', () => {
     expect(typeof media.homepage.carousel.ariaLabel).toBe('string');
   });
 
-  it('loadPhotography returns photography page config', () => {
-    const photo = loadPhotography();
+  it('loadPhotographyPage returns photography page config', async () => {
+    const page = await loadPhotographyPage();
+    const photo = page.photographyConfig;
     expect(photo).toBeDefined();
     expect(photo.grid).toBeDefined();
     expect(typeof photo.grid.columns.desktop).toBe('number');

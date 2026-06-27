@@ -1,20 +1,28 @@
 export type PageKey = 'home' | 'about' | 'blog' | 'photography';
 
-export interface PageLoader {
-  frame: () => Promise<unknown>;
-  controls?: (_ctx: { frame: unknown }) => Promise<unknown>;
+/** Registered loader for a page route.
+ *  `frame` returns the page data; `controls` returns extra data
+ *  that depends on the frame (e.g. an avatar image that needs profile). */
+export interface PageLoader<TFrame = unknown, TControl = unknown> {
+  frame: () => Promise<TFrame>;
+  controls?: (_ctx: { frame: TFrame }) => Promise<TControl>;
 }
 
-const registry = new Map<PageKey, PageLoader>();
+const registry = new Map<PageKey, PageLoader<unknown, unknown>>();
 
-export function registerPageLoader(key: PageKey, loader: PageLoader): void {
-  registry.set(key, loader);
+/** Registers a page loader so `getPageLoader(key)` can retrieve it. */
+export function registerPageLoader<TFrame, TControl>(
+  key: PageKey,
+  loader: PageLoader<TFrame, TControl>,
+): void {
+  registry.set(key, loader as PageLoader<unknown, unknown>);
 }
 
-export function getPageLoader(key: PageKey): PageLoader {
+/** Retrieves the loader previously registered for `key`. Throws if missing. */
+export function getPageLoader<TFrame, TControl>(key: PageKey): PageLoader<TFrame, TControl> {
   const loader = registry.get(key);
   if (!loader) {
     throw new Error(`No page loader registered for key: ${key}`);
   }
-  return loader;
+  return loader as PageLoader<TFrame, TControl>;
 }

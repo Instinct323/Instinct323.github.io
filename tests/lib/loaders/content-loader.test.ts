@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { loadAboutPageFrame, loadHomePage } from '../../../src/lib/loaders/content-loader';
+import { getPageLoader } from '../../../src/lib/loaders/page-loader-registry';
+
+import '../../../src/lib/loaders/content-loader';
+import type { HomePageData } from '../../../src/types/home';
+import type { AboutPageData } from '../../../src/types/site';
 
 describe('content-loader', () => {
-  describe('loadHomePage', () => {
+  describe('home page loader', () => {
     it('returns home page data with profile, site, and hero', async () => {
-      const home = await loadHomePage();
+      const home = (await getPageLoader('home').frame()) as HomePageData;
       expect(typeof home.profile.name).toBe('string');
       expect(typeof home.profile.organization).toBe('string');
       expect(typeof home.profile.location).toBe('string');
@@ -13,9 +17,9 @@ describe('content-loader', () => {
     });
   });
 
-  describe('loadAboutPageFrame', () => {
+  describe('about page loader', () => {
     it('returns about page frame with profile, introduction, and publications', async () => {
-      const frame = await loadAboutPageFrame();
+      const frame = (await getPageLoader('about').frame()) as Omit<AboutPageData, 'avatarImage'>;
       expect(typeof frame.profile.name).toBe('string');
       expect(typeof frame.profile.organization).toBe('string');
       expect(typeof frame.profile.location).toBe('string');

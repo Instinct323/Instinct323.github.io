@@ -39,7 +39,6 @@ export function extractDateFromSlug(slug: string): Date | null {
   return null;
 }
 
-/** @deprecated Use `getPageLoader('blog').frame` instead. */
 export function loadBlogPosts(): BlogPost[] {
   const entries = Object.entries(BLOG_POST_MODULES);
 
