@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
+import path from 'node:path';
 
 export default defineConfig({
   site: 'https://instinct323.github.io',
@@ -14,6 +15,11 @@ export default defineConfig({
   vite: {
     ssr: {
       noExternal: ['@mdit/plugin-katex'],
+    },
+    resolve: {
+      alias: {
+        '~': path.resolve('./src'),
+      },
     },
   },
 });

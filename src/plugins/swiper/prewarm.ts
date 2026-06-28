@@ -1,4 +1,4 @@
-import { runWhenIdle } from '../../lib/runtime/scheduling';
+import { runWhenIdle } from '~/core/runtime/scheduling';
 
 const CAROUSEL_PREWARM_TIMEOUT = 1200;
 const CAROUSEL_PREWARM_FALLBACK = 250;

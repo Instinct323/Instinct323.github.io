@@ -1,15 +1,15 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import '../lib/loaders/blog-loader';
-import { renderMarkdownWithKatex } from '../lib/utils/markdown';
-import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
-import { getPageLoader } from '../lib/loaders/page-loader-registry';
+import Layout from '~/features/layout/Layout.astro';
+import '~/features/blog/loader';
+import { renderMarkdownWithKatex } from '~/core/content/markdown';
+import { orchestratePageLoad } from '~/features/site/load';
+import { getPageLoader } from '~/features/site/load';
 
 const blogLoad = await orchestratePageLoad({
   frame: getPageLoader('blog').frame,
 });
 
-const { posts } = blogLoad.frame as { posts: import('../lib/loaders/blog-loader').BlogPost[] };
+const { posts } = blogLoad.frame as { posts: import('~/features/blog/loader').BlogPost[] };
 const initialPost = posts[0];
 const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileURL: initialPost.baseUrl });
 ---
@@ -214,7 +214,7 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
 </style>
 
 <script>
-  import { renderMarkdown } from '../lib/utils/markdown';
+  import { renderMarkdown } from '~/core/content/markdown';
 
   document.addEventListener('DOMContentLoaded', () => {
     const blogList = document.getElementById('blog-list');

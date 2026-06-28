@@ -1,16 +1,16 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AvatarSection from '../components/about/AvatarSection.astro';
-import ContentSection from '../components/about/ContentSection.astro';
-import LinksSection from '../components/about/LinksSection.astro';
-import ProfileCard from '../components/about/ProfileCard.astro';
-import PublicationsSection from '../components/about/PublicationsSection.astro';
-import '../lib/loaders/content-loader';
-import { loadMediaConfig } from '../lib/loaders/config-loader';
-import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
-import { getPageLoader } from '../lib/loaders/page-loader-registry';
-import type { AboutPageData, MediaConfig } from '../types/site';
-import type { ContentImage } from '../types/media';
+import Layout from '~/features/layout/Layout.astro';
+import AvatarSection from '~/features/about/profile/Avatar.astro';
+import ContentSection from '~/features/about/Content.astro';
+import LinksSection from '~/features/about/Links.astro';
+import ProfileCard from '~/features/about/profile/Card.astro';
+import PublicationsSection from '~/features/about/publication/List.astro';
+import '~/features/home/content-loader';
+import { loadMediaConfig } from '~/features/site/config-loader';
+import { orchestratePageLoad } from '~/features/site/load';
+import { getPageLoader } from '~/features/site/load';
+import type { AboutPageData, MediaConfig } from '~/features/site/types';
+import type { ContentImage } from '~/core/media/types';
 
 const aboutLoader = getPageLoader('about');
 const aboutLoad = await orchestratePageLoad({
@@ -58,7 +58,7 @@ const profileName = profile.name;
 </Layout>
 
 <script>
-  import { initDeferredMounts } from '../lib/deferred-mount-page';
+  import { initDeferredMounts } from '~/core/runtime/deferred-mount-page';
 
   if (import.meta.env.SSR === false) {
     initDeferredMounts();

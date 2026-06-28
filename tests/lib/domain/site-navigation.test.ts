@@ -4,8 +4,8 @@ import {
   buildPrimaryNavModel,
   type SiteNavItem,
   type SiteNavModel,
-} from '../../../src/lib/domain/site-navigation';
-import type { NavigationConfig } from '../../../src/types/site';
+} from '~/features/site/navigation';
+import type { NavigationConfig } from '~/features/site/types';
 
 function buildRoutes(): NavigationConfig['routes'] {
   return {

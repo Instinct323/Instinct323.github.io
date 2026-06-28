@@ -3,4 +3,4 @@ export {
   assertFiniteNumber,
   assertObject,
   assertString,
-} from '../../lib/utils/assertions';
+} from '~/core/validation/assert';

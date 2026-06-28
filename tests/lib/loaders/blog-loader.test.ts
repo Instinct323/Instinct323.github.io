@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { extractDateFromSlug } from '../../../src/lib/loaders/blog-loader';
-import { compareByWeightAndDate } from '../../../src/lib/utils/content-normalize';
+import { extractDateFromSlug } from '~/features/blog/loader';
+import { compareByWeightAndDate } from '~/core/content/normalize';
 
 // extractDateFromSlug is tested in isolation since loadBlogPosts
 // depends on import.meta.glob which is only available at build time.

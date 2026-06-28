@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildShellStyle } from '../../../src/lib/domain/layout-shell';
-import type { ShellsConfig } from '../../../src/types/site';
+import { buildShellStyle } from '~/features/site/shell';
+import type { ShellsConfig } from '~/features/site/types';
 
 const testShellsConfig: ShellsConfig = {
   home: {

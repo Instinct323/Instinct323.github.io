@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getPageLoader } from '../../../src/lib/loaders/page-loader-registry';
+import { getPageLoader } from '~/features/site/load';
 
-import '../../../src/lib/loaders/content-loader';
-import type { HomePageData } from '../../../src/types/home';
-import type { AboutPageData } from '../../../src/types/site';
+import '~/features/home/content-loader';
+import type { HomePageData } from '~/features/home/types';
+import type { AboutPageData } from '~/features/site/types';
 
 describe('content-loader', () => {
   describe('home page loader', () => {

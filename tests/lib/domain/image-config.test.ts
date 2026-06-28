@@ -3,8 +3,8 @@ import {
   resolveSiteImageConfig,
   resolveImageLazyLoadConfig,
   resolveImagePlaceholderEffectConfig,
-} from '../../../src/lib/domain/image-config';
-import type { SiteImageConfig } from '../../../src/types/image-config';
+} from '~/features/site/image-config-resolver';
+import type { SiteImageConfig } from '~/features/site/image-config';
 
 describe('resolveSiteImageConfig', () => {
   const validConfig: SiteImageConfig = {

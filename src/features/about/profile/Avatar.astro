@@ -1,0 +1,65 @@
+---
+// AvatarSection.astro - Left rail avatar display
+// Responsive variant generation is centralized in media-loader-core for cross-surface consistency.
+
+import type { ContentImage } from '~/core/media/types';
+import { createImageVariantSet } from '~/core/media/image';
+import { resolveControlImageLoading } from '~/features/site/load';
+
+interface Props {
+  avatarImage: ContentImage;
+}
+
+const { avatarImage } = Astro.props;
+const { alt, responsive } = avatarImage;
+const variantSet = await createImageVariantSet(avatarImage);
+const criticalImageLoading = resolveControlImageLoading('critical');
+---
+
+<div data-testid="about-avatar">
+  <div class="avatar-frame">
+    <img
+      class="avatar-image"
+      src={variantSet.src}
+      srcset={variantSet.srcset}
+      sizes={responsive.sizes}
+      alt={alt}
+      width={variantSet.width}
+      height={variantSet.height}
+      loading={criticalImageLoading.loading}
+      decoding={criticalImageLoading.decoding}
+      fetchpriority={criticalImageLoading.fetchPriority}
+    />
+  </div>
+</div>
+
+<style>
+  div {
+    display: flex;
+    justify-content: center;
+  }
+
+  .avatar-frame {
+    width: 100%;
+    max-width: var(--avatar-max-width);
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  @media (max-width: 767px) {
+    .avatar-frame {
+      max-width: var(--avatar-max-width-mobile);
+      aspect-ratio: 1;
+      border-radius: 50%;
+    }
+  }
+</style>

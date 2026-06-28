@@ -7,7 +7,7 @@ import {
   slugToTitle,
   sanitizePositiveWidths,
   parseNumericAttr,
-} from '../../../src/lib/utils/content-normalize';
+} from '~/core/content/normalize';
 
 describe('compareNatural', () => {
   it('sorts strings with numeric suffixes naturally', () => {

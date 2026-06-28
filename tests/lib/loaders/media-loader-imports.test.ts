@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import {
   IMAGE_MEDIUM_WIDTHS_KEY,
   selectCandidateWidthsByPolicy,
-} from '../../../src/lib/media/responsive';
-import { computeContentImageOptions, loadContentImageWithConfigValidation } from '../../../src/lib/media/surface';
-import { loadFeaturedSlides } from '../../../src/lib/media/surface';
-import { loadMediaTree } from '../../../src/lib/media/surface';
+} from '~/core/media/sizing';
+import { computeContentImageOptions, loadContentImageWithConfigValidation } from '~/core/media/surface';
+import { loadFeaturedSlides } from '~/core/media/surface';
+import { loadMediaTree } from '~/core/media/surface';
 import {
   assertMediaConfigShape,
   getValidatedHomepageGalleryConfig,
-} from '../../../src/lib/media/config';
+} from '~/core/media/config';
 
 describe('media-loader import path changes', () => {
   it('can import IMAGE_MEDIUM_WIDTHS_KEY directly from image-width-utils', () => {

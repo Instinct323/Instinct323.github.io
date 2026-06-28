@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import '../../../src/plugins/starfield'; // registers starfield effect resolver for loadEffectsConfig
+import '~/plugins/starfield'; // registers starfield effect resolver for loadEffectsConfig
 import {
   loadHomepageConfig,
   loadMediaConfig,
   loadNavigationConfig,
   loadSiteMetadata,
-} from '../../../src/lib/loaders/config-loader';
-import { loadSiteConfig } from '../../../src/lib/loaders/config-cache';
-import { loadPhotographyPage, loadEffectsConfig } from '../../../src/lib/loaders/photography-effects-loader';
+} from '~/features/site/config-loader';
+import { loadSiteConfig } from '~/features/site/config-cache';
+import { loadPhotographyPage, loadEffectsConfig } from '~/features/photography/loader';
 
 describe('config-loader lazy singleton', () => {
   it('loadSiteConfig returns the same object on repeated calls (caching)', () => {

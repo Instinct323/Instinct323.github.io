@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { resolveFeaturedCarouselVisual } from '../../../src/lib/domain/carousel-config';
-import type { HomePageCarouselVisualConfig } from '../../../src/types/carousel';
+import { resolveFeaturedCarouselVisual } from '~/plugins/swiper/config-resolver';
+import type { HomePageCarouselVisualConfig } from '~/plugins/swiper/types';
 
 describe('resolveFeaturedCarouselVisual', () => {
   const validConfig: HomePageCarouselVisualConfig = {

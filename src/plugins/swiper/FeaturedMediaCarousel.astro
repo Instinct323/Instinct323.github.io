@@ -4,10 +4,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 import './styles.css';
-import DeferredImage from '../../components/common/DeferredImage.astro';
-import type { FeaturedSlide } from '../../types/media';
-import type { HomePageConfigGroup as HomepageConfig } from '../../types/home';
-import { resolveControlImageLoading } from '../../lib/loaders/page-load-orchestrator';
+import DeferredImage from '~/features/common/DeferredImage.astro';
+import type { FeaturedSlide } from '~/core/media/types';
+import type { HomePageConfigGroup as HomepageConfig } from '~/features/home/types';
+import { resolveControlImageLoading } from '~/features/site/load';
 
 // Contract: Render the full featured-media carousel region used on the home page,
 // including slide markup, controls, and client bootstrap hooks.

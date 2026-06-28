@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { HomePageConfig } from '../../src/types/home-config';
-import type { HomePageConfig as HomePageConfigFromHome } from '../../src/types/home';
+import type { HomePageConfig } from '~/features/home/home-config';
+import type { HomePageConfig as HomePageConfigFromHome } from '~/features/home/types';
 
 describe('HomePageConfig type extraction', () => {
   it('has all required fields with correct types', () => {

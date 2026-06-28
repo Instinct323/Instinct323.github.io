@@ -2,7 +2,7 @@ import Swiper from 'swiper';
 import type { Swiper as SwiperInstance } from 'swiper';
 import type { SwiperOptions } from 'swiper/types';
 import { EffectCoverflow, Keyboard, Navigation, Pagination } from 'swiper/modules';
-import { parseNumericAttr } from '../../lib/utils/content-normalize';
+import { parseNumericAttr } from '~/core/content/normalize';
 
 const ROOT_SELECTOR = '.home-carousel';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';

@@ -1,0 +1,208 @@
+---
+import { getImage } from 'astro:assets';
+import { backgroundDesktopSource, backgroundMobileSource } from '~/core/content/astro-adapter/assets';
+import LayoutHead from '~/features/layout/Head.astro';
+import Footer from '~/features/layout/Footer.astro';
+import Header from '~/features/layout/Header.astro';
+import '~/plugins/starfield';
+import { loadMediaConfig, loadSiteMetadata } from '~/features/site/config-loader';
+import { loadEffectsConfig } from '~/features/photography/loader';
+import { buildShellStyle, type LayoutProps } from '~/features/site/shell';
+import { RESPONSIVE_VIEWPORT_WIDTHS } from '~/core/media/sizing';
+import { assertMediaConfigShape } from '~/core/media/config';
+import { orchestratePageLoad } from '~/features/site/load';
+import {
+  LAYOUT_MOBILE_HEIGHT,
+  LAYOUT_DESKTOP_HEIGHT,
+  inferCoverWidth,
+} from '~/core/utils/layout';
+import { IMAGE_HIGH_WIDTHS_KEY, selectCandidateWidthsByPolicy } from '~/core/media/sizing';
+import { assertString } from '~/core/validation/assert';
+import '~/styles/layout-shell.css';
+import '~/styles/tokens.css';
+
+const {
+  title,
+  description,
+  type = 'website',
+  noindex = false,
+  shell = 'default',
+  contentWidth = 'standard',
+} = Astro.props as LayoutProps;
+
+const BACKGROUND_MOBILE_ASPECT_RATIO = backgroundMobileSource.width / backgroundMobileSource.height;
+const BACKGROUND_DESKTOP_ASPECT_RATIO = backgroundDesktopSource.width / backgroundDesktopSource.height;
+
+type BackgroundVariantKey = 'mobile' | 'desktop';
+
+interface BackgroundVariantInput {
+  key: BackgroundVariantKey;
+  source: typeof backgroundMobileSource;
+  inferredWidth: number;
+  aspectRatio: number;
+}
+
+const mobileInferredWidth = inferCoverWidth(
+  RESPONSIVE_VIEWPORT_WIDTHS.mobile,
+  LAYOUT_MOBILE_HEIGHT,
+  BACKGROUND_MOBILE_ASPECT_RATIO,
+);
+const desktopInferredWidth = inferCoverWidth(
+  RESPONSIVE_VIEWPORT_WIDTHS.desktop,
+  LAYOUT_DESKTOP_HEIGHT,
+  BACKGROUND_DESKTOP_ASPECT_RATIO,
+);
+
+type LayoutFrameData = {
+  siteMetadata: Awaited<ReturnType<typeof loadSiteMetadata>>;
+  mediaConfig: Awaited<ReturnType<typeof loadMediaConfig>>;
+  effectsConfig: Awaited<ReturnType<typeof loadEffectsConfig>>;
+};
+
+type LayoutBackgroundData = {
+  backgroundMobile: Awaited<ReturnType<typeof getImage>>;
+  backgroundDesktop: Awaited<ReturnType<typeof getImage>>;
+};
+
+const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundData>({
+  frame: async () => {
+    const [siteMetadata, mediaConfig, effectsConfig] = await Promise.all([
+      loadSiteMetadata(),
+      loadMediaConfig(),
+      loadEffectsConfig(),
+    ]);
+
+    assertMediaConfigShape(mediaConfig);
+
+    return {
+      siteMetadata,
+      mediaConfig,
+      effectsConfig,
+    };
+  },
+  background: async ({ frame }) => {
+    const backgroundQuality = frame.mediaConfig.image.quality;
+    const backgroundWidths = frame.mediaConfig.image.widths.high;
+    const backgroundDprScale = frame.mediaConfig.image.dprScale.medium;
+    const variants: BackgroundVariantInput[] = [
+      {
+        key: 'mobile',
+        source: backgroundMobileSource,
+        inferredWidth: mobileInferredWidth,
+        aspectRatio: BACKGROUND_MOBILE_ASPECT_RATIO,
+      },
+      {
+        key: 'desktop',
+        source: backgroundDesktopSource,
+        inferredWidth: desktopInferredWidth,
+        aspectRatio: BACKGROUND_DESKTOP_ASPECT_RATIO,
+      },
+    ];
+
+    const backgroundVariantEntries = await Promise.all(variants.map(async (variant) => {
+      const width = selectCandidateWidthsByPolicy({
+        candidateWidths: backgroundWidths,
+        inferredWidths: [variant.inferredWidth],
+        dprScale: backgroundDprScale,
+        key: `${IMAGE_HIGH_WIDTHS_KEY}.${variant.key}.medium`,
+        maxSelectableWidth: variant.source.width,
+      })[0];
+
+      const image = await getImage({
+        src: variant.source,
+        width,
+        height: Math.ceil(width / variant.aspectRatio),
+        fit: 'cover',
+        position: 'center',
+        format: 'webp',
+        quality: backgroundQuality,
+      });
+
+      return [variant.key, image] as const;
+    }));
+
+    const backgroundByVariant = Object.fromEntries(backgroundVariantEntries) as Record<
+      BackgroundVariantKey,
+      Awaited<ReturnType<typeof getImage>>
+    >;
+
+    return {
+      backgroundMobile: backgroundByVariant.mobile,
+      backgroundDesktop: backgroundByVariant.desktop,
+    };
+  },
+});
+
+const {
+  siteMetadata,
+  effectsConfig,
+} = layoutLoad.frame;
+const { backgroundMobile, backgroundDesktop } = layoutLoad.background;
+
+// Fail-fast: Astro.site must be configured in astro.config.ts
+if (!Astro.site) {
+  throw new Error('Astro.site is not configured. Please set site in astro.config.ts.');
+}
+const siteUrl = Astro.site;
+
+const shellBackgroundPayload = JSON.stringify({
+  mobileSrc: backgroundMobile.src,
+  desktopSrc: backgroundDesktop.src,
+});
+
+// Fail-fast: title and description should be provided by pages or site config
+const resolvedTitle = title !== undefined ? title : assertString(siteMetadata.defaultTitle, 'siteMetadata.defaultTitle');
+const resolvedDescription = description !== undefined ? description : assertString(siteMetadata.defaultDescription, 'siteMetadata.defaultDescription');
+const keyword = siteMetadata.keyword;
+
+  const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+  const sitemapUrl = new URL('/sitemap-index.xml', siteUrl).toString();
+  const shellStyle = buildShellStyle(shell, contentWidth);
+  const starfieldConfig = effectsConfig.starfield;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <LayoutHead
+      generator={Astro.generator}
+      title={resolvedTitle}
+      description={resolvedDescription}
+      keyword={keyword}
+      canonicalUrl={canonicalUrl}
+      sitemapUrl={sitemapUrl}
+      type={type}
+      noindex={noindex}
+    />
+    <style is:inline set:html={`
+      :root {
+        --page-bg-image-mobile: url('${backgroundMobile.src}');
+        --page-bg-image-desktop: url('${backgroundDesktop.src}');
+      }
+    `} />
+  </head>
+  <body data-shell={shell} style={shellStyle}>
+    <div
+      class="site-frame"
+      aria-hidden="true"
+      data-shell-background={shellBackgroundPayload}
+    >
+      <canvas class="site-stars-background"></canvas>
+      <canvas
+        class="site-stars"
+        data-testid="site-stars"
+        data-starfield={JSON.stringify(starfieldConfig)}
+      ></canvas>
+    </div>
+    <main class="site-shell" data-shell={shell} data-testid="site-shell">
+      <Header />
+      <slot />
+      <Footer />
+    </main>
+    <script>
+      import { initLayout } from '~/core/runtime/layout';
+
+      initLayout();
+    </script>
+  </body>
+</html>

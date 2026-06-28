@@ -5,8 +5,8 @@ vi.mock('../../../src/lib/media/resolution', () => ({
   resolveContentImageMetadata: vi.fn(() => null),
 }));
 
-import { assertMediaConfigShape } from '../../../src/lib/media/config';
-import type { MediaConfig } from '../../../src/types/site';
+import { assertMediaConfigShape } from '~/core/media/config';
+import type { MediaConfig } from '~/features/site/types';
 
 describe('assertMediaConfigShape', () => {
   const validConfig: MediaConfig = {

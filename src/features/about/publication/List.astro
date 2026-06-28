@@ -1,0 +1,269 @@
+---
+import type { Publication } from '~/features/site/types';
+import { resolvePublicationLinks, buildVideoEmbedUrl } from '~/features/about/publication/utils';
+
+/** Props for the publications list section. */
+interface Props {
+  publications: Publication[];
+  highlightAuthor?: string;
+}
+
+const { publications, highlightAuthor } = Astro.props as Props;
+---
+
+<section data-testid="about-publications" class="card">
+  <h2 class="section-heading">Publications</h2>
+  {publications.length === 0 ? (
+    <p class="empty">No publications yet.</p>
+  ) : (
+    <ul class="publication-list">
+      {publications.map((publication, publicationIndex) => {
+        const embedUrl = publication.video ? buildVideoEmbedUrl(publication.video) : undefined;
+        return (
+          <li class="publication-item">
+            <h3 class="publication-title">{publication.title}</h3>
+            <p class="publication-authors">
+              {publication.authors.map((author, i) => (
+                <span class:list={[{ 'highlight-author': highlightAuthor && author === highlightAuthor }]}>
+                  {author}{i < publication.authors.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </p>
+            <p class="publication-meta">
+              <span class="date">{publication.date}</span>
+              {publication.source && <span class="source">{publication.source}</span>}
+            </p>
+            <div class="publication-links">
+              {publication.abstract && (
+                // Using JS toggle instead of <details> because <details> creates an
+                // implicit container layer that breaks flex alignment with sibling buttons.
+                <button
+                  type="button"
+                  class="publication-link-button publication-abstract-toggle"
+                  data-abstract-toggle
+                  data-target={`publication-abstract-${publicationIndex}`}
+                  aria-expanded="false"
+                >
+                  Abstract
+                </button>
+              )}
+              {resolvePublicationLinks(publication).map((link) => (
+                <a
+                  class="publication-link-button"
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-link-name={link.name}
+                >
+                  {link.label}
+                </a>
+              ))}
+              {embedUrl && (
+                <button
+                  type="button"
+                  class="publication-link-button publication-video-toggle"
+                  data-video-toggle
+                  data-target={`publication-video-${publicationIndex}`}
+                  data-embed={embedUrl}
+                  aria-expanded="false"
+                >
+                  Video
+                </button>
+              )}
+            </div>
+            {publication.abstract && (
+              <p id={`publication-abstract-${publicationIndex}`} class="publication-abstract" hidden>
+                {publication.abstract}
+              </p>
+            )}
+            {embedUrl && (
+              <div id={`publication-video-${publicationIndex}`} class="publication-video" hidden>
+                <iframe
+                  title={`Video for ${publication.title}`}
+                  class="publication-video-iframe"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                />
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  )}
+</section>
+
+<style>
+  section {
+    margin-top: 0;
+  }
+
+  .empty {
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .publication-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .publication-item {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .publication-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .publication-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-strong);
+    line-height: 1.4;
+  }
+
+  .publication-authors {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .highlight-author {
+    font-weight: 600;
+    color: var(--text-body);
+  }
+
+  .publication-meta {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .source {
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--surface-border);
+  }
+
+  .publication-links {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .publication-link-button {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--link-accent);
+    background: var(--link-accent-bg);
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    text-decoration: none;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background var(--motion-duration-ui) var(--motion-ease-standard),
+      transform var(--motion-duration-ui) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-ui) var(--motion-ease-standard);
+  }
+
+  .publication-abstract-toggle {
+    color: var(--pub-abstract-toggle-color, #3a2711);
+    background: rgba(218, 165, 32, 0.2);
+    border-color: rgba(184, 134, 11, 0.34);
+  }
+
+  .publication-link-button:hover {
+    background: var(--link-accent-bg-hover);
+    transform: var(--motion-lift-sm);
+  }
+
+  .publication-abstract-toggle:hover {
+    background: rgba(218, 165, 32, 0.3);
+  }
+
+  .publication-link-button:focus-visible {
+    outline: none;
+    background: var(--link-accent-bg-hover);
+    box-shadow: var(--focus-ring);
+    transform: var(--motion-lift-sm);
+  }
+
+  .publication-abstract-toggle:focus-visible {
+    background: rgba(218, 165, 32, 0.3);
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.35);
+  }
+
+  .publication-abstract {
+    margin: 0.5rem 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    text-align: justify;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--surface-border);
+  }
+
+  .publication-video {
+    margin: 0.5rem 0 0;
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .publication-video-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+  }
+
+  .publication-video-toggle {
+    color: var(--pub-video-toggle-color, #1a4a8a);
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(37, 99, 235, 0.3);
+  }
+
+  .publication-video-toggle:hover {
+    background: rgba(59, 130, 246, 0.25);
+  }
+
+  .publication-video-toggle:focus-visible {
+    background: rgba(59, 130, 235, 0.3);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
+  }
+
+  @media (max-width: 767px) {
+    .publication-title {
+      font-size: 0.9375rem;
+    }
+  }
+</style>
+
+<script>
+  // Wire up expand/collapse toggles for abstracts and videos.
+  import { initPublicationToggles } from '~/core/runtime/publication-toggles';
+  initPublicationToggles();
+</script>

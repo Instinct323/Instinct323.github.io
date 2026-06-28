@@ -1,13 +1,13 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import EditorialHero from '../components/home/EditorialHero.astro';
-import FeaturedMediaCarousel from '../plugins/swiper/FeaturedMediaCarousel.astro';
-import '../lib/loaders/content-loader';
-import { loadFeaturedSlides } from '../lib/loaders/media-loader/home';
-import { resolveDeferredMountRuntimeConfig } from '../lib/runtime/deferred-mount-init';
-import { orchestratePageLoad } from '../lib/loaders/page-load-orchestrator';
-import { getPageLoader } from '../lib/loaders/page-loader-registry';
-import type { HomePageData } from '../types/home';
+import Layout from '~/features/layout/Layout.astro';
+import EditorialHero from '~/features/home/sections/Hero.astro';
+import FeaturedMediaCarousel from '~/plugins/swiper/FeaturedMediaCarousel.astro';
+import '~/features/home/content-loader';
+import { loadFeaturedSlides } from '~/core/media/surface';
+import { resolveDeferredMountRuntimeConfig } from '~/core/runtime/deferred-mount-init';
+import { orchestratePageLoad } from '~/features/site/load';
+import { getPageLoader } from '~/features/site/load';
+import type { HomePageData } from '~/features/home/types';
 
 const homeLoad = await orchestratePageLoad({
   frame: getPageLoader('home').frame,

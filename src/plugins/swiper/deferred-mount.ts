@@ -1,4 +1,4 @@
-import { bootstrapDeferredMounts } from '../../lib/runtime/deferred-mount-init';
+import { bootstrapDeferredMounts } from '~/core/runtime/deferred-mount-init';
 
 export function initCarouselDeferredMounts(): void {
   try {
