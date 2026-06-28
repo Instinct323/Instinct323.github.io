@@ -11,6 +11,11 @@ body {
   isolation: isolate;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 .site-frame {
   position: fixed;
   inset: 0;
