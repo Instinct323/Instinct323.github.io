@@ -4,23 +4,14 @@ import { resolveSiteImageConfig } from '~/features/site/image-config-resolver';
 import type { HomePageConfigGroup } from '~/features/home/types';
 import type { MediaConfig, NavigationConfig, SiteConfig, SiteMetadata } from '~/features/site/types';
 
-export { loadProfile } from '~/features/about/profile/loader';
-const featuredMediaCache = new Map<SiteConfig['home']['featuredMedia'], SiteConfig['home']['featuredMedia']>();
-
 function buildFeaturedMediaConfig(featured: SiteConfig['home']['featuredMedia']): SiteConfig['home']['featuredMedia'] {
-  const cached = featuredMediaCache.get(featured);
-  if (cached) return cached;
-
-  const carousel = featured.carousel;
-  const result = {
+  return {
     items: featured.items,
     carousel: {
-      ...carousel,
-      visual: resolveFeaturedCarouselVisual(carousel.visual),
+      ...featured.carousel,
+      visual: resolveFeaturedCarouselVisual(featured.carousel.visual),
     },
   };
-  featuredMediaCache.set(featured, result);
-  return result;
 }
 
 /** Extracts the navigation slice from the full site config. */

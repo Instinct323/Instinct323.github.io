@@ -11,10 +11,6 @@ export interface SiteNavModel {
   items: SiteNavItem[];
 }
 
-export function formatPageLabel(key: string): string {
-  return wordsToTitle([key]);
-}
-
 function buildNavItems(navigation: NavigationConfig): SiteNavItem[] {
   return navigation.order.map((key) => {
     const route = navigation.routes[key];
@@ -25,7 +21,7 @@ function buildNavItems(navigation: NavigationConfig): SiteNavItem[] {
       key: route.key,
       href: route.href,
       testId: 'nav-' + route.key,
-      label: formatPageLabel(route.key),
+      label: wordsToTitle([route.key]),
     };
   });
 }

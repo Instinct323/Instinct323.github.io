@@ -7,9 +7,10 @@ export const PUBLICATION_DIR = `${ABOUT_DIR}/publication`;
 // NOTE: Vite's import.meta.glob requires string literals at build time — dynamic
 // expressions like `${CONTENT_ROOT}/**/*.json` cannot be analyzed statically, so
 // glob patterns must be hardcoded here rather than derived from CONTENT_ROOT
+const CONTENT_MODULE_PATH_PREFIX = '../../../../content/';
 
-export const CONTENT_IMAGE_PATH_PREFIX = '../../../../content/';
-export const CONTENT_MODULE_KEY_TEMPLATE = '../../../../content/';
+export const CONTENT_IMAGE_PATH_PREFIX = CONTENT_MODULE_PATH_PREFIX;
+export const CONTENT_MODULE_KEY_TEMPLATE = CONTENT_MODULE_PATH_PREFIX;
 export const PHOTOGRAPHY_MODULE_KEY_PREFIX = 'photography/';
 
 export const CONFIG_FILE = `${CONTENT_ROOT}/config.jsonc`;

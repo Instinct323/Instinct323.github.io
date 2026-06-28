@@ -3,11 +3,6 @@ export interface IdleScheduleOptions {
   fallbackDelayMs: number;
 }
 
-const DEFAULT_IDLE_SCHEDULE_OPTIONS: IdleScheduleOptions = {
-  timeout: 1000,
-  fallbackDelayMs: 150,
-};
-
 export const SHELL_BACKGROUND_TIMEOUT = 2000;
 export const SHELL_BACKGROUND_FALLBACK = 180;
 
@@ -16,18 +11,9 @@ export function runWhenIdle(
   callback: () => void,
   options: Partial<IdleScheduleOptions> = {},
 ): void {
-  const { timeout, fallbackDelayMs } = {
-    ...DEFAULT_IDLE_SCHEDULE_OPTIONS,
-    ...options,
-  };
+  const timeout = options.timeout ?? 1000;
 
-  try {
-    window.requestIdleCallback(() => {
-      callback();
-    }, { timeout });
-  } catch {
-    window.setTimeout(() => {
-      callback();
-    }, fallbackDelayMs);
-  }
+  window.requestIdleCallback(() => {
+    callback();
+  }, { timeout });
 }

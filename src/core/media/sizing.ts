@@ -142,7 +142,14 @@ function normalizeCandidateWidths(
   throw new Error(`Invalid ${key}: no candidate width is <= maxSelectableWidth (${normalizedMax}).`);
 }
 
-/** Selects the best candidate width for each inferred width using DPR-scaled bucket matching. */
+/**
+ * Selects the best candidate width for each inferred width using DPR-scaled bucket matching.
+ *
+ * `inferredWidths` is sourced by the caller: `surface.ts` derives it from
+ * avatar sizes (`ABOUT_AVATAR_INFERRED_WIDTHS`) or gallery grid cell widths
+ * (`computeGalleryWidthsFromGrid`); `config.ts` derives it from carousel
+ * `slideWidth` percentages (`computeCarouselInferredWidths`).
+ */
 export function selectCandidateWidthsByPolicy(input: CandidateWidthPolicyInput): number[] {
   const {
     candidateWidths,
@@ -234,7 +241,12 @@ export function computeCarouselInferredWidths(slideWidth: ResponsiveSlideWidthPe
   return computeLayoutResponsiveWidths(profile, Number.POSITIVE_INFINITY);
 }
 
-/** Derives gallery cell widths from the grid definition at standard breakpoints. */
+/**
+ * Derives gallery cell widths from the grid definition at standard breakpoints.
+ *
+ * Used by `surface.ts` to produce the `inferredWidths` consumed by
+ * `selectCandidateWidthsByPolicy` for non-homepage surfaces (photography gallery).
+ */
 export function computeGalleryWidthsFromGrid(grid: MediaConfig['grid']): number[] {
   return computeGridCellWidths(grid, {
     mobile: RESPONSIVE_VIEWPORT_WIDTHS.mobile,

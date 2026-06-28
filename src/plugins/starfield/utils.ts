@@ -55,10 +55,7 @@ export function randomRange(min: number, max: number): number {
   return min + Math.random() * (max - min);
 }
 
-/** @internal */
-export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
+export { clamp } from '~/core/utils/clamp';
 
 /** Mutates the grid in place, creating empty row and column arrays on demand so spatial lookup never hits undefined. */
 export function getOrCreateCell(cells: CellGrid, cellX: number, cellY: number): Star[] {

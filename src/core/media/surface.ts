@@ -2,16 +2,16 @@ import { loadMediaConfig } from '~/features/site/config-loader';
 import { ABOUT_AVATAR_SIZES } from '~/core/content/paths';
 import { createGridSizesString, MOBILE_BREAKPOINT } from '~/core/media/sizing';
 import { createCachedLoader } from '~/core/utils/cache';
-import { assertMediaConfigShape, getValidatedHomepageGalleryConfig } from './config';
+import { assertMediaConfigShape } from './config';
 import { computeGalleryWidthsFromGrid } from '~/core/media/sizing';
 import {
   IMAGE_MEDIUM_WIDTHS_KEY,
   selectCandidateWidthsByPolicy,
 } from '~/core/media/sizing';
 import type { MediaConfig } from '~/features/site/types';
-import type { ContentImage, ContentImageOptions, FeaturedSlide, ImageLoader, MediaImage, MediaTree } from '~/core/media/types';
-import { loadContentImageResolved, createImageVariantSet } from '~/core/media/image';
-import { loadMediaTreeFromGallery } from '~/core/media/tree';
+import type { ContentImage, ContentImageOptions, ImageLoader } from '~/core/media/types';
+import { loadContentImageResolved } from '~/core/media/image';
+import { getValidatedHomepageGalleryConfig } from '~/features/home/gallery-config';
 
 export const getMediaConfigCached = createCachedLoader(loadMediaConfig, {
   init: assertMediaConfigShape,
@@ -120,75 +120,3 @@ export const imageLoader: ImageLoader = {
     return loadContentImageWithConfigValidation(path, options);
   },
 };
-
-export async function createFeaturedSlide(image: ContentImage): Promise<FeaturedSlide> {
-  const variantSet = await createImageVariantSet(image);
-
-  return {
-    src: variantSet.src,
-    srcset: variantSet.srcset,
-    sizes: image.responsive.sizes ?? HOME_COVERFLOW_SIZES,
-    alt: image.alt,
-    width: variantSet.width,
-    height: variantSet.height,
-    aspectRatio: image.aspectRatio,
-    image,
-  };
-}
-
-export async function loadFeaturedSlidesForHomepage(
-  featuredPaths: string[],
-  homeImageOptions: ContentImageOptions,
-  loadContentImage: (_path: string, _options: ContentImageOptions) => Promise<ContentImage | null>
-): Promise<FeaturedSlide[]> {
-  const featuredImages = await Promise.all(featuredPaths.map(async (path) => {
-    const image = await loadContentImage(path, homeImageOptions);
-
-    if (!image) {
-      throw new Error(`Invalid homepage.featured: failed to load validated image "${path}".`);
-    }
-
-    return image;
-  }));
-
-  return Promise.all(featuredImages.map((image) => createFeaturedSlide(image)));
-}
-
-/** Loads homepage featured slides with validated gallery config. */
-export async function loadFeaturedSlides(): Promise<FeaturedSlide[]> {
-  const homepageGalleryConfig = await getValidatedHomepageGalleryConfig(getMediaConfigCached);
-  const homeImageOptions = await computeContentImageOptions('home', {});
-
-  return loadFeaturedSlidesForHomepage(homepageGalleryConfig.featured, homeImageOptions, loadContentImageWithConfigValidation);
-}
-
-/** Maps a content image path to the MediaImage shape expected by the gallery tree builder. Returns null when the image cannot be resolved. */
-function mapGalleryImage(path: string, options: ContentImageOptions): MediaImage | null {
-  const imageAsset = loadContentImageResolved(path, options);
-
-  if (!imageAsset) {
-    if (import.meta.env.DEV) {
-      console.error(`[mapGalleryImage] skipping gallery image (unresolved path): ${path}`);
-      return null;
-    }
-    throw new Error(`[mapGalleryImage] gallery image unresolved: ${path}`);
-  }
-
-  return {
-    path: imageAsset.path,
-    alt: imageAsset.alt,
-    width: imageAsset.width,
-    height: imageAsset.height,
-    aspectRatio: imageAsset.aspectRatio,
-    responsive: imageAsset.responsive,
-    src: imageAsset.source,
-  };
-}
-
-/** Builds the full photography gallery tree with responsive image variants. */
-export async function loadMediaTree(): Promise<MediaTree> {
-  const mediaConfig = await getMediaConfigCached();
-  const galleryImageOptions = await computeContentImageOptionsFromConfig(mediaConfig, 'photography', {});
-
-  return loadMediaTreeFromGallery(mediaConfig.grid, galleryImageOptions, mapGalleryImage);
-}

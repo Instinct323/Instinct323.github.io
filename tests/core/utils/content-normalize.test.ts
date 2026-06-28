@@ -48,12 +48,12 @@ describe('filenameWithoutExt', () => {
     expect(filenameWithoutExt('README')).toBe('README');
   });
 
-  it('handles hidden files (extension stripped)', () => {
-    expect(filenameWithoutExt('.bashrc')).toBe('');
+  it('treats hidden files as having no extension', () => {
+    expect(filenameWithoutExt('.bashrc')).toBe('.bashrc');
   });
 
-  it('handles filename with only extension', () => {
-    expect(filenameWithoutExt('.pdf')).toBe('');
+  it('treats dot-prefixed names as their full name with no extension', () => {
+    expect(filenameWithoutExt('.pdf')).toBe('.pdf');
   });
 });
 

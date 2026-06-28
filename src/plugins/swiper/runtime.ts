@@ -9,10 +9,15 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const SWIPER_INIT_FLAG = 'swiperInitialized';
 
 const CAROUSEL_ANIMATION_SPEED_MS = 600;
+// Coverflow `depth`: how far behind the active slide adjacent slides sit on the Z axis (px).
 const CAROUSEL_COVERFLOW_DEPTH = 100;
+// Coverflow `modifier`: multiplier scaling the rotate/stretch/depth values for the effect intensity.
 const CAROUSEL_COVERFLOW_MODIFIER = 2.5;
 
-// Module-level state: intentional cross-call cache. Reset via resetCarouselState().
+// Module-level state shared across every init call. The reduced-motion MediaQueryList
+// and the listener-binding flag are both intentionally cached here so multiple carousels
+// on the same page share one matchMedia instance and one global listener (avoiding
+// O(n) listeners). Tests reset this state via resetCarouselState() to start clean.
 const state = {
   reducedMotionQuery: null as MediaQueryList | null,
   reducedMotionListenerBound: false,
@@ -199,6 +204,11 @@ function createSwiperConfig(root: SwiperRoot, slideCount: number, config?: Parti
   };
 }
 
+/**
+ * Initializes a single Swiper instance on the given root, guarding against
+ * double-init and missing slide markup. Returns success/failure so callers
+ * can choose to log or fall back.
+ */
 function initSwiper(
   root: SwiperRoot,
   slideCount: number,

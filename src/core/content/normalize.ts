@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 const NUMERIC_PREFIX_PATTERN = /^\d+-(.+)$/;
 
 export function compareNatural(a: string, b: string): number {
@@ -5,7 +7,7 @@ export function compareNatural(a: string, b: string): number {
 }
 
 export function filenameWithoutExt(filename: string): string {
-  return filename.replace(/\.[^.]+$/, '');
+  return path.parse(filename).name;
 }
 
 export function stripNumericPrefix(name: string): string {
@@ -14,11 +16,7 @@ export function stripNumericPrefix(name: string): string {
 }
 
 export function folderNameToSlug(name: string): string {
-  return stripNumericPrefix(name)
-    .trim()
-    .toLowerCase()
-    .replace(/[\s_]+/g, '-')
-    .replace(/-+/g, '-');
+  return name.replace(/^\d+-/, '').trim().toLowerCase().replace(/[\s_]+/g, '-').replace(/-+/g, '-');
 }
 
 export function wordsToTitle(segments: string[]): string {

@@ -228,7 +228,10 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
 <script>
   import { renderMarkdown } from '~/core/content/markdown';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // Astro <script> defaults to a module script, which defers execution until
+  // after the HTML is parsed — by the time this runs, DOMContentLoaded has
+  // already fired, so a listener would never be called. Bind directly.
+  (() => {
     const blogList = document.getElementById('blog-list');
     const detailTitle = document.getElementById('detail-title');
     const detailContent = document.getElementById('detail-content');
@@ -261,5 +264,5 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
         }
       });
     });
-  });
+  })();
 </script>

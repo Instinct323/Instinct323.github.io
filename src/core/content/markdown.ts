@@ -16,12 +16,7 @@ export interface ParseMarkdownResult {
 
 /** Resolves relative src/href paths in rendered markdown HTML against a base file URL. */
 function resolveRelativePaths(html: string, fileURL: string): string {
-  let baseURL: string;
-  try {
-    baseURL = new URL('.', fileURL).href;
-  } catch {
-    throw new Error(`resolveRelativePaths: invalid fileURL "${fileURL}"`);
-  }
+  const baseURL = new URL('.', fileURL).href;
 
   return html.replace(
     /(?:src|href)=["']([^"']+)["']/g,
@@ -73,10 +68,6 @@ const BASE_MARKDOWN_IT_OPTIONS = {
 const md = new MarkdownIt(BASE_MARKDOWN_IT_OPTIONS);
 
 function renderWithMd(renderer: MarkdownIt, markdown: string, options?: RenderMarkdownOptions): string {
-  if (!markdown || typeof markdown !== 'string') {
-    return '';
-  }
-
   let html = renderer.render(markdown);
 
   if (options?.fileURL) {
@@ -103,10 +94,6 @@ function parseDateFromFrontmatter(data: Record<string, unknown> | undefined): Da
 }
 
 export function parseMarkdownWithFrontmatter(markdown: string): ParseMarkdownResult {
-  if (!markdown || typeof markdown !== 'string') {
-    throw new Error('Invalid markdown input');
-  }
-
   const parsed = matter(markdown);
   const title = parsed.data?.title;
   const validTitle = typeof title === 'string' && title.trim().length > 0 ? title.trim() : null;

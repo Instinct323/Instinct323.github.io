@@ -17,10 +17,6 @@ function isImageLoadingEffectName(value: string): value is ImageLoadingEffectNam
 }
 
 /**
- * Validates the lazy-load subset of image config.
- * Extracting this allows reuse by both the build-time image pipeline and
- * the runtime deferred mount bootstrap.
- *
  * @throws When rootMargin is missing/invalid or localDebugDelayMs is not a non-negative integer.
  */
 export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['lazyLoad'] {
@@ -39,10 +35,6 @@ export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['la
 }
 
 /**
- * Validates the placeholder effect name against the allowed set.
- * Restricting to known effects prevents runtime errors from typos
- * or unsupported effect names.
- *
  * @throws When the effect name is not in the registered set.
  */
 export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageConfig['placeholderEffect'] {
@@ -58,10 +50,6 @@ export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageC
 }
 
 /**
- * Validates and normalizes the full site image configuration object.
- * Centralizing validation ensures invalid config fails fast at build time
- * rather than producing broken images at runtime.
- *
  * @throws When any required field is missing or out of range.
  */
 export function resolveSiteImageConfig(config: unknown): SiteImageConfig {

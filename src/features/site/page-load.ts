@@ -2,23 +2,31 @@ export const PAGE_LOAD_PRIORITY = ['frame', 'controls', 'background'] as const;
 
 export type PageLoadStage = (typeof PAGE_LOAD_PRIORITY)[number];
 
-type MaybePromise<T> = T | Promise<T>;
+/** Frame data: primary page-specific content (HomePageData, AboutFrame, etc.). */
+export type FrameConfig = unknown;
 
-export interface PageLoadContext<TFrame, TBackground> {
-  frame: TFrame;
-  background: TBackground;
+/** Background data: optional visual resources (background images by variant, etc.). */
+export type BackgroundConfig = unknown;
+
+/** Controls data: optional UI controls (featured slides, avatar, etc.). */
+export type ControlsConfig = unknown;
+
+export interface PageLoadPlan {
+  /** Loads the primary page frame. Always required. */
+  frame: () => Promise<FrameConfig>;
+  /** Optional background loader. Receives the resolved frame. */
+  background?: (_ctx: { frame: FrameConfig }) => Promise<BackgroundConfig>;
+  /** Optional controls loader. Receives the resolved frame. */
+  controls?: (_ctx: { frame: FrameConfig }) => Promise<ControlsConfig>;
 }
 
-export interface PageLoadPlan<TFrame, TBackground, TControls> {
-  frame: () => MaybePromise<TFrame>;
-  background?: (_ctx: Pick<PageLoadContext<TFrame, TBackground>, 'frame'>) => MaybePromise<TBackground>;
-  controls?: (_ctx: Pick<PageLoadContext<TFrame, TBackground>, 'frame'>) => MaybePromise<TControls>;
-}
-
-export interface PageLoadResult<TFrame, TBackground, TControls> {
-  frame: TFrame;
-  background: TBackground;
-  controls: TControls;
+export interface PageLoadResult {
+  /** Resolved frame data. Always present. */
+  frame: FrameConfig;
+  /** Resolved background data, or `null` when no background loader was supplied. */
+  background: BackgroundConfig;
+  /** Resolved controls data, or `null` when no controls loader was supplied. */
+  controls: ControlsConfig;
 }
 
 export type ControlImagePriority = 'critical' | 'deferred';

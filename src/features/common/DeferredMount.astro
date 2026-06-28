@@ -11,53 +11,23 @@ interface Props {
   announcePlaceholder?: boolean;
 }
 
-function resolveProps(rawProps: Props): {
-  enabled: boolean;
-  group?: string;
-  placeholderText?: string;
-  announcePlaceholder: boolean;
-} {
-  // Fail-fast: enabled must be explicitly provided or true
-  let enabled: boolean;
-  if (rawProps.enabled !== undefined) {
-    enabled = assertBoolean(rawProps.enabled, 'DeferredMount.enabled');
-  } else {
-    enabled = true;
-  }
+const {
+  enabled: rawEnabled = true,
+  group: rawGroup,
+  placeholderText: rawPlaceholderText,
+  announcePlaceholder: rawAnnouncePlaceholder = false,
+} = Astro.props;
 
-  // Fail-fast: announcePlaceholder must be explicitly provided or false
-  let announcePlaceholder: boolean;
-  if (rawProps.announcePlaceholder !== undefined) {
-    announcePlaceholder = assertBoolean(rawProps.announcePlaceholder, 'DeferredMount.announcePlaceholder');
-  } else {
-    announcePlaceholder = false;
-  }
-
-  let group: string | undefined;
-  if (rawProps.group !== undefined) {
-    group = assertString(rawProps.group, 'DeferredMount.group');
-  }
-
-  let placeholderText: string | undefined;
-  if (rawProps.placeholderText !== undefined) {
-    placeholderText = assertString(rawProps.placeholderText, 'DeferredMount.placeholderText');
-  }
-
-  return {
-    enabled,
-    group,
-    placeholderText,
-    announcePlaceholder,
-  };
-}
-
-const { enabled, group, placeholderText, announcePlaceholder } = resolveProps(Astro.props);
+const enabled = assertBoolean(rawEnabled, 'DeferredMount.enabled');
+const announcePlaceholder = assertBoolean(rawAnnouncePlaceholder, 'DeferredMount.announcePlaceholder');
+const group = rawGroup === undefined ? undefined : assertString(rawGroup, 'DeferredMount.group');
+const placeholderText = rawPlaceholderText === undefined ? undefined : assertString(rawPlaceholderText, 'DeferredMount.placeholderText');
 ---
 
 <div
   class="deferred-mount"
   data-deferred-mount={enabled ? 'true' : 'false'}
-  data-deferred-state={enabled ? DEFERRED_MOUNT_STATE.pending : DEFERRED_MOUNT_STATE.loaded}
+  data-deferred-state={enabled ? 'pending' : DEFERRED_MOUNT_STATE.loaded}
   data-deferred-group={group}
   aria-busy={enabled ? 'true' : 'false'}
 >

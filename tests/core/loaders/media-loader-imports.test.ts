@@ -4,12 +4,10 @@ import {
   selectCandidateWidthsByPolicy,
 } from '~/core/media/sizing';
 import { computeContentImageOptions, loadContentImageWithConfigValidation } from '~/core/media/surface';
-import { loadFeaturedSlides } from '~/core/media/surface';
-import { loadMediaTree } from '~/core/media/surface';
-import {
-  assertMediaConfigShape,
-  getValidatedHomepageGalleryConfig,
-} from '~/core/media/config';
+import { loadFeaturedSlides } from '~/features/home/featured-slides';
+import { loadMediaTree } from '~/features/photography/media-tree';
+import { assertMediaConfigShape } from '~/core/media/config';
+import { getValidatedHomepageGalleryConfig } from '~/features/home/gallery-config';
 
 describe('media-loader import path changes', () => {
   it('can import IMAGE_MEDIUM_WIDTHS_KEY directly from image-width-utils', () => {

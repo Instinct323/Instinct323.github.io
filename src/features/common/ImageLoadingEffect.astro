@@ -1,17 +1,17 @@
 ---
-import { getImageLoadingEffect } from '~/features/site/image-effects';
+import { IMAGE_LOADING_EFFECTS, type ImageLoadingEffectName } from '~/features/site/image-effects';
 
 interface Props {
   effectName: string;
 }
 
 const { effectName } = Astro.props;
-
-if (typeof effectName !== 'string' || !effectName.trim()) {
-  throw new Error(`Invalid image placeholder effect name: ${String(effectName)}`);
+const trimmed = effectName.trim();
+const svg = IMAGE_LOADING_EFFECTS[trimmed as ImageLoadingEffectName];
+if (!svg) {
+  throw new Error(`Unsupported image placeholder effect name: ${trimmed}`);
 }
-
-const selectedEffect = getImageLoadingEffect(effectName.trim());
+const selectedEffect = { name: trimmed as ImageLoadingEffectName, svg };
 ---
 
 <div class="fx-root" data-effect-name={selectedEffect.name} aria-hidden="true">

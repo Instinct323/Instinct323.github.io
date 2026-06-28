@@ -3,11 +3,12 @@ import Layout from '~/features/layout/Layout.astro';
 import EditorialHero from '~/features/home/sections/Hero.astro';
 import FeaturedMediaCarousel from '~/plugins/swiper/FeaturedMediaCarousel.astro';
 import '~/features/home/content-loader';
-import { loadFeaturedSlides } from '~/core/media/surface';
+import { loadFeaturedSlides } from '~/features/home/featured-slides';
 import { resolveDeferredMountRuntimeConfig } from '~/core/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '~/features/site/load';
 import { getPageLoader } from '~/features/site/load';
 import type { HomePageData } from '~/features/home/types';
+import type { FeaturedSlide } from '~/core/media/types';
 
 const homeLoad = await orchestratePageLoad({
   frame: getPageLoader('home').frame,
@@ -15,7 +16,7 @@ const homeLoad = await orchestratePageLoad({
 });
 
 const { profile, home, site } = homeLoad.frame as HomePageData;
-const featuredSlides = homeLoad.controls;
+const featuredSlides = (homeLoad.controls ?? []) as FeaturedSlide[];
 const lazyLoadRuntimePayload = JSON.stringify(resolveDeferredMountRuntimeConfig(site.image.lazyLoad, import.meta.env.DEV));
 const placeholderEffectName = site.image.placeholderEffect;
 

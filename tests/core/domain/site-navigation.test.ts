@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
-  formatPageLabel,
   buildPrimaryNavModel,
   type SiteNavItem,
   type SiteNavModel,
 } from '~/features/site/navigation';
+import { wordsToTitle } from '~/core/content/normalize';
 import type { NavigationConfig } from '~/features/site/types';
 
 function buildRoutes(): NavigationConfig['routes'] {
@@ -16,25 +16,25 @@ function buildRoutes(): NavigationConfig['routes'] {
   };
 }
 
-describe('formatPageLabel', () => {
+describe('wordsToTitle (used for nav labels)', () => {
   it("returns '' for empty string", () => {
-    expect(formatPageLabel('')).toBe('');
+    expect(wordsToTitle([''])).toBe('');
   });
 
   it("returns 'About' for 'about'", () => {
-    expect(formatPageLabel('about')).toBe('About');
+    expect(wordsToTitle(['about'])).toBe('About');
   });
 
   it("returns 'Photography' for 'photography'", () => {
-    expect(formatPageLabel('photography')).toBe('Photography');
+    expect(wordsToTitle(['photography'])).toBe('Photography');
   });
 
   it('capitalizes single character correctly', () => {
-    expect(formatPageLabel('a')).toBe('A');
+    expect(wordsToTitle(['a'])).toBe('A');
   });
 
   it('capitalizes multi-word keys correctly', () => {
-    expect(formatPageLabel('my-page')).toBe('My-page');
+    expect(wordsToTitle(['my-page'])).toBe('My-page');
   });
 });
 
@@ -243,7 +243,7 @@ describe('buildNavItems (via buildPrimaryNavModel)', () => {
     });
   });
 
-  it('generates correct label from formatPageLabel', () => {
+  it('generates correct label from wordsToTitle', () => {
     const navigation: NavigationConfig = {
       order: ['home', 'about'],
       routes: buildRoutes(),
@@ -251,7 +251,7 @@ describe('buildNavItems (via buildPrimaryNavModel)', () => {
 
     const result: SiteNavModel = buildPrimaryNavModel(navigation);
 
-    expect(result.items[0].label).toBe(formatPageLabel('home'));
-    expect(result.items[1].label).toBe(formatPageLabel('about'));
+    expect(result.items[0].label).toBe(wordsToTitle(['home']));
+    expect(result.items[1].label).toBe(wordsToTitle(['about']));
   });
 });

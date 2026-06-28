@@ -12,7 +12,6 @@ export const DEFERRED_MOUNT_DATA = {
 } as const;
 
 export const DEFERRED_MOUNT_STATE = {
-  pending: 'pending',
   mounted: 'mounted',
   loaded: 'loaded',
   error: 'error',
@@ -20,10 +19,6 @@ export const DEFERRED_MOUNT_STATE = {
 
 /** Builds a CSS selector for deferred-mount nodes belonging to a given group. */
 export function buildDeferredMountGroupSelector(group: string): string {
-  if (typeof group !== 'string' || group.trim().length === 0) {
-    throw new Error('Missing or invalid deferred mount group selector input.');
-  }
-
   return `[${DEFERRED_MOUNT_DATA.group}="${group}"][${DEFERRED_MOUNT_DATA.mount}="true"]`;
 }
 
@@ -134,7 +129,7 @@ function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
  * Heavy DOM subtrees are deferred until they enter the viewport so initial
  * page load stays fast and lightweight.
  *
- * @throws When selector, rootMargin, or mountDelayMs are missing or invalid.
+ * @throws When `rootMargin` is syntactically invalid for `IntersectionObserver`.
  */
 export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
   const { selector, rootMargin, mountDelayMs } = config;

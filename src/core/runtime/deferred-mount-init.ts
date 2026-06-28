@@ -33,10 +33,6 @@ function parseBootstrapConfig(serializedConfig: string): DeferredMountBootstrapC
       const config = rawConfig as Record<string, unknown>;
       const rootMargin = assertString(config?.rootMargin, 'deferred mount bootstrap rootMargin');
 
-      if (typeof config?.mountDelayMs !== 'number' || config.mountDelayMs < 0) {
-        throw new Error('Invalid deferred mount bootstrap mountDelayMs.');
-      }
-
       return {
         rootMargin,
         mountDelayMs: config.mountDelayMs as number,
@@ -70,9 +66,8 @@ export function bootstrapDeferredMounts(options: DeferredMountBootstrapOptions):
 }
 
 /**
- * Wraps deferred mount initialization in a try/catch so one failed group
- * does not crash the page or block other groups. Deferred mounts are
- * non-critical; graceful degradation keeps the rest of the page usable.
+ * Fail-soft wrapper for non-critical deferred mounts. One failed group
+ * must not crash the page or block other groups.
  */
 export function initDeferredMountGroupSafely(
   options: DeferredMountBootstrapOptions,

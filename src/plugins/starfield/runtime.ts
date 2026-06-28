@@ -248,6 +248,10 @@ function animateFrame(state: StarfieldState, context: StarfieldContext): void {
   updateStarPositionForParallax(state, context.config);
   context.ctxSt.clearRect(0, 0, state.width, state.height);
 
+  // Rebuild the spatial cell grid every frame: parallax + per-star drift move stars
+  // across cell boundaries, so a frame-1 index would miss neighbor pairs on frame 2.
+  // O(n) is acceptable because cellSize === maxDistance, so each connection check
+  // only scans a 3x3 window of cells.
   state.cells = {};
 
   state.stars.forEach((star) => {
@@ -341,6 +345,23 @@ function removeEventListeners(handlers: ReturnType<typeof createEventHandlers>) 
   document.removeEventListener('visibilitychange', handlers.handleVisibilityChange);
 }
 
+/**
+ * Bootstraps the starfield canvas animation.
+ *
+ * Lifecycle (in order):
+ *   1. Resize — canvas backing store is sized to `window.innerWidth/Height` × `DPR_CAP`.
+ *   2. Seed — `state.stars` is populated from `starDensities[config.starDensity]`.
+ *   3. RAF + listeners — a `requestAnimationFrame` loop drives `animateStars`;
+ *      `resize`/`mousemove`/`touchstart`/`touchmove`/`visibilitychange` are wired.
+ *
+ * The returned teardown function MUST be invoked when the host component unmounts
+ * (Astro view transitions, route change, etc.). It cancels the RAF, clears the
+ * idle pointer timeout, and removes every window/document listener registered
+ * above. Forgetting to call it leaks listeners and keeps the animation alive
+ * after the canvas is gone.
+ *
+ * @returns A teardown handle — call it on unmount to release resources.
+ */
 export function initStarfieldCore(
   backgroundCanvas: HTMLCanvasElement,
   starsCanvas: HTMLCanvasElement,

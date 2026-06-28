@@ -99,19 +99,19 @@ describe('normalizePublication', () => {
 
   it('throws when given non-object input', () => {
     expect(() => normalizePublication(null, filePath)).toThrow(
-      `Invalid publication content in ${filePath}`
+      'Missing or invalid publication content configuration object'
     );
     expect(() => normalizePublication(undefined, filePath)).toThrow(
-      `Invalid publication content in ${filePath}`
+      'Missing or invalid publication content configuration object'
     );
     expect(() => normalizePublication('string', filePath)).toThrow(
-      `Invalid publication content in ${filePath}`
+      'Missing or invalid publication content configuration object'
     );
     expect(() => normalizePublication(42, filePath)).toThrow(
-      `Invalid publication content in ${filePath}`
+      'Missing or invalid publication content configuration object'
     );
     expect(() => normalizePublication([], filePath)).toThrow(
-      `Invalid publication content in ${filePath}`
+      'Missing or invalid publication content configuration object'
     );
   });
 
@@ -410,13 +410,15 @@ describe('resolvePublicationLinks', () => {
     expect(result).toEqual([]);
   });
 
-  it('trims whitespace from link names and hrefs', () => {
+  it('passes upstream-filtered links through unchanged', () => {
     const publication: Publication = {
       title: 'Test Title',
       authors: ['John Doe'],
       date: '2024-01-15',
       links: {
-        '  pdf  ': '  https://example.com/paper.pdf  ',
+        'source_code': 'https://github.com/example/repo',
+        'project-website': 'https://example.com',
+        pdf: 'https://example.com/paper.pdf',
       },
     };
 
@@ -424,19 +426,18 @@ describe('resolvePublicationLinks', () => {
 
     expect(result).toEqual([
       { name: 'pdf', href: 'https://example.com/paper.pdf', label: 'Pdf' },
+      { name: 'project-website', href: 'https://example.com', label: 'Project Website' },
+      { name: 'source_code', href: 'https://github.com/example/repo', label: 'Source Code' },
     ]);
   });
 
-  it('filters out links with empty names or hrefs', () => {
+  it('trims whitespace from link names and hrefs', () => {
     const publication: Publication = {
       title: 'Test Title',
       authors: ['John Doe'],
       date: '2024-01-15',
       links: {
-        pdf: 'https://example.com/paper.pdf',
-        '': 'https://example.com/empty-name',
-        code: '   ',
-        website: '',
+        '  pdf  ': '  https://example.com/paper.pdf  ',
       },
     };
 

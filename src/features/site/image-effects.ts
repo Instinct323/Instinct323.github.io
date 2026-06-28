@@ -22,12 +22,3 @@ export const IMAGE_LOADING_EFFECTS = {
 } as const;
 
 export const IMAGE_LOADING_EFFECT_NAMES = Object.keys(IMAGE_LOADING_EFFECTS) as ImageLoadingEffectName[];
-
-export function getImageLoadingEffect(effectName: string): { name: ImageLoadingEffectName; svg: string } {
-  const name = effectName as ImageLoadingEffectName;
-  const svg = IMAGE_LOADING_EFFECTS[name];
-  if (!svg) {
-    throw new Error(`Unsupported image placeholder effect name: ${effectName}`);
-  }
-  return { name, svg };
-}

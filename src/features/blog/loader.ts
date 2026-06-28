@@ -1,5 +1,5 @@
 import { parseMarkdownWithFrontmatter } from '~/core/content/markdown';
-import { compareByWeightAndDate } from '~/core/content/normalize';
+import { compareByWeightAndDate, getDateTime } from '~/core/content/normalize';
 import { BLOG_POST_MODULES } from '~/core/content/astro-adapter/blog';
 export interface BlogPost {
   title: string;
@@ -28,9 +28,9 @@ export function extractDateFromSlug(slug: string): Date | null {
   const dateMatch = slug.match(/(\d{4})-(\d{2})-(\d{2})/);
   if (dateMatch) {
     const [, year, month, day] = dateMatch;
-    const date = new Date(`${year}-${month}-${day}`);
-    if (!isNaN(date.getTime())) {
-      return date;
+    const time = getDateTime(`${year}-${month}-${day}`);
+    if (time !== null) {
+      return new Date(time);
     }
   }
 

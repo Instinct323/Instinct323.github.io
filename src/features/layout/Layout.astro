@@ -1,23 +1,20 @@
 ---
-import { getImage } from 'astro:assets';
-import { backgroundDesktopSource, backgroundMobileSource } from '~/core/content/astro-adapter/assets';
+// Layout.astro — page shell orchestrator
+// Loading contract: frame (metadata + media + effects) → background (images) → template (SEO + shell + starfield)
 import LayoutHead from '~/features/layout/Head.astro';
 import Footer from '~/features/layout/Footer.astro';
 import Header from '~/features/layout/Header.astro';
 import '~/plugins/starfield';
 import { loadMediaConfig, loadSiteMetadata } from '~/features/site/config-loader';
 import { loadEffectsConfig } from '~/features/photography/loader';
-import { buildShellStyle, type LayoutProps } from '~/features/site/shell';
-import { RESPONSIVE_VIEWPORT_WIDTHS } from '~/core/media/sizing';
+import type { LayoutProps } from '~/features/site/shell';
 import { assertMediaConfigShape } from '~/core/media/config';
 import { orchestratePageLoad } from '~/features/site/load';
-import {
-  LAYOUT_MOBILE_HEIGHT,
-  LAYOUT_DESKTOP_HEIGHT,
-  inferCoverWidth,
-} from '~/core/utils/layout';
-import { IMAGE_HIGH_WIDTHS_KEY, selectCandidateWidthsByPolicy } from '~/core/media/sizing';
-import { assertString } from '~/core/validation/assert';
+import { loadLayoutBackgrounds } from '~/features/layout/layout-background';
+import { resolveLayoutSeo } from '~/features/layout/layout-seo';
+import { buildLayoutShell } from '~/features/layout/layout-shell';
+import { resolveStarfieldConfig } from '~/features/layout/layout-starfield';
+import type { LayoutBackgroundData } from '~/features/layout/layout-background';
 import '~/styles/layout-shell.css';
 import '~/styles/tokens.css';
 
@@ -30,41 +27,13 @@ const {
   contentWidth = 'standard',
 } = Astro.props as LayoutProps;
 
-const BACKGROUND_MOBILE_ASPECT_RATIO = backgroundMobileSource.width / backgroundMobileSource.height;
-const BACKGROUND_DESKTOP_ASPECT_RATIO = backgroundDesktopSource.width / backgroundDesktopSource.height;
-
-type BackgroundVariantKey = 'mobile' | 'desktop';
-
-interface BackgroundVariantInput {
-  key: BackgroundVariantKey;
-  source: typeof backgroundMobileSource;
-  inferredWidth: number;
-  aspectRatio: number;
-}
-
-const mobileInferredWidth = inferCoverWidth(
-  RESPONSIVE_VIEWPORT_WIDTHS.mobile,
-  LAYOUT_MOBILE_HEIGHT,
-  BACKGROUND_MOBILE_ASPECT_RATIO,
-);
-const desktopInferredWidth = inferCoverWidth(
-  RESPONSIVE_VIEWPORT_WIDTHS.desktop,
-  LAYOUT_DESKTOP_HEIGHT,
-  BACKGROUND_DESKTOP_ASPECT_RATIO,
-);
-
 type LayoutFrameData = {
   siteMetadata: Awaited<ReturnType<typeof loadSiteMetadata>>;
   mediaConfig: Awaited<ReturnType<typeof loadMediaConfig>>;
   effectsConfig: Awaited<ReturnType<typeof loadEffectsConfig>>;
 };
 
-type LayoutBackgroundData = {
-  backgroundMobile: Awaited<ReturnType<typeof getImage>>;
-  backgroundDesktop: Awaited<ReturnType<typeof getImage>>;
-};
-
-const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundData>({
+const layoutLoad = await orchestratePageLoad({
   frame: async () => {
     const [siteMetadata, mediaConfig, effectsConfig] = await Promise.all([
       loadSiteMetadata(),
@@ -80,64 +49,14 @@ const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundDa
       effectsConfig,
     };
   },
-  background: async ({ frame }) => {
-    const backgroundQuality = frame.mediaConfig.image.quality;
-    const backgroundWidths = frame.mediaConfig.image.widths.high;
-    const backgroundDprScale = frame.mediaConfig.image.dprScale.medium;
-    const variants: BackgroundVariantInput[] = [
-      {
-        key: 'mobile',
-        source: backgroundMobileSource,
-        inferredWidth: mobileInferredWidth,
-        aspectRatio: BACKGROUND_MOBILE_ASPECT_RATIO,
-      },
-      {
-        key: 'desktop',
-        source: backgroundDesktopSource,
-        inferredWidth: desktopInferredWidth,
-        aspectRatio: BACKGROUND_DESKTOP_ASPECT_RATIO,
-      },
-    ];
-
-    const backgroundVariantEntries = await Promise.all(variants.map(async (variant) => {
-      const width = selectCandidateWidthsByPolicy({
-        candidateWidths: backgroundWidths,
-        inferredWidths: [variant.inferredWidth],
-        dprScale: backgroundDprScale,
-        key: `${IMAGE_HIGH_WIDTHS_KEY}.${variant.key}.medium`,
-        maxSelectableWidth: variant.source.width,
-      })[0];
-
-      const image = await getImage({
-        src: variant.source,
-        width,
-        height: Math.ceil(width / variant.aspectRatio),
-        fit: 'cover',
-        position: 'center',
-        format: 'webp',
-        quality: backgroundQuality,
-      });
-
-      return [variant.key, image] as const;
-    }));
-
-    const backgroundByVariant = Object.fromEntries(backgroundVariantEntries) as Record<
-      BackgroundVariantKey,
-      Awaited<ReturnType<typeof getImage>>
-    >;
-
-    return {
-      backgroundMobile: backgroundByVariant.mobile,
-      backgroundDesktop: backgroundByVariant.desktop,
-    };
-  },
+  background: loadLayoutBackgrounds,
 });
 
 const {
   siteMetadata,
   effectsConfig,
-} = layoutLoad.frame;
-const { backgroundMobile, backgroundDesktop } = layoutLoad.background;
+} = layoutLoad.frame as LayoutFrameData;
+const { backgroundMobile, backgroundDesktop } = layoutLoad.background as LayoutBackgroundData;
 
 // Fail-fast: Astro.site must be configured in astro.config.ts
 if (!Astro.site) {
@@ -145,20 +64,22 @@ if (!Astro.site) {
 }
 const siteUrl = Astro.site;
 
-const shellBackgroundPayload = JSON.stringify({
-  mobileSrc: backgroundMobile.src,
-  desktopSrc: backgroundDesktop.src,
+const {
+  resolvedTitle,
+  resolvedDescription,
+  keyword,
+  canonicalUrl,
+  sitemapUrl,
+} = resolveLayoutSeo({ title, description, siteMetadata, siteUrl, pathname: Astro.url.pathname });
+
+const { shellStyle, shellBackgroundPayload } = buildLayoutShell({
+  shell,
+  contentWidth,
+  backgroundMobile,
+  backgroundDesktop,
 });
 
-// Fail-fast: title and description should be provided by pages or site config
-const resolvedTitle = title !== undefined ? title : assertString(siteMetadata.defaultTitle, 'siteMetadata.defaultTitle');
-const resolvedDescription = description !== undefined ? description : assertString(siteMetadata.defaultDescription, 'siteMetadata.defaultDescription');
-const keyword = siteMetadata.keyword;
-
-  const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
-  const sitemapUrl = new URL('/sitemap-index.xml', siteUrl).toString();
-  const shellStyle = buildShellStyle(shell, contentWidth);
-  const starfieldConfig = effectsConfig.starfield;
+const starfieldConfig = resolveStarfieldConfig(effectsConfig);
 ---
 
 <!doctype html>

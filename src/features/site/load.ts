@@ -10,7 +10,8 @@ export { PAGE_LOAD_PRIORITY } from '~/features/site/page-load';
 export type { PageLoadStage };
 
 import { loadBlogPage } from '~/features/blog/loader';
-import { loadAboutPageFrame, loadAboutAvatarImage, loadHomePage } from '~/features/home/content-loader';
+import { loadAboutPageFrame, loadAboutAvatarImage } from '~/features/about/page-loader';
+import { loadHomePage } from '~/features/home/content-loader';
 import { loadPhotographyPage } from '~/features/photography/loader';
 
 export type PageKey = 'home' | 'about' | 'blog' | 'photography';
@@ -30,12 +31,19 @@ const PAGE_LOADERS = {
   photography: { frame: loadPhotographyPage },
 };
 
+/**
+ * Returns the page loader for the given key.
+ *
+ * @throws if `key` is not registered. This is a fail-fast contract — unknown
+ * keys indicate a programmer error (typo, missing registration) and must
+ * surface immediately, not return `null` and force every caller to handle it.
+ */
 export function getPageLoader<TFrame, TControl>(key: PageKey): PageLoader<TFrame, TControl> {
-  const loader = PAGE_LOADERS[key];
+  const loader = PAGE_LOADERS[key] as PageLoader<TFrame, TControl>;
   if (!loader) {
     throw new Error(`No page loader registered for key: ${key}`);
   }
-  return loader as PageLoader<TFrame, TControl>;
+  return loader;
 }
 
 /**
@@ -53,13 +61,9 @@ export function resolveControlImageLoading(priority: ControlImagePriority): Cont
 }
 
 /** Executes a page-load plan in three sequential stages: frame, controls, background. */
-export async function orchestratePageLoad<
-  TFrame,
-  TBackground = undefined,
-  TControls = null
->(plan: PageLoadPlan<TFrame, TBackground, TControls>): Promise<PageLoadResult<TFrame, TBackground, TControls>> {
+export async function orchestratePageLoad(plan: PageLoadPlan): Promise<PageLoadResult> {
   const frame = await plan.frame();
   const controls = plan.controls ? await plan.controls({ frame }) : null;
   const background = plan.background ? await plan.background({ frame }) : null;
-  return { frame, background: background as TBackground, controls: controls as TControls };
+  return { frame, background, controls };
 }

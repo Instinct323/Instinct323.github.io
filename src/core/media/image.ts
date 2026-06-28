@@ -171,17 +171,9 @@ export function loadContentImageResolved(path: string, options: ContentImageOpti
   const source = resolveContentImageMetadata(path);
 
   if (!normalizedPath) {
-    if (import.meta.env.DEV) {
-      console.warn(`[loadContentImageResolved] rejected path (failed normalize): ${path}`);
-      return null;
-    }
     throw new Error(`[loadContentImageResolved] rejected path (failed normalize): ${path}`);
   }
   if (!source) {
-    if (import.meta.env.DEV) {
-      console.warn(`[loadContentImageResolved] no image metadata matched path: ${normalizedPath}`);
-      return null;
-    }
     throw new Error(`[loadContentImageResolved] no image metadata matched path: ${normalizedPath}`);
   }
 

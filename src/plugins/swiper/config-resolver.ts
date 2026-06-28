@@ -1,10 +1,9 @@
 import type { HomePageCarouselVisualConfig } from '~/plugins/swiper/types';
+import { clamp } from '~/core/utils/clamp';
 import { assertFiniteNumber, assertObject } from '~/core/validation/assert';
 
 /**
  * Validates and normalizes the carousel visual configuration.
- * Fail-fast validation ensures missing or invalid slide width values
- * are caught early before they break responsive layout.
  *
  * @throws When slideWidth breakpoints or spaceBetween are missing/invalid.
  */
@@ -33,7 +32,7 @@ export function resolveFeaturedCarouselVisual(visual: unknown): HomePageCarousel
   }
 
   const inactiveOpacityRaw = assertFiniteNumber(source.inactiveOpacity, 'carousel visual.inactiveOpacity');
-  const inactiveOpacity = Math.min(1, Math.max(0, inactiveOpacityRaw));
+  const inactiveOpacity = clamp(inactiveOpacityRaw, 0, 1);
 
   return {
     spaceBetween,

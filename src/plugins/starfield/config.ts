@@ -4,7 +4,7 @@ import {
   assertFiniteNumber,
   assertObject,
   assertString,
-} from './assertions';
+} from '~/core/validation/assert';
 
 /**
  * Validates and normalizes the starfield effect configuration.

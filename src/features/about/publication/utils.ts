@@ -58,19 +58,10 @@ function normalizePublicationLinks(raw: RawPublication): Record<string, string> 
 /**
  * Normalizes raw publication data into a validated `Publication` object.
  *
- * @param rawValue - Raw publication data from JSON/YAML.
- * @param filePath - Source file path for error messages.
- * @returns A validated Publication object.
  * @throws {Error} When required fields are missing or invalid.
  */
 export function normalizePublication(rawValue: unknown, filePath: string): Publication {
-  try {
-    assertObject(rawValue, 'publication content');
-  } catch {
-    throw new Error(`Invalid publication content in ${filePath}`);
-  }
-
-  const raw = rawValue as RawPublication;
+  const raw = assertObject<RawPublication>(rawValue, 'publication content');
   const title = assertString(raw.title, 'title');
   const date = assertString(raw.date, 'date');
 
@@ -85,12 +76,7 @@ export function normalizePublication(rawValue: unknown, filePath: string): Publi
   };
 
   if (raw.weight !== undefined) {
-    try {
-      publication.weight = assertFiniteNumber(raw.weight, 'weight');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      throw new Error(`Invalid publication field "weight" in ${filePath}: ${message}`);
-    }
+    publication.weight = assertFiniteNumber(raw.weight, 'weight');
   }
 
   return publication;
@@ -115,7 +101,6 @@ export function formatPublicationLinkLabel(name: string): string {
  */
 export function resolvePublicationLinks(publication: Publication): PublicationLinkEntry[] {
   return Object.entries(publication.links ?? {})
-    .filter(([name, href]) => Boolean(name.trim() && href.trim()))
     .map(([name, href]) => {
       const normalizedName = name.trim();
       return {

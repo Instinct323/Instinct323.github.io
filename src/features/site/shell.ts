@@ -47,12 +47,7 @@ const SHELLS_CONFIG: ShellsConfig = {
     textMuted: 'var(--shell-home-text-muted)',
   },
   photography: {
-    overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
-    overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
-    surfaceBg: 'var(--shell-elevated-surface-bg)',
-    cardSurfaceBg: 'var(--shell-elevated-card-bg)',
-    surfaceBorder: 'var(--shell-elevated-surface-border)',
-    pageCanvas: 'var(--shell-elevated-canvas)',
+    ...BASE_SHELL_TOKENS,
     textStrong: 'var(--shell-text-strong-photography)',
     textBody: 'var(--shell-text-body-photography)',
     textMuted: 'var(--shell-text-muted-photography)',

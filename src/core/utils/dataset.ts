@@ -1,6 +1,9 @@
 /**
- * Parses a dataset attribute string as JSON, catches SyntaxError with context,
- * and passes the parsed result through a validator function.
+ * Parses a JSON payload sourced from an HTML data-* attribute and routes the
+ * decoded value through a validator. JSON syntax errors are re-thrown with
+ * caller-provided context (e.g. the attribute name + page location) so the
+ * failure message points at the right DOM slot rather than dumping a raw
+ * `SyntaxError` stack.
  */
 export function parseDatasetPayload<T>(
   datasetValue: string,

@@ -1,11 +1,12 @@
 import { loadSiteConfig } from '~/features/site/config-cache';
-import { getEffectsResolver } from '~/features/site/effects';
+import { EFFECTS_RESOLVERS } from '~/features/site/effects';
 import { assertObject } from '~/core/validation/assert';
 import type { StarfieldEffectConfig } from '~/plugins/starfield';
 import type { PhotographyPageConfig, SiteConfig } from '~/features/site/types';
 import type { SiteEffectsConfig } from '~/features/site/effects';
-import { loadMediaTree } from '~/core/media/surface';
+import { loadMediaTree } from '~/features/photography/media-tree';
 import { loadMediaConfig } from '~/features/site/config-loader';
+
 function resolvePhotographyConfig(config: SiteConfig['photography']): PhotographyPageConfig {
   const source = config as Partial<PhotographyPageConfig>;
 
@@ -18,10 +19,10 @@ function resolvePhotographyConfig(config: SiteConfig['photography']): Photograph
 export async function loadEffectsConfig(): Promise<SiteEffectsConfig> {
   const effects = assertObject<SiteEffectsConfig>(loadSiteConfig().effects, 'effects');
 
-  const resolveStarfieldConfig = getEffectsResolver<StarfieldEffectConfig>('starfield');
+  const starfieldResolver = EFFECTS_RESOLVERS.starfield as (_config: unknown) => StarfieldEffectConfig;
 
   return {
-    starfield: resolveStarfieldConfig(effects.starfield),
+    starfield: starfieldResolver(effects.starfield),
   };
 }
 
@@ -38,5 +39,3 @@ export async function loadPhotographyPage(): Promise<{
 
   return { mediaTree, photographyConfig, mediaConfig };
 }
-
-

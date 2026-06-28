@@ -5,6 +5,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
 import './styles.css';
 import DeferredImage from '~/features/common/DeferredImage.astro';
+import { clamp } from '~/core/utils/clamp';
 import type { FeaturedSlide } from '~/core/media/types';
 import type { HomePageConfigGroup as HomepageConfig } from '~/features/home/types';
 import { resolveControlImageLoading } from '~/features/site/load';
@@ -32,7 +33,7 @@ const visual = settings.visual;
 const slideWidthDesktop = visual.slideWidth.desktop;
 const slideWidthTablet = visual.slideWidth.tablet;
 const slideWidthMobile = visual.slideWidth.mobile;
-const inactiveOpacity = Math.min(1, Math.max(0, visual.inactiveOpacity));
+const inactiveOpacity = clamp(visual.inactiveOpacity, 0, 1);
 const deferredImageLoading = resolveControlImageLoading('deferred');
 
 const prevIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;

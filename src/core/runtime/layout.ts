@@ -56,25 +56,17 @@ function applyShellBackgroundImages(payload: ShellBackgroundPayload): void {
  * repeat navigations fast.
  */
 function initShellBackground(): void {
+  const parsed = parseShellBackgroundPayload();
+  if (!parsed) {
+    return;
+  }
+
+  applyShellBackgroundImages(parsed.payload);
+
   try {
-    const parsed = parseShellBackgroundPayload();
-    if (!parsed) {
-      return;
-    }
-
-    applyShellBackgroundImages(parsed.payload);
-
-    try {
-      window.sessionStorage.setItem(SHELL_BACKGROUND_CACHE_KEY, parsed.serializedPayload);
-    } catch (e) {
-      console.warn('SessionStorage unavailable:', e);
-    }
+    window.sessionStorage.setItem(SHELL_BACKGROUND_CACHE_KEY, parsed.serializedPayload);
   } catch (e) {
-    if (import.meta.env.DEV) {
-      console.error('[SHELL BACKGROUND FAILURE]', e);
-      throw e;
-    }
-    console.error('Failed to apply shell background images:', e);
+    console.warn('SessionStorage unavailable:', e);
   }
 }
 
