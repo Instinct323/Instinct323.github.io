@@ -13,16 +13,39 @@ bun dev
 
 ```text
 ├── content/                  # Site content and config files
-│   └── blog/*/               # Blog posts (README.md + assets)
+│   ├── about/
+│   ├── background/
+│   ├── blog/*/               # Blog posts (README.md + assets)
+│   ├── config.jsonc
+│   └── photography/
 ├── src/
-│   ├── components/           # Astro UI components
-│   ├── layouts/              # Shared layout shell
-│   ├── lib/                  # Config/content/media loaders
-│   │   ├── content-paths.ts  # Centralized resource path definitions
-│   │   └── loaders/          # Content loaders (blog, photos, etc.)
-│   ├── pages/                # Route entry pages (index, blog, photos, about)
-│   └── styles/               # Global tokens and shared styles
-├── tests/
+│   ├── core/                 # Content loading, media processing, runtime, utils
+│   │   ├── content/
+│   │   ├── media/
+│   │   ├── runtime/
+│   │   ├── utils/
+│   │   └── validation/
+│   ├── features/             # Feature modules (about, blog, home, photography, site)
+│   │   ├── about/
+│   │   ├── blog/
+│   │   ├── common/
+│   │   ├── home/
+│   │   ├── layout/
+│   │   ├── photography/
+│   │   └── site/
+│   ├── pages/                # Astro route entry pages
+│   ├── plugins/              # Third-party plugin wrappers (starfield, swiper)
+│   ├── styles/               # Global CSS tokens and shared styles
+│   └── types/                # Shared type declarations
+├── tests/                    # Test suites mirroring src/ structure
+│   ├── core/
+│   ├── features/
+│   ├── mocks/
+│   ├── plugins/
+│   ├── assert-site-output.js
+│   ├── verify-no-media-json-refs.js
+│   └── verify-no-unused-tokens.js
+├── scripts/
 └── package.json
 ```
 

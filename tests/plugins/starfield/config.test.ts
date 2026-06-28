@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { resolveStarfieldEffectConfig } from '../../src/plugins/starfield';
-import type { StarfieldEffectConfig } from '../../src/plugins/starfield';
+import { resolveStarfieldEffectConfig } from '../../../src/plugins/starfield';
+import type { StarfieldEffectConfig } from '../../../src/plugins/starfield';
 
 describe('resolveStarfieldEffectConfig', () => {
   const validConfig: StarfieldEffectConfig = {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { initStarfield } from '../../src/plugins/starfield';
-import type { StarfieldEffectConfig } from '../../src/plugins/starfield';
+import { initStarfield } from '../../../src/plugins/starfield';
+import type { StarfieldEffectConfig } from '../../../src/plugins/starfield';
 
 function createTestConfig(overrides: Partial<StarfieldEffectConfig> = {}): StarfieldEffectConfig {
   return {
