@@ -29,7 +29,7 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
             data-base-url={post.baseUrl}
           >
             <h3 class="blog-item-title">
-              {post.title}
+              <span class="title-fade">{post.title}</span>
               {post.weight > 0 && <span class="blog-item-pin">Pinned</span>}
             </h3>
             {post.date && (
@@ -46,7 +46,7 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
 
       <div class="blog-detail">
         <article class="card" id="blog-detail-card">
-          <h1 id="detail-title">{initialPost.title}</h1>
+          <h1 id="detail-title" class="title-fade">{initialPost.title}</h1>
           <div id="detail-content" set:html={initialContentHtml} />
         </article>
       </div>
@@ -102,7 +102,19 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
     border-color: rgba(59, 130, 246, 0.4);
   }
 
+  .title-fade {
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+
   .blog-item-title {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
     margin: 0 0 0.5rem 0;
     font-size: 1rem;
     font-weight: 600;
@@ -117,9 +129,9 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
     color: white;
     padding: 0.125rem 0.375rem;
     border-radius: var(--radius-sm);
-    margin-left: 0.375rem;
     vertical-align: middle;
     font-weight: 500;
+    flex-shrink: 0;
   }
 
   .blog-item-date {
