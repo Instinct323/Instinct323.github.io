@@ -3,7 +3,7 @@ import {
   parseHexColorOrDefault,
   calculateDistance,
   randomRange,
-  addStarToCellGrid,
+  getOrCreateCell,
   calculateConnectionOpacity,
   DPR_CAP,
   IDLE_RESTART_TIME,
@@ -46,9 +46,13 @@ function createStar(x: number, y: number, config: StarfieldEffectConfig): Star {
   const speedY = (Math.random() - 0.5) * config.speedFactor;
   const rotationSpeed = randomRange(config.rotationSpeed.min, config.rotationSpeed.max);
   const depth = Math.random();
-  const canConnect = config.percentStarsConnecting === 100
-    ? true
-    : config.connectionsWhenNoMouse && Math.random() < config.percentStarsConnecting / 100;
+  // Connection-gating interaction:
+  //   - `connectionsWhenNoMouse` is the master switch (false = no connections ever)
+  //   - `percentStarsConnecting` controls probabilistic connection eligibility per star
+  //   - `mouseRadius` in shouldDrawConnection() allows ALL nearby stars to connect when
+  //     the pointer is inside the radius (independent of `canConnect` flag).
+  // `canConnect` is the per-star eligibility flag, not the global gate.
+  const canConnect = config.connectionsWhenNoMouse && Math.random() < config.percentStarsConnecting / 100;
 
   return {
     x,
@@ -106,7 +110,7 @@ function createStars(state: StarfieldState, context: StarfieldContext): void {
     const y = Math.random() * state.height;
     const star = createStar(x, y, context.config);
     state.stars.push(star);
-    addStarToCellGrid(state.cells, star, context.cellSize);
+    getOrCreateCell(state.cells, Math.floor(star.x / context.cellSize), Math.floor(star.y / context.cellSize)).push(star);
   }
 }
 
@@ -257,7 +261,7 @@ function animateFrame(state: StarfieldState, context: StarfieldContext): void {
   state.stars.forEach((star) => {
     updateStar(star, state.width, state.height);
     drawStar(star, context.ctxSt, context.config);
-    addStarToCellGrid(state.cells, star, context.cellSize);
+    getOrCreateCell(state.cells, Math.floor(star.x / context.cellSize), Math.floor(star.y / context.cellSize)).push(star);
     drawConnections(star, state, context);
   });
 }
@@ -287,20 +291,6 @@ function setPointerPosition(
   }, IDLE_RESTART_TIME);
 }
 
-function handleTouchStart(event: TouchEvent, state: StarfieldState): void {
-  const touch = event.touches[0];
-  if (touch) setPointerPosition(touch.clientX, touch.clientY, state);
-}
-
-function handleTouchMove(event: TouchEvent, state: StarfieldState): void {
-  const touch = event.touches[0];
-  if (touch) setPointerPosition(touch.clientX, touch.clientY, state);
-}
-
-function handleMouseMove(event: MouseEvent, state: StarfieldState): void {
-  setPointerPosition(event.clientX, event.clientY, state);
-}
-
 function handleVisibilityChange(state: StarfieldState, context: StarfieldContext): void {
   state.isVisible = !document.hidden;
   if (state.isVisible && !state.rafId) {
@@ -319,17 +309,15 @@ function handleResize(state: StarfieldState, context: StarfieldContext): void {
   createStars(state, context);
 }
 
-function createEventHandlers(state: StarfieldState, context: StarfieldContext) {
-  return {
-    handleTouchStart: (event: TouchEvent) => handleTouchStart(event, state),
-    handleTouchMove: (event: TouchEvent) => handleTouchMove(event, state),
-    handleMouseMove: (event: MouseEvent) => handleMouseMove(event, state),
-    handleVisibilityChange: () => handleVisibilityChange(state, context),
-    handleResize: () => handleResize(state, context),
-  };
-}
+type StarfieldEventHandlers = {
+  handleTouchStart: (_event: TouchEvent) => void;
+  handleTouchMove: (_event: TouchEvent) => void;
+  handleMouseMove: (_event: MouseEvent) => void;
+  handleVisibilityChange: () => void;
+  handleResize: () => void;
+};
 
-function addEventListeners(handlers: ReturnType<typeof createEventHandlers>) {
+function addEventListeners(handlers: StarfieldEventHandlers) {
   window.addEventListener('resize', handlers.handleResize);
   window.addEventListener('mousemove', handlers.handleMouseMove);
   window.addEventListener('touchstart', handlers.handleTouchStart as EventListener);
@@ -337,7 +325,7 @@ function addEventListeners(handlers: ReturnType<typeof createEventHandlers>) {
   document.addEventListener('visibilitychange', handlers.handleVisibilityChange);
 }
 
-function removeEventListeners(handlers: ReturnType<typeof createEventHandlers>) {
+function removeEventListeners(handlers: StarfieldEventHandlers) {
   window.removeEventListener('resize', handlers.handleResize);
   window.removeEventListener('mousemove', handlers.handleMouseMove);
   window.removeEventListener('touchstart', handlers.handleTouchStart as EventListener);
@@ -395,7 +383,19 @@ export function initStarfieldCore(
   createStars(state, context);
   state.rafId = requestAnimationFrame(() => animateStars(state, context));
 
-  const handlers = createEventHandlers(state, context);
+  const handlers: StarfieldEventHandlers = {
+    handleTouchStart: (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (touch) setPointerPosition(touch.clientX, touch.clientY, state);
+    },
+    handleTouchMove: (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (touch) setPointerPosition(touch.clientX, touch.clientY, state);
+    },
+    handleMouseMove: (event: MouseEvent) => setPointerPosition(event.clientX, event.clientY, state),
+    handleVisibilityChange: () => handleVisibilityChange(state, context),
+    handleResize: () => handleResize(state, context),
+  };
   addEventListeners(handlers);
 
   return () => {

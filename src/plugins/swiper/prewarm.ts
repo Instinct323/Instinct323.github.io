@@ -1,7 +1,6 @@
 import { runWhenIdle } from '~/core/runtime/scheduling';
 
 const CAROUSEL_PREWARM_TIMEOUT = 1200;
-const CAROUSEL_PREWARM_FALLBACK = 250;
 
 /**
  * Initializes the carousel with a four-tier prewarm strategy, ranked by
@@ -53,7 +52,6 @@ export function initCarouselWithPrewarm(carouselRoot: HTMLElement): void {
     });
   }, {
     timeout: CAROUSEL_PREWARM_TIMEOUT,
-    fallbackDelayMs: CAROUSEL_PREWARM_FALLBACK,
   });
 
   const prewarmOnIntent = () => {

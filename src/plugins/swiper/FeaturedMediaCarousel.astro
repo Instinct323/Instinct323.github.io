@@ -132,15 +132,6 @@ const nextIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
 )}
 
 {hasSlides && <script>
-  import { initCarouselDeferredMounts } from './deferred-mount';
-  initCarouselDeferredMounts();
-</script>}
-
-{hasMultiSlides && <script>
-  import { initCarouselWithPrewarm } from './prewarm';
-
-  const carouselRoot = document.querySelector('.home-carousel');
-  if (carouselRoot instanceof HTMLElement) {
-    initCarouselWithPrewarm(carouselRoot);
-  }
+  import { initFeaturedMediaCarousel } from './carousel-init';
+  initFeaturedMediaCarousel();
 </script>}

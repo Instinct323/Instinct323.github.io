@@ -7,7 +7,8 @@ import {
   loadSiteMetadata,
 } from '~/features/site/config-loader';
 import { loadSiteConfig } from '~/features/site/config-cache';
-import { loadPhotographyPage, loadEffectsConfig } from '~/features/photography/loader';
+import { loadPhotographyPage } from '~/features/photography/loader';
+import { loadEffectsConfig } from '~/features/site/effects-loader';
 
 describe('config-loader lazy singleton', () => {
   it('loadSiteConfig returns the same object on repeated calls (caching)', () => {
@@ -111,6 +112,6 @@ describe('config-loader lazy singleton', () => {
     const effects = await loadEffectsConfig();
     expect(effects).toBeDefined();
     expect(effects.starfield).toBeDefined();
-    expect(typeof (effects.starfield as Record<string, unknown>).enabled).toBe('boolean');
+    expect(typeof effects.starfield.enabled).toBe('boolean');
   });
 });

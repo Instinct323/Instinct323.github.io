@@ -1,4 +1,4 @@
-import type { Publication } from '~/features/site/types';
+import type { Publication } from '~/features/about/publication/types';
 import { assertFiniteNumber, assertObject, assertString } from '~/core/validation/assert';
 import { slugToTitle } from '~/core/content/normalize';
 
@@ -18,12 +18,9 @@ function assertAuthors(value: unknown, filePath: string): string[] {
     throw new Error(`Invalid publication field "authors" in ${filePath}`);
   }
 
-  return value.map((author) => {
-    if (typeof author !== 'string' || !author.trim()) {
-      throw new Error(`Invalid publication field "authors" in ${filePath}: expected non-empty strings`);
-    }
-    return author.trim();
-  });
+  return value.map((author, index) =>
+    assertString(author, `publication field "authors" in ${filePath}[${index}]`),
+  );
 }
 
 function normalizePublicationLinks(raw: RawPublication): Record<string, string> | undefined {

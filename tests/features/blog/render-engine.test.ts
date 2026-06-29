@@ -3,11 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const renderMarkdownMock = vi.fn();
 const renderMarkdownWithKatexMock = vi.fn();
 
-vi.mock('~/core/content/markdown-client', () => ({
+vi.mock('~/core/content/markdown-render', () => ({
   renderMarkdown: renderMarkdownMock,
-}));
-
-vi.mock('~/core/content/markdown-katex', () => ({
   renderMarkdownWithKatex: renderMarkdownWithKatexMock,
 }));
 

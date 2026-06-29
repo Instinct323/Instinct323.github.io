@@ -72,12 +72,6 @@ export function getOrCreateCell(cells: CellGrid, cellX: number, cellY: number): 
   return cells[cellXKey][cellYKey];
 }
 
-export function addStarToCellGrid(cells: CellGrid, star: Star, cellSize: number): void {
-  const cellX = Math.floor(star.x / cellSize);
-  const cellY = Math.floor(star.y / cellSize);
-  getOrCreateCell(cells, cellX, cellY).push(star);
-}
-
 /** Opacity decreases linearly as distance approaches maxDistance. */
 export function calculateConnectionOpacity(
   distance: number,

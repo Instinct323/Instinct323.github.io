@@ -6,7 +6,7 @@ import {
   resolveEmbedUrl,
   buildVideoEmbedUrl,
 } from '~/features/about/publication/utils';
-import type { Publication } from '~/features/site/types';
+import type { Publication } from '~/features/about/publication/types';
 
 describe('normalizePublication', () => {
   const filePath = 'test/publication.yaml';

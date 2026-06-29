@@ -1,7 +1,7 @@
 import { loadHomepageConfig } from '~/features/site/config-loader';
 import { loadSiteConfig } from '~/features/site/config-cache';
 import { loadProfile } from '~/features/about/profile/loader';
-import { extractRequiredProfile } from '~/features/about/page-loader';
+import { extractRequiredProfile } from '~/core/profile';
 import type { HomePageData } from '~/features/home/types';
 
 export async function loadHomePage(): Promise<HomePageData> {

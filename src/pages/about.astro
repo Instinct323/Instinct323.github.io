@@ -5,27 +5,15 @@ import ContentSection from '~/features/about/Content.astro';
 import LinksSection from '~/features/about/Links.astro';
 import ProfileCard from '~/features/about/profile/Card.astro';
 import PublicationsSection from '~/features/about/publication/List.astro';
-import '~/features/home/content-loader';
-import { loadMediaConfig } from '~/features/site/config-loader';
 import { orchestratePageLoad } from '~/features/site/load';
 import { getPageLoader } from '~/features/site/load';
-import type { AboutPageData, MediaConfig } from '~/features/site/types';
+import type { AboutPageData } from '~/features/about/types';
+import type { MediaConfig } from '~/features/site/types';
 import type { ContentImage } from '~/core/media/types';
 
-const aboutLoader = getPageLoader('about');
 const aboutLoad = await orchestratePageLoad({
-  frame: async () => {
-    const [aboutFrame, mediaConfig] = await Promise.all([
-      aboutLoader.frame() as Promise<Omit<AboutPageData, 'avatarImage'>>,
-      loadMediaConfig(),
-    ]);
-
-    return {
-      ...aboutFrame,
-      mediaConfig,
-    };
-  },
-  controls: aboutLoader.controls,
+  frame: getPageLoader('about').frame,
+  controls: getPageLoader('about').controls,
 });
 
 const { introductionHtml, profile, publications } = aboutLoad.frame as Omit<AboutPageData, 'avatarImage'> & { mediaConfig: MediaConfig };

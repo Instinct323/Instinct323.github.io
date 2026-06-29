@@ -1,10 +1,8 @@
 export interface IdleScheduleOptions {
   timeout: number;
-  fallbackDelayMs: number;
 }
 
 export const SHELL_BACKGROUND_TIMEOUT = 2000;
-export const SHELL_BACKGROUND_FALLBACK = 180;
 
 /** Schedules a callback during browser idle time, falling back to setTimeout. */
 export function runWhenIdle(

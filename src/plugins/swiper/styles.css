@@ -1,4 +1,4 @@
-/* Swiper base styles override - Refined presentation */
+/* Swiper base layout for the home carousel. */
 .home-carousel.swiper {
   position: relative;
   width: 100%;
@@ -32,7 +32,7 @@
   opacity: 1;
 }
 
-/* Refined card frame - cleaner depth */
+/* Slide media frame: 4:3 box with placeholder background and shadow. */
 .slide-media-frame {
   position: relative;
   width: 100%;
@@ -59,7 +59,7 @@
   transform: scale(1.03);
 }
 
-/* Refined arrows - minimal presence */
+/* Carousel navigation arrow. */
 .nav-arrow {
   position: absolute;
   top: 50%;
@@ -95,7 +95,7 @@
 .nav-arrow--prev { left: 0.5rem; }
 .nav-arrow--next { right: 0.5rem; }
 
-/* Refined indicator - editorial counter style */
+/* Carousel counter + progress indicator pill. */
 .elegant-indicator {
   position: absolute;
   bottom: 0;

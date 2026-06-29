@@ -3,6 +3,7 @@ import Layout from '~/features/layout/Layout.astro';
 import GallerySection from '~/features/photography/gallery/Section.astro';
 import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
 import type { PhotographyPageFrame } from '~/features/photography/loader';
+import { getDevResponseDelayMs } from '~/core/utils/dev-response-delay';
 import '~/styles/pills.css';
 
 const photographyLoad = await orchestratePageLoad({
@@ -18,7 +19,7 @@ const {
 const { categories } = mediaTree;
 const { grid } = photographyConfig;
 const imageConfig = mediaConfig.image;
-const galleryLazyRuntimePayload = JSON.stringify({ rootMargin: imageConfig.lazyLoad.rootMargin, mountDelayMs: import.meta.env.DEV ? import.meta.env.DEV_RESPONSE_DELAY_MS : 0 });
+const galleryLazyRuntimePayload = JSON.stringify({ rootMargin: imageConfig.lazyLoad.rootMargin, mountDelayMs: getDevResponseDelayMs() });
 ---
 
 <Layout

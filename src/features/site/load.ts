@@ -9,8 +9,8 @@ import type {
 export { PAGE_LOAD_PRIORITY } from '~/features/site/page-load';
 export type { PageLoadStage };
 
-import { loadBlogPage } from '~/features/blog/loader';
-import { loadAboutPageFrame, loadAboutAvatarImage } from '~/features/about/page-loader';
+import { loadBlogPosts } from '~/features/blog/loader';
+import { loadAboutPageFrameWithMedia, loadAboutAvatarImage } from '~/features/about/page-loader';
 import { loadHomePage } from '~/features/home/content-loader';
 import { loadPhotographyPage } from '~/features/photography/loader';
 
@@ -24,10 +24,10 @@ export interface PageLoader<TFrame = unknown, TControl = unknown> {
 const PAGE_LOADERS = {
   home: { frame: loadHomePage },
   about: {
-    frame: loadAboutPageFrame,
-    controls: ({ frame }: { frame: Awaited<ReturnType<typeof loadAboutPageFrame>> }) => loadAboutAvatarImage(frame.profile),
+    frame: loadAboutPageFrameWithMedia,
+    controls: ({ frame }: { frame: Awaited<ReturnType<typeof loadAboutPageFrameWithMedia>> }) => loadAboutAvatarImage(frame.profile),
   },
-  blog: { frame: loadBlogPage },
+  blog: { frame: async () => ({ posts: loadBlogPosts() }) },
   photography: { frame: loadPhotographyPage },
 };
 
@@ -60,7 +60,11 @@ export function resolveControlImageLoading(priority: ControlImagePriority): Cont
   return { loading: 'lazy', decoding: 'async', fetchPriority: 'auto' };
 }
 
-/** Executes a page-load plan in three sequential stages: frame, controls, background. */
+/**
+ * Loads the page frame first, then runs `controls` and `background` in
+ * parallel (both depending on the frame). The shape lets callers load
+ * critical data sequentially while deferring less-critical work.
+ */
 export async function orchestratePageLoad<TFrame, TBackground, TControls>(
   plan: PageLoadPlan<TFrame, TBackground, TControls>,
 ): Promise<PageLoadResult<TFrame, TBackground, TControls>> {

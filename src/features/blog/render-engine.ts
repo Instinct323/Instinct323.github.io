@@ -1,17 +1,10 @@
 import type { BlogPostData } from '~/core/content/blog-data-types';
-
-const KATEX_CSS_HREF = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
-const KATEX_CSS_INTEGRITY =
-  'sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV';
+import { KATEX_CSS_HREF, KATEX_CSS_INTEGRITY } from './katex-constants';
 
 export async function renderPostContent(post: BlogPostData): Promise<string> {
-  if (post.hasLatex) {
-    const { renderMarkdownWithKatex } = await import('~/core/content/markdown-katex');
-    return renderMarkdownWithKatex(post.content, { fileURL: post.baseUrl });
-  }
-
-  const { renderMarkdown } = await import('~/core/content/markdown-client');
-  return renderMarkdown(post.content, { fileURL: post.baseUrl });
+  const { renderMarkdown, renderMarkdownWithKatex } = await import('~/core/content/markdown-render');
+  const render = post.hasLatex ? renderMarkdownWithKatex : renderMarkdown;
+  return render(post.content, { fileURL: post.baseUrl });
 }
 
 export function ensureKatexCss(): void {

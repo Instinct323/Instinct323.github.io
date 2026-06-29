@@ -20,3 +20,13 @@ export interface ResolvedProfileData extends ProfileData {
   location: string;
   organization: string;
 }
+
+import type { ContentImage } from '~/core/media/types';
+import type { Publication } from './publication/types';
+
+export interface AboutPageData {
+  profile: ResolvedProfileData;
+  introductionHtml: string;
+  publications: Publication[];
+  avatarImage: ContentImage;
+}

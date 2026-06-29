@@ -5,7 +5,6 @@ import {
   randomRange,
   clamp,
   getOrCreateCell,
-  addStarToCellGrid,
   calculateConnectionOpacity,
   DPR_CAP,
   IDLE_RESTART_TIME,
@@ -223,46 +222,6 @@ describe('getOrCreateCell', () => {
     const result = getOrCreateCell(cells, -1, -2);
     expect(result).toEqual([]);
     expect(cells['-1']['-2']).toEqual([]);
-  });
-});
-
-describe('addStarToCellGrid', () => {
-  it('adds a star to the correct cell based on position and cellSize', () => {
-    const cells: CellGrid = {};
-    const star = makeStar({ x: 150, y: 250 });
-    addStarToCellGrid(cells, star, 100);
-
-    expect(cells['1']['2']).toHaveLength(1);
-    expect(cells['1']['2'][0]).toBe(star);
-  });
-
-  it('places star at cell (0,0) when position is within first cell', () => {
-    const cells: CellGrid = {};
-    const star = makeStar({ x: 50, y: 50 });
-    addStarToCellGrid(cells, star, 100);
-
-    expect(cells['0']['0']).toHaveLength(1);
-  });
-
-  it('accumulates multiple stars in the same cell', () => {
-    const cells: CellGrid = {};
-    const star1 = makeStar({ x: 10, y: 10 });
-    const star2 = makeStar({ x: 20, y: 20 });
-    addStarToCellGrid(cells, star1, 100);
-    addStarToCellGrid(cells, star2, 100);
-
-    expect(cells['0']['0']).toHaveLength(2);
-  });
-
-  it('distributes stars across different cells', () => {
-    const cells: CellGrid = {};
-    const star1 = makeStar({ x: 50, y: 50 });
-    const star2 = makeStar({ x: 150, y: 150 });
-    addStarToCellGrid(cells, star1, 100);
-    addStarToCellGrid(cells, star2, 100);
-
-    expect(cells['0']['0']).toHaveLength(1);
-    expect(cells['1']['1']).toHaveLength(1);
   });
 });
 

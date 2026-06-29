@@ -1,4 +1,5 @@
-// Separated from site.ts to avoid circular dependency.
+// Shared between index.astro and content-loader.ts; kept distinct from `~/features/site`
+// so that site can be imported without pulling homepage-only types into all features.
 
 import type { HomePageCarouselConfig } from '~/plugins/swiper/types';
 

@@ -16,14 +16,8 @@ function isImageLoadingEffectName(value: string): value is ImageLoadingEffectNam
   return IMAGE_LOADING_EFFECT_NAME_SET.has(value);
 }
 
-/**
- * @throws When rootMargin is missing/invalid.
- */
 export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['lazyLoad'] {
   const source = assertObject<Partial<SiteImageConfig['lazyLoad']>>(config, 'image.lazyLoad');
-  if ('localDebugDelayMs' in source) {
-    console.warn('localDebugDelayMs is no longer supported; the field is ignored. Use astro.config.mjs DEV_RESPONSE_DELAY_MS for dev-time observability.');
-  }
   const rootMargin = assertString(source.rootMargin, 'image.lazyLoad.rootMargin');
 
   return {
@@ -31,9 +25,6 @@ export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['la
   };
 }
 
-/**
- * @throws When the effect name is not in the registered set.
- */
 export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageConfig['placeholderEffect'] {
   const effectName = assertString(config, 'image.placeholderEffect');
 
@@ -46,9 +37,6 @@ export function resolveImagePlaceholderEffectConfig(config: unknown): SiteImageC
   return effectName;
 }
 
-/**
- * @throws When any required field is missing or out of range.
- */
 export function resolveSiteImageConfig(config: unknown): SiteImageConfig {
   const source = assertObject<Partial<SiteImageConfig>>(config, 'image');
   const format = assertString(source.format, 'image.format');

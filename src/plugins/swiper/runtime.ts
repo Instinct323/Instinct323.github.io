@@ -3,6 +3,7 @@ import type { Swiper as SwiperInstance } from 'swiper';
 import type { SwiperOptions } from 'swiper/types';
 import { EffectCoverflow, Keyboard, Navigation, Pagination } from 'swiper/modules';
 import { parseNumericAttr } from '~/core/content/normalize';
+import { assertPositiveInteger } from '~/core/validation/assert';
 
 const ROOT_SELECTOR = '.home-carousel';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
@@ -71,11 +72,10 @@ function updateProgress(swiper: SwiperInstance, slideCount: number): void {
 
 function getCounterPadLength(root: HTMLElement, configPadLength?: number): number {
   if (configPadLength !== undefined) {
-    return configPadLength > 0 ? configPadLength : 2;
+    return assertPositiveInteger(configPadLength, 'counterPadLength');
   }
   const raw = root.getAttribute('data-counter-pad-length');
-  const parsed = parseNumericAttr(raw, 2);
-  return parsed > 0 ? parsed : 2;
+  return assertPositiveInteger(parseNumericAttr(raw, 2), 'data-counter-pad-length');
 }
 
 function updateCounter(swiper: SwiperInstance, counterPadLength?: number): void {
@@ -104,7 +104,10 @@ function updatePaginationAria(swiper: SwiperInstance): void {
   });
 }
 
-/** Finds all carousel root elements in the DOM that are ready for Swiper initialization. */
+/**
+ * Returns all `.home-carousel` elements that are HTMLElements
+ * (filtering out any non-element matches from `querySelectorAll`).
+ */
 function getCarouselRoots(): SwiperRoot[] {
   return Array.from(document.querySelectorAll(ROOT_SELECTOR)).filter(
     (root): root is SwiperRoot => root instanceof HTMLElement
@@ -124,7 +127,11 @@ function getSpaceBetween(root: HTMLElement): number {
   return parsed >= 0 ? parsed : 0;
 }
 
-/** Tries each selector in order and returns the first matching HTMLElement, or null if none match. Supports graceful degradation when markup uses legacy or current class names. */
+/**
+ * Supports graceful degradation when markup uses legacy or current class
+ * names: tries each selector in order and returns the first matching
+ * `HTMLElement`, or `null` if none match.
+ */
 function getFirstOptionalHTMLElement(root: ParentNode, selectors: string[]): HTMLElement | null {
   for (const selector of selectors) {
     const el = root.querySelector(selector);

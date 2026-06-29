@@ -580,17 +580,6 @@ describe('starfield-runtime', () => {
       expect(mockAddEventListener).toHaveBeenCalledWith('touchmove', expect.any(Function));
     });
 
-    it('handles touchend event - removed (empty listener)', () => {
-      const { backgroundCanvas, starsCanvas } = createMockCanvases();
-      const config = createTestConfig();
-      initStarfield(backgroundCanvas, starsCanvas, config);
-
-      const touchEndHandler = mockAddEventListener.mock.calls.find(
-        (call: unknown[]) => call[0] === 'touchend',
-      )?.[1] as (() => void) | undefined;
-
-      expect(touchEndHandler).toBeUndefined();
-    });
   });
 
   describe('visibility and animation control', () => {

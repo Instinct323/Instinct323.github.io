@@ -1,5 +1,5 @@
 import { assertStrictlyIncreasingPositiveWidths, IMAGE_MEDIUM_WIDTHS_KEY, selectCandidateWidthsByPolicy } from '~/core/media/sizing';
-import { assertPositiveScale } from '~/core/validation/assert';
+import { assertPositiveScale, assertPositiveInteger, assertString } from '~/core/validation/assert';
 import type { MediaConfig } from '~/features/site/types';
 import type { HomePageImageConfig } from '~/features/site/image-config';
 import type { HomePageCarouselConfig } from '~/plugins/swiper/types';
@@ -44,13 +44,8 @@ export async function getValidatedHomepageGalleryConfig(
     throw new Error('Invalid homepage.featured: expected an array of image paths relative to content/photography/.');
   }
 
-  if (typeof globalImage?.format !== 'string' || !globalImage.format.trim()) {
-    throw new Error('Invalid image.format: expected a non-empty string.');
-  }
-
-  if (typeof globalImage?.quality !== 'number' || !Number.isFinite(globalImage.quality) || globalImage.quality <= 0) {
-    throw new Error('Invalid image.quality: expected a positive number.');
-  }
+  const format = assertString(globalImage?.format, 'image.format');
+  const quality = assertPositiveInteger(globalImage?.quality, 'image.quality');
 
   if (!carousel || typeof carousel !== 'object') {
     throw new Error('Invalid homepage.carousel: expected carousel settings.');
@@ -86,8 +81,8 @@ export async function getValidatedHomepageGalleryConfig(
   return {
     featured: resolvedFeatured,
     image: {
-      format: globalImage.format.trim(),
-      quality: globalImage.quality,
+      format,
+      quality,
       widths,
     },
     carousel,

@@ -93,11 +93,9 @@ describe('buildShellStyle', () => {
     expect(result).not.toContain('--text-strong');
   });
 
-  it('buildShellStyle("home", "custom-var-name") passes through custom content width as-is', () => {
-    const result = buildShellStyle('home', 'custom-var-name', testShellsConfig);
-
-    expect(result).toContain('--layout-content-width: custom-var-name');
-    expect(result).not.toContain('--layout-content-width: var(--page-width');
-    expect(result).toContain('--text-strong: var(--shell-home-text-strong)');
+  it('throws on unknown contentWidth token', () => {
+    expect(() => buildShellStyle('home', 'custom-var-name', testShellsConfig)).toThrow(
+      'Unknown contentWidth token: "custom-var-name". Expected one of: compact, standard, wide.'
+    );
   });
 });

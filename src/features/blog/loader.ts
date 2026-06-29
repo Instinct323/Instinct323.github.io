@@ -15,6 +15,3 @@ export function loadBlogPosts(): BlogPost[] {
   return sortBlogPosts(posts);
 }
 
-export async function loadBlogPage(): Promise<{ posts: BlogPost[] }> {
-  return { posts: loadBlogPosts() };
-}

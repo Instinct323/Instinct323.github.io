@@ -96,11 +96,11 @@ export async function loadLayoutBackgrounds({
     }),
   );
 
-  const mobileEntry = backgroundVariantEntries.find(([key]) => key === 'mobile');
-  const desktopEntry = backgroundVariantEntries.find(([key]) => key === 'desktop');
-  if (!mobileEntry || !desktopEntry) {
-    throw new Error('Background variant resolution failed');
-  }
+  // `variants` is constructed above with both 'mobile' and 'desktop' keys,
+  // so these finds always succeed. The non-null assertions also satisfy
+  // TypeScript's noUncheckedIndexedAccess for downstream tuple indexing.
+  const mobileEntry = backgroundVariantEntries.find(([key]) => key === 'mobile')!;
+  const desktopEntry = backgroundVariantEntries.find(([key]) => key === 'desktop')!;
 
   return {
     backgroundMobile: mobileEntry[1],

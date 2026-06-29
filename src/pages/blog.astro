@@ -1,7 +1,7 @@
 ---
 import Layout from '~/features/layout/Layout.astro';
 import '~/features/blog/loader';
-import { renderMarkdownWithKatex } from '~/core/content/markdown';
+import { renderMarkdown, renderMarkdownWithKatex } from '~/core/content/markdown';
 import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
 import { LATEX_REGEX, type BlogPageFrame } from '~/core/content/blog-data-types';
 
@@ -11,8 +11,10 @@ const blogLoad = await orchestratePageLoad({
 
 const { posts } = blogLoad.frame as BlogPageFrame;
 const initialPost = posts[0];
-const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileURL: initialPost.baseUrl });
 const needsKatex = LATEX_REGEX.test(initialPost.content);
+const initialContentHtml = needsKatex
+  ? renderMarkdownWithKatex(initialPost.content, { fileURL: initialPost.baseUrl })
+  : renderMarkdown(initialPost.content, { fileURL: initialPost.baseUrl });
 ---
 
 <Layout

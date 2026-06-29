@@ -1,40 +1,18 @@
 import { loadProfile } from '~/features/about/profile/loader';
 import { introductionRaw } from '~/core/content/astro-adapter/config';
-import { assertString } from '~/core/validation/assert';
-import { compareByWeightAndDate, trimProfileFacts } from '~/core/content/normalize';
-import type { AboutPageData, Publication } from '~/features/site/types';
+import { compareByWeightAndDate } from '~/core/content/normalize';
+import type { AboutPageData } from '~/features/about/types';
+import type { Publication } from '~/features/about/publication/types';
 import type { ContentImage } from '~/core/media/types';
-import type { ProfileData, ResolvedProfileData } from '~/features/about/types';
+import type { ResolvedProfileData } from '~/features/about/types';
 import { imageLoader } from '~/core/media/surface';
 import { renderMarkdown } from '~/core/content/markdown';
 import { normalizePublication } from '~/features/about/publication/utils';
 import { AVATAR_JPG, AVATAR_RELATIVE_PATH } from '~/core/content/paths';
 import { PUBLICATION_MODULES } from '~/core/content/astro-adapter/publications';
-
-function requireProfileFactValue(profileData: ProfileData, id: 'name' | 'organization' | 'location'): string {
-  const fact = profileData.facts.find((item) => item.id === id);
-  if (!fact) {
-    throw new Error(`Missing required profile fact: ${id}`);
-  }
-
-  return assertString(fact.value, id);
-}
-
-export function extractRequiredProfile(profileData: ProfileData): ResolvedProfileData {
-  const name = requireProfileFactValue(profileData, 'name');
-  const organization = requireProfileFactValue(profileData, 'organization');
-  const location = requireProfileFactValue(profileData, 'location');
-
-  return {
-    facts: trimProfileFacts(profileData.facts),
-    email: profileData.email,
-    website: profileData.website,
-    links: profileData.links,
-    name,
-    organization,
-    location,
-  };
-}
+import { extractRequiredProfile } from '~/core/profile';
+import { loadMediaConfig } from '~/features/site/config-loader';
+import type { MediaConfig } from '~/features/site/types';
 
 export async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarImage'>> {
   const [profileData, publications] = await Promise.all([
@@ -49,9 +27,17 @@ export async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarI
   };
 }
 
-export async function loadAboutAvatarImage(profileData: ProfileData): Promise<ContentImage> {
+export async function loadAboutPageFrameWithMedia(): Promise<Omit<AboutPageData, 'avatarImage'> & { mediaConfig: MediaConfig }> {
+  const [aboutFrame, mediaConfig] = await Promise.all([
+    loadAboutPageFrame(),
+    loadMediaConfig(),
+  ]);
+  return { ...aboutFrame, mediaConfig };
+}
+
+export async function loadAboutAvatarImage(profileData: ResolvedProfileData): Promise<ContentImage> {
   const aboutImageOptions = await imageLoader.computeOptions('about', {
-    alt: requireProfileFactValue(profileData, 'name'),
+    alt: profileData.name,
   });
   const avatarImage = await imageLoader.loadImage(AVATAR_RELATIVE_PATH, aboutImageOptions);
 

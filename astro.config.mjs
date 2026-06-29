@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import react from '@astrojs/react';
 import path from 'node:path';
 import fs from 'node:fs';
 import { parse } from 'jsonc-parser';
@@ -18,7 +17,7 @@ export default defineConfig({
       entrypoint: 'astro/assets/services/sharp',
     },
   },
-  integrations: [sitemap(), react()],
+  integrations: [sitemap()],
   vite: {
     define: {
       'import.meta.env.DEV_RESPONSE_DELAY_MS': JSON.stringify(DEV_RESPONSE_DELAY_MS),

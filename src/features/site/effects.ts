@@ -1,15 +1,5 @@
-import { resolveStarfieldEffectConfig } from '~/plugins/starfield';
+import type { StarfieldEffectConfig } from '~/plugins/starfield';
 
 export interface SiteEffectsConfig {
-  starfield: unknown;
+  starfield: StarfieldEffectConfig;
 }
-
-/**
- * Direct resolver lookup table. Kept as a named export (not a wrapper function)
- * because there is only one effect registered today; the dictionary form is the
- * "fake abstraction" pattern. If a second resolver is added, expose the dictionary
- * directly to call sites — do not reintroduce a getEffectsResolver() helper.
- */
-export const EFFECTS_RESOLVERS: Record<string, (_config: unknown) => unknown> = {
-  starfield: (config: unknown) => resolveStarfieldEffectConfig(config) as unknown,
-};

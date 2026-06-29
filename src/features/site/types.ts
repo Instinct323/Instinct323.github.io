@@ -1,8 +1,7 @@
 import type { SiteEffectsConfig } from './effects';
-import type { ResolvedProfileData } from '~/features/about/types';
-import type { ContentImage } from '~/core/media/types';
 import type { HomePageConfig } from '~/features/home/home-config';
 import type { SiteImageConfig } from '~/features/site/image-config';
+import type { PhotographyPageConfig } from '~/features/photography/types';
 
 export interface SiteMetadata {
   siteUrl: string;
@@ -19,13 +18,6 @@ export interface SiteNavRoute {
 export interface SiteNavigation {
   order: string[];
   routes: Record<string, SiteNavRoute>;
-}
-
-export interface PhotographyPageConfig {
-  grid: {
-    columns: { desktop: number; mobile: number };
-    gap: string;
-  };
 }
 
 export interface ShellTokenConfig {
@@ -94,20 +86,3 @@ export interface MediaConfig {
   };
 }
 
-export interface Publication {
-  title: string;
-  abstract?: string;
-  authors: string[];
-  date: string;
-  source?: string;
-  links?: Record<string, string>;
-  video?: string;
-  weight?: number;
-}
-
-export interface AboutPageData {
-  profile: ResolvedProfileData;
-  introductionHtml: string;
-  publications: Publication[];
-  avatarImage: ContentImage;
-}

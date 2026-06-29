@@ -1,4 +1,4 @@
-import type { Publication } from '~/features/site/types';
+import type { Publication } from '~/features/about/publication/types';
 
 /**
  * Publication modules glob for about/publication JSON files

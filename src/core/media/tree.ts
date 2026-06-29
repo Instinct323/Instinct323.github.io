@@ -100,7 +100,7 @@ export async function loadMediaTreeFromGallery(
     .filter((entry): entry is [string, ImageModuleEntry] => isImageModuleEntry(entry[1]))
     .sort(([pathA], [pathB]) => compareNatural(pathA, pathB));
 
-  for (const [path, mod] of entries) {
+  for (const [path, _mod] of entries) {
     if (!path.includes(PHOTOGRAPHY_FILTER)) {
       continue;
     }

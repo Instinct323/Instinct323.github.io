@@ -1,5 +1,6 @@
 import type { LayoutProps } from '~/features/layout/types';
 import type { ShellsConfig } from '~/features/site/types';
+import { assertString } from '~/core/validation/assert';
 
 export type { LayoutProps };
 
@@ -9,17 +10,13 @@ const contentWidthTokens: Record<string, string> = {
   wide: 'var(--page-width-wide)',
 };
 
-/**
- * Resolves a content-width token to its CSS custom property value.
- * Unknown tokens are passed through as-is so callers can inject raw CSS
- * values without changing the shell contract.
- */
 function resolveContentWidth(contentWidth: string): string {
-  if (contentWidth in contentWidthTokens) {
-    return contentWidthTokens[contentWidth];
+  const key = assertString(contentWidth, 'contentWidth');
+  const resolved = contentWidthTokens[key];
+  if (!resolved) {
+    throw new Error(`Unknown contentWidth token: "${key}". Expected one of: ${Object.keys(contentWidthTokens).join(', ')}.`);
   }
-
-  return contentWidth;
+  return resolved;
 }
 
 const PAGE_OVERLAY = 'var(--page-overlay)';

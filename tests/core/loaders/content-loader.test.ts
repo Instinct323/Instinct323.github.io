@@ -3,7 +3,7 @@ import { getPageLoader } from '~/features/site/load';
 
 import '~/features/home/content-loader';
 import type { HomePageData } from '~/features/home/types';
-import type { AboutPageData } from '~/features/site/types';
+import type { AboutPageData } from '~/features/about/types';
 
 describe('content-loader', () => {
   describe('home page loader', () => {

@@ -37,16 +37,16 @@ export interface StarfieldEffectConfig {
   parallaxEffect: boolean;
   /** Divisor for pointer→center offset; larger = subtler parallax. */
   parallaxStrength: number;
-  /** Pointer interaction radius in px — see the connection-gating note above. */
+  /** Pointer interaction radius in px. */
   mouseRadius: number;
   /** Inclusive rotation-speed range (rad/frame) sampled uniformly for star-shaped stars. */
   rotationSpeed: {
     min: number;
     max: number;
   };
-  /** When true, star-star connections may render with the pointer idle — see connection-gating note. */
+  /** When true, star-star connections may render with the pointer idle. */
   connectionsWhenNoMouse: boolean;
-  /** Per-star probability (0-100) of being eligible to draw lines when allowed — see connection-gating note. */
+  /** Per-star probability (0-100) of being eligible to draw lines when allowed. */
   percentStarsConnecting: number;
   /** Stroke width in px for connection lines. */
   lineThickness: number;

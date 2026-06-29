@@ -2,7 +2,6 @@
 import Layout from '~/features/layout/Layout.astro';
 import EditorialHero from '~/features/home/sections/Hero.astro';
 import FeaturedMediaCarousel from '~/plugins/swiper/FeaturedMediaCarousel.astro';
-import '~/features/home/content-loader';
 import { loadFeaturedSlides } from '~/features/home/featured-slides';
 import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
 import type { HomePageData } from '~/features/home/types';
@@ -15,7 +14,9 @@ const homeLoad = await orchestratePageLoad({
 
 const { profile, home, site } = homeLoad.frame as HomePageData;
 const featuredSlides = (homeLoad.controls ?? []) as FeaturedSlide[];
-const lazyLoadRuntimePayload = JSON.stringify({ rootMargin: site.image.lazyLoad.rootMargin, mountDelayMs: import.meta.env.DEV ? import.meta.env.DEV_RESPONSE_DELAY_MS : 0 });
+import { getDevResponseDelayMs } from '~/core/utils/dev-response-delay';
+
+const lazyLoadRuntimePayload = JSON.stringify({ rootMargin: site.image.lazyLoad.rootMargin, mountDelayMs: getDevResponseDelayMs() });
 const placeholderEffectName = site.image.placeholderEffect;
 
 const hasSlides = featuredSlides.length > 0;
@@ -80,7 +81,7 @@ const sections = layoutCfg.sectionOrder;
     flex-direction: column;
   }
 
-  /* Refined gradient mesh - subtle, non-animated atmosphere */
+  /* Subtle, non-animated gradient blobs sit behind the page content. */
   .background-decor {
     position: absolute;
     inset: 0;
@@ -120,7 +121,7 @@ const sections = layoutCfg.sectionOrder;
     to { opacity: 1; }
   }
 
-  /* Grid-based layout with intentional whitespace */
+  /* Grid-based page layout. */
   .editorial-layout {
     position: relative;
     z-index: 1;
@@ -157,7 +158,7 @@ const sections = layoutCfg.sectionOrder;
     align-items: center;
   }
 
-  /* Desktop: Refined proportions */
+  /* Desktop: header offset matches sticky header height. */
   @media (min-width: 1025px) {
     .editorial-layout {
       padding-top: var(--header-height, 4.25rem);
@@ -172,7 +173,7 @@ const sections = layoutCfg.sectionOrder;
     }
   }
 
-  /* Tablet: Fluid transitions */
+  /* Tablet: stack sections vertically. */
   @media (max-width: 1024px) {
     .editorial-layout {
       display: flex;
@@ -194,7 +195,7 @@ const sections = layoutCfg.sectionOrder;
     }
   }
 
-  /* Mobile: Compact rhythm */
+  /* Mobile: tighter spacing and padding. */
   @media (max-width: 767px) {
     .editorial-layout {
       padding: calc(var(--header-height) + var(--space-section-sm)) var(--space-page-x) var(--space-section-md);

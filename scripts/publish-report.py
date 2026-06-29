@@ -9,13 +9,14 @@ WORKDIR = Path(__file__).parent.parent
 
 
 def execute(cmd, check=True):
-    exit_code = print("\033[32m\033[1m" + cmd + "\033[0m") or os.system(cmd)
+    print("\033[32m\033[1m" + cmd + "\033[0m")
+    exit_code = os.system(cmd)
     if check and exit_code: raise OSError(f"Fail to execute: {cmd}")
     return exit_code
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Initialize the registry")
+    parser = argparse.ArgumentParser(description="Publish a report into content/blog/ and push it to git")
     parser.add_argument("file", type=str, help="Report file path")
     args = parser.parse_args()
 
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     shutil.copy(file, dst / "README.md")
 
     execute(f"git add {dst}")
+    # Stage README then renormalize line endings (Windows CRLF normalization)
     execute(f"git add {dst} --renormalize")
     execute(f"git commit -m \"add {file.stem}\"", check=False)
     execute("git push")
