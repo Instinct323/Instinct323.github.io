@@ -25,6 +25,7 @@ const {
   noindex = false,
   shell = 'default',
   contentWidth = 'standard',
+  needsKatex = false,
 } = Astro.props as LayoutProps;
 
 type LayoutFrameData = {
@@ -94,6 +95,7 @@ const starfieldConfig = resolveStarfieldConfig(effectsConfig);
       sitemapUrl={sitemapUrl}
       type={type}
       noindex={noindex}
+      needsKatex={needsKatex}
     />
     <style is:inline set:html={`
       :root {

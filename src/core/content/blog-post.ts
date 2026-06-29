@@ -1,0 +1,58 @@
+import { parseMarkdownWithFrontmatter } from './markdown';
+import { compareByWeightAndDate, getDateTime } from './normalize';
+
+export interface BlogPost {
+  title: string;
+  date: Date | null;
+  content: string;
+  slug: string;
+  baseUrl: string;
+  weight: number;
+}
+
+/** Extracts the blog post slug from a file path. Fails fast when the path does not match the expected `blog/{slug}/README.md` pattern. */
+export function extractSlugFromPath(filePath: string): string {
+  const match = filePath.match(/blog\/([^/]+)\/README\.md$/);
+  if (!match) {
+    throw new Error(`Cannot extract slug from path: ${filePath}`);
+  }
+  return match[1];
+}
+
+/**
+ * Extracts a date from a slug string.
+ * Supports patterns like "Report-2026-04-06-18-07-08" or "2026-04-06-some-title".
+ * Returns null if no recognizable date pattern is found.
+ */
+export function extractDateFromSlug(slug: string): Date | null {
+  const dateMatch = slug.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (dateMatch) {
+    const [, year, month, day] = dateMatch;
+    const time = getDateTime(`${year}-${month}-${day}`);
+    if (time !== null) {
+      return new Date(time);
+    }
+  }
+  return null;
+}
+
+export function parseBlogPost(filePath: string, content: string, baseUrl: string): BlogPost {
+  const parsed = parseMarkdownWithFrontmatter(content);
+  const slug = extractSlugFromPath(filePath);
+  const date = parsed.date ?? extractDateFromSlug(slug) ?? null;
+  const weight = typeof parsed.data.weight === 'number' ? parsed.data.weight : 0;
+  const title = parsed.title ?? slug;
+
+  return {
+    title,
+    date,
+    content: parsed.content,
+    slug,
+    baseUrl,
+    weight,
+  };
+}
+
+export function sortBlogPosts(posts: BlogPost[]): BlogPost[] {
+  return [...posts].sort(compareByWeightAndDate);
+}

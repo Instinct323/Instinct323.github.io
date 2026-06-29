@@ -70,18 +70,18 @@ date: 2026-06-28
 ```
 
 关键文件直达链接：
-- 训练入口 [`train.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/train.py)
-- 评估入口 [`eval.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/eval.py)
-- 策略基类 [`base_policy.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/base_policy.py)
-- 完整版策略 [`dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/dp3.py)
-- 轻量版策略 [`simple_dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/simple_dp3.py)
-- 点云编码器 [`pointnet_extractor.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/vision/pointnet_extractor.py)
-- 完整版 U-Net [`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/conditional_unet1d.py)
-- 轻量版 U-Net [`simple_conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py)
-- 数据集基类 [`base_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/dataset/base_dataset.py)
-- Adroit 数据集 [`adroit_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/dataset/adroit_dataset.py)
-- Runner 基类 [`base_runner.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/env_runner/base_runner.py)
-- 算法配置 [`dp3.yaml`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/config/dp3.yaml) / [`simple_dp3.yaml`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/config/simple_dp3.yaml)
+- 训练入口 [`train.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/train.py)
+- 评估入口 [`eval.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/eval.py)
+- 策略基类 [`base_policy.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/base_policy.py)
+- 完整版策略 [`dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/dp3.py)
+- 轻量版策略 [`simple_dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/simple_dp3.py)
+- 点云编码器 [`pointnet_extractor.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/vision/pointnet_extractor.py)
+- 完整版 U-Net [`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/conditional_unet1d.py)
+- 轻量版 U-Net [`simple_conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py)
+- 数据集基类 [`base_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset/base_dataset.py)
+- Adroit 数据集 [`adroit_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset/adroit_dataset.py)
+- Runner 基类 [`base_runner.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/env_runner/base_runner.py)
+- 算法配置 [`dp3.yaml`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/config/dp3.yaml) / [`simple_dp3.yaml`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/config/simple_dp3.yaml)
 
 ---
 
@@ -91,9 +91,9 @@ DP3 代码组织遵循清晰的三层抽象：
 
 | 层级 | 职责 | 关键文件 |
 |------|------|----------|
-| **策略层 (Policy)** | 定义 `predict_action()` 和 `compute_loss()`，连接观测与动作 | [`dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/dp3.py), [`simple_dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/simple_dp3.py) |
-| **模型层 (Model)** | 实现神经网络前向传播：观测编码器 + 扩散模型 | [`pointnet_extractor.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/vision/pointnet_extractor.py), [`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/conditional_unet1d.py) |
-| **数据层 (Dataset)** | 加载示范数据，提供 `__getitem__` 和归一化 | [`*_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/tree/master/diffusion_policy_3d/dataset) |
+| **策略层 (Policy)** | 定义 `predict_action()` 和 `compute_loss()`，连接观测与动作 | [`dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/dp3.py), [`simple_dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/simple_dp3.py) |
+| **模型层 (Model)** | 实现神经网络前向传播：观测编码器 + 扩散模型 | [`pointnet_extractor.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/vision/pointnet_extractor.py), [`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/conditional_unet1d.py) |
+| **数据层 (Dataset)** | 加载示范数据，提供 `__getitem__` 和归一化 | [`*_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/tree/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset) |
 
 评估时额外引入 **Runner 层**，负责在仿真环境中 rollout 策略并记录视频与成功率。
 
@@ -159,20 +159,20 @@ DP3 代码组织遵循清晰的三层抽象：
 - `compute_loss(batch)` —— 训练
 - `set_normalizer(normalizer)` —— 设置数据归一化器
 
-源码：[base_policy.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/base_policy.py)
+源码：[base_policy.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/base_policy.py)
 
 #### DP3 / SimpleDP3
 两者**代码结构几乎完全相同**，唯一区别是使用的 U-Net 不同：
 
-- **DP3** → [`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/conditional_unet1d.py)（完整版：每层 2 个 ResBlock，支持 Cross-Attention 条件注入，参数量更大）
-- **SimpleDP3** → [`simple_conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py)（轻量版：每层 1 个 ResBlock，仅支持 FiLM/Add，参数量更小，推理 **25 FPS**）
+- **DP3** → [`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/conditional_unet1d.py)（完整版：每层 2 个 ResBlock，支持 Cross-Attention 条件注入，参数量更大）
+- **SimpleDP3** → [`simple_conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py)（轻量版：每层 1 个 ResBlock，仅支持 FiLM/Add，参数量更小，推理 **25 FPS**）
 
 每个 Policy 包含三个子模块：
 1. `obs_encoder: DP3Encoder` —— 编码 3D 观测
 2. `model: ConditionalUnet1D` —— 扩散去噪网络
 3. `noise_scheduler: DDIMScheduler` —— 来自 `diffusers` 的调度器
 
-源码：[dp3.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/dp3.py) | [simple_dp3.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/simple_dp3.py)
+源码：[dp3.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/dp3.py) | [simple_dp3.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/simple_dp3.py)
 
 ### 观测编码器（DP3Encoder）
 
@@ -193,7 +193,7 @@ obs_dict = {
 - 最终拼接 State MLP 输出，作为 `global_cond` 输入 U-Net
 - **特殊处理**：DexArt 支持 `imagin_robot`（想象机器人点云），`DP3Encoder` 会将其与真实点云拼接后再编码
 
-源码：[pointnet_extractor.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/vision/pointnet_extractor.py)
+源码：[pointnet_extractor.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/vision/pointnet_extractor.py)
 
 ### 扩散模型（ConditionalUnet1D）
 
@@ -223,7 +223,7 @@ Input: (B, T, action_dim)  # T = horizon
 
 **时间步编码**：正弦位置编码 `SinusoidalPosEmb` + MLP，与 global_cond 拼接后作为条件。
 
-源码：[conditional_unet1d.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/conditional_unet1d.py) | [simple_conditional_unet1d.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py)
+源码：[conditional_unet1d.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/conditional_unet1d.py) | [simple_conditional_unet1d.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py)
 
 ### 数据集（Dataset）
 
@@ -243,7 +243,7 @@ replay_buffer = {
 - `LinearNormalizer`：对 action、agent_pos、point_cloud 做 Min-Max 归一化
 - 各数据集的区别仅在于：Zarr 路径不同、obs 字段略有差异、环境封装不同
 
-源码：[base_dataset.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/dataset/base_dataset.py) | [adroit_dataset.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/dataset/adroit_dataset.py)
+源码：[base_dataset.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset/base_dataset.py) | [adroit_dataset.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset/adroit_dataset.py)
 
 ### 环境运行器（EnvRunner）
 
@@ -254,7 +254,7 @@ replay_buffer = {
   3. 每次 rollout：`obs → policy.predict_action → env.step → 记录 reward/success`
   4. 返回平均成功率、视频等日志
 
-源码：[base_runner.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/env_runner/base_runner.py)
+源码：[base_runner.py](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/env_runner/base_runner.py)
 
 ---
 
@@ -275,7 +275,7 @@ python train.py --config-name=dp3 task=adroit_hammer
 
 配置文件中通过 `hydra.utils.instantiate()` 动态创建对象，实现**零硬编码**的模块替换。
 
-源码：[dp3.yaml](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/config/dp3.yaml) | [simple_dp3.yaml](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/config/simple_dp3.yaml)
+源码：[dp3.yaml](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/config/dp3.yaml) | [simple_dp3.yaml](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/config/simple_dp3.yaml)
 
 ---
 
@@ -283,7 +283,7 @@ python train.py --config-name=dp3 task=adroit_hammer
 
 | 维度 | DP3 | SimpleDP3 |
 |------|-----|-----------|
-| U-Net | [完整版](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/conditional_unet1d.py) | [轻量版](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py) |
+| U-Net | [完整版](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/conditional_unet1d.py) | [轻量版](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/simple_conditional_unet1d.py) |
 | 每层 ResBlock 数 | 2 | 1 |
 | Cross-Attention | 支持 | 不支持 |
 | down_dims | [512, 1024, 2048] | [128, 256, 384] |
@@ -298,11 +298,11 @@ python train.py --config-name=dp3 task=adroit_hammer
 
 时间有限时，按以下顺序阅读即可掌握全貌：
 
-1. **[`train.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/train.py)** —— 训练主循环、Workspace 管理
-2. **[`dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/policy/dp3.py)** —— 策略的 `compute_loss` + `predict_action`
-3. **[`pointnet_extractor.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/vision/pointnet_extractor.py)** —— 3D 观测编码逻辑
-4. **[`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/model/diffusion/conditional_unet1d.py)** —— 扩散模型结构
-5. **[`base_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/dataset/base_dataset.py) + [`adroit_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/diffusion_policy_3d/dataset/adroit_dataset.py)** —— 数据流
+1. **[`train.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/train.py)** —— 训练主循环、Workspace 管理
+2. **[`dp3.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/policy/dp3.py)** —— 策略的 `compute_loss` + `predict_action`
+3. **[`pointnet_extractor.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/vision/pointnet_extractor.py)** —— 3D 观测编码逻辑
+4. **[`conditional_unet1d.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/model/diffusion/conditional_unet1d.py)** —— 扩散模型结构
+5. **[`base_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset/base_dataset.py) + [`adroit_dataset.py`](https://github.com/YanjieZe/3D-Diffusion-Policy/blob/master/3D-Diffusion-Policy/diffusion_policy_3d/dataset/adroit_dataset.py)** —— 数据流
 
 其余文件为支撑性代码（工具函数、环境封装、配置等），需要时再深入。
 

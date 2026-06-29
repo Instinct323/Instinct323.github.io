@@ -10,10 +10,10 @@
   "navigation": {
     "order": ["home", "about", "blog", "photography"],
     "routes": {
-      "home": { "key": "home", "href": "/" },
-      "about": { "key": "about", "href": "/about" },
-      "photography": { "key": "photography", "href": "/photography" },
-      "blog": { "key": "blog", "href": "/blog" }
+      "home": {"key": "home", "href": "/"},
+      "about": {"key": "about", "href": "/about"},
+      "photography": {"key": "photography", "href": "/photography"},
+      "blog": {"key": "blog", "href": "/blog"}
     }
   },
   // Owned by homepage editors; consumed by src/lib/content-loader.ts and home components.
@@ -84,8 +84,7 @@
       "high": 3
     },
     "lazyLoad": {
-      "rootMargin": "100px 0px",
-      "localDebugDelayMs": 1000
+      "rootMargin": "100px 0px"
     },
     // ref: https://codepen.io/AlexWarnes/pen/jXYYKL
     "placeholderEffect": "bars-height-wave"

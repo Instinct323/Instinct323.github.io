@@ -24,7 +24,6 @@ export interface SiteImageConfig {
   };
   lazyLoad: {
     rootMargin: string;
-    localDebugDelayMs: number;
   };
   placeholderEffect: ImageLoadingEffectName;
 }

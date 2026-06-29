@@ -1,22 +1,7 @@
 import { buildDeferredMountGroupSelector, initDeferredMounts } from './deferred-mount';
-import { assertString } from '~/core/validation/assert';
+import { assertFiniteNumber, assertString } from '~/core/validation/assert';
 import { parseDatasetPayload } from '~/core/utils/dataset';
-import type { DeferredImageLazyLoadConfig, DeferredMountRuntimeConfig } from '~/features/site/page-load';
-
-/**
- * Derives the runtime deferred mount config from lazy-load settings.
- * In development we add an artificial delay so developers can observe
- * the loading behavior; in production we mount immediately for speed.
- */
-export function resolveDeferredMountRuntimeConfig(
-  lazyLoad: DeferredImageLazyLoadConfig,
-  isDev: boolean,
-): Omit<DeferredMountRuntimeConfig, 'selector'> {
-  return {
-    rootMargin: lazyLoad.rootMargin,
-    mountDelayMs: isDev ? lazyLoad.localDebugDelayMs : 0,
-  };
-}
+import type { DeferredMountRuntimeConfig } from '~/features/site/page-load';
 
 export interface DeferredMountBootstrapOptions {
   containerSelector: string;
@@ -26,6 +11,11 @@ export interface DeferredMountBootstrapOptions {
 
 type DeferredMountBootstrapConfig = Omit<DeferredMountRuntimeConfig, 'selector'>;
 
+/**
+ * Parses the deferred-mount bootstrap config serialized in a DOM
+ * dataset. Expects rootMargin (string) and mountDelayMs (number);
+ * mountDelayMs is validated by assertFiniteNumber.
+ */
 function parseBootstrapConfig(serializedConfig: string): DeferredMountBootstrapConfig {
   return parseDatasetPayload(
     serializedConfig,
@@ -35,13 +25,18 @@ function parseBootstrapConfig(serializedConfig: string): DeferredMountBootstrapC
 
       return {
         rootMargin,
-        mountDelayMs: config.mountDelayMs as number,
+        mountDelayMs: assertFiniteNumber(config.mountDelayMs, 'deferred mount bootstrap mountDelayMs'),
       };
     },
     'Invalid deferred mount bootstrap config',
   );
 }
 
+/**
+ * Boots a deferred mount group. Missing container → silent return
+ * (the page may simply not use this group). Missing payload → throw
+ * (the group is expected but its runtime config data is absent).
+ */
 export function bootstrapDeferredMounts(options: DeferredMountBootstrapOptions): void {
   const containerSelector = assertString(options.containerSelector, 'deferred mount bootstrap containerSelector');
   const configDataKey = assertString(options.configDataKey, 'deferred mount bootstrap configDataKey');

@@ -49,6 +49,32 @@ function applyShellBackgroundImages(payload: ShellBackgroundPayload): void {
   document.body.style.setProperty('--page-bg-image-desktop', `url('${payload.desktopSrc}')`);
 }
 
+function readShellBackgroundCache(): ShellBackgroundPayload | null {
+  let serializedPayload: string | null;
+  try {
+    serializedPayload = window.sessionStorage.getItem(SHELL_BACKGROUND_CACHE_KEY);
+  } catch {
+    return null;
+  }
+  if (!serializedPayload) {
+    return null;
+  }
+  return parseDatasetPayload(
+    serializedPayload,
+    (raw) => {
+      const payload = raw as { mobileSrc?: string; desktopSrc?: string };
+      if (!payload.mobileSrc || !payload.desktopSrc) {
+        throw new Error('Invalid shell background cache payload');
+      }
+      return {
+        mobileSrc: payload.mobileSrc,
+        desktopSrc: payload.desktopSrc,
+      };
+    },
+    'Invalid shell background cache payload',
+  );
+}
+
 /**
  * Applies the shell background immediately and updates sessionStorage.
  * Background image URLs are already inlined server-side so this is
@@ -56,6 +82,12 @@ function applyShellBackgroundImages(payload: ShellBackgroundPayload): void {
  * repeat navigations fast.
  */
 function initShellBackground(): void {
+  const cached = readShellBackgroundCache();
+  if (cached) {
+    applyShellBackgroundImages(cached);
+    return;
+  }
+
   const parsed = parseShellBackgroundPayload();
   if (!parsed) {
     return;
@@ -70,12 +102,12 @@ function initShellBackground(): void {
   }
 }
 
-function initializeStarfield(): boolean {
+function initializeStarfield(): void {
   const backgroundCanvas = document.querySelector<HTMLCanvasElement>('.site-stars-background');
   const starsCanvas = document.querySelector<HTMLCanvasElement>('.site-stars');
 
   if (!backgroundCanvas || !starsCanvas) {
-    return false;
+    return;
   }
 
   try {
@@ -85,12 +117,10 @@ function initializeStarfield(): boolean {
     }
     const config = JSON.parse(serializedConfig);
     initStarfield(backgroundCanvas, starsCanvas, config);
-    return true;
   } catch (e) {
     console.error('Failed to initialize starfield:', e);
     hideCanvases(backgroundCanvas, starsCanvas);
     document.body.dataset.starfieldError = String(e);
-    return false;
   }
 }
 
@@ -98,9 +128,12 @@ function initializeStarfield(): boolean {
  * Layout runtime entry point. Shell background images are cached in
  * sessionStorage so repeat navigations can apply them instantly without
  * waiting for the idle scheduler. The starfield effect is resolved
- * dynamically so the layout runtime never eagerly loads the effect bundle.
+ * dynamically and scheduled via requestIdleCallback (or
+ * requestAnimationFrame) so the layout runtime never eagerly loads the
+ * effect bundle.
  */
 export function initLayout(): void {
   initShellBackground();
-  initializeStarfield();
+  const schedule = 'requestIdleCallback' in window ? requestIdleCallback : requestAnimationFrame;
+  schedule(() => initializeStarfield());
 }

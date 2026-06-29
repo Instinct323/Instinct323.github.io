@@ -4,18 +4,21 @@ import '~/features/blog/loader';
 import { renderMarkdownWithKatex } from '~/core/content/markdown';
 import { orchestratePageLoad } from '~/features/site/load';
 import { getPageLoader } from '~/features/site/load';
+import { LATEX_REGEX, type BlogPageFrame } from '~/core/content/blog-data-types';
 
 const blogLoad = await orchestratePageLoad({
   frame: getPageLoader('blog').frame,
 });
 
-const { posts } = blogLoad.frame as { posts: import('~/features/blog/loader').BlogPost[] };
+const { posts } = blogLoad.frame as BlogPageFrame;
 const initialPost = posts[0];
 const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileURL: initialPost.baseUrl });
+const needsKatex = posts.some((post) => LATEX_REGEX.test(post.content));
 ---
 
 <Layout
   contentWidth="wide"
+  needsKatex={needsKatex}
 >
   <section class="blog-page page-container layout-content-container">
     <div class="blog-container">
@@ -24,9 +27,6 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
           <button
             class:list={['card', 'blog-item', { active: index === 0 }]}
             data-slug={post.slug}
-            data-title={post.title}
-            data-content={post.content}
-            data-base-url={post.baseUrl}
           >
             <h3 class="blog-item-title">
               <span class="title-fade">{post.title}</span>
@@ -55,10 +55,6 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
 </Layout>
 
 <style>
-  .blog-page {
-    /* Uses .page-container from layout-shell.css */
-  }
-
   .blog-container {
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -223,14 +219,18 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
       align-items: stretch;
     }
   }
+
+
 </style>
 
-<script>
-  import { renderMarkdown } from '~/core/content/markdown';
+<script is:inline define:vars={{ postMeta: posts.map((p) => ({ slug: p.slug, title: p.title })) }}>
+  window.__BLOG_META__ = postMeta;
+</script>
 
-  // Astro <script> defaults to a module script, which defers execution until
-  // after the HTML is parsed — by the time this runs, DOMContentLoaded has
-  // already fired, so a listener would never be called. Bind directly.
+<script>
+  import { renderMarkdown } from '~/core/content/markdown-client';
+  import type { BlogPostData } from '~/core/content/blog-data-types';
+
   (() => {
     const blogList = document.getElementById('blog-list');
     const detailTitle = document.getElementById('detail-title');
@@ -238,30 +238,80 @@ const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileUR
 
     if (!blogList || !detailTitle || !detailContent) return;
 
+    const postsMeta = window.__BLOG_META__;
+    const metaBySlug = new Map(postsMeta.map((m) => [m.slug, m]));
+    const postCache = new Map<string, BlogPostData>();
+
+    async function loadPost(slug: string): Promise<BlogPostData | null> {
+      const cached = postCache.get(slug);
+      if (cached) return cached;
+
+      try {
+        const res = await fetch(`/blog-data/${slug}.json`);
+        if (!res.ok) return null;
+        const data = (await res.json()) as BlogPostData;
+        postCache.set(slug, data);
+        return data;
+      } catch {
+        return null;
+      }
+    }
+
+    function prefetchPost(slug: string): void {
+      fetch(`/blog-data/${slug}.json`, { priority: 'low' } as RequestInit).catch(() => {
+        // prefetch failures are non-critical
+      });
+    }
+
+    async function renderPostContent(content: string, baseUrl: string, hasLatex: boolean): Promise<string> {
+      if (hasLatex) {
+        try {
+          const { renderMarkdownWithKatex } = await import('~/core/content/markdown-katex');
+          return renderMarkdownWithKatex(content, { fileURL: baseUrl });
+        } catch (e) {
+          console.error('Failed to load katex renderer:', e);
+          setStatusMessage('Failed to load article.', '#ef4444');
+          return '';
+        }
+      }
+      return renderMarkdown(content, { fileURL: baseUrl });
+    }
+
+    function setStatusMessage(text: string, color: string): void {
+      if (!detailContent) return;
+      detailContent.innerHTML = '';
+      const el = document.createElement('div');
+      el.textContent = text;
+      el.style.cssText = `color: ${color}; padding: 2rem 0; text-align: center;`;
+      detailContent.appendChild(el);
+    }
+
     const items = blogList.querySelectorAll('.blog-item');
 
     items.forEach((item) => {
-      item.addEventListener('click', () => {
-        items.forEach((i) => i.classList.remove('active'));
+      const slug = (item as HTMLElement).dataset.slug;
+      if (!slug) return;
 
+      item.addEventListener('mouseenter', () => prefetchPost(slug), { once: true });
+
+      item.addEventListener('click', async () => {
+        items.forEach((i) => i.classList.remove('active'));
         item.classList.add('active');
 
-        const el = item as HTMLElement;
-        const title = el.dataset.title;
-        const content = el.dataset.content;
-        const baseUrl = el.dataset.baseUrl;
+        const meta = metaBySlug.get(slug);
+        if (!meta) return;
 
-        if (title) detailTitle.textContent = title;
-        if (content) detailContent.innerHTML = renderMarkdown(content, baseUrl ? { fileURL: baseUrl } : undefined);
-      });
+        detailTitle.textContent = meta.title;
+        setStatusMessage('Loading...', 'var(--text-muted)');
 
-      item.addEventListener('keydown', (e) => {
-        const event = e as KeyboardEvent;
-        const el = item as HTMLElement;
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          el.click();
+        const post = await loadPost(slug);
+        if (!post) {
+          setStatusMessage('Failed to load article.', '#ef4444');
+          return;
         }
+
+        detailTitle.textContent = post.title;
+        detailContent.innerHTML = await renderPostContent(post.content, post.baseUrl, post.hasLatex);
       });
     });
   })();

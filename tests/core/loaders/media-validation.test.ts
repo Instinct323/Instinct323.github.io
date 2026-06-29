@@ -28,9 +28,8 @@ describe('assertMediaConfigShape', () => {
       },
       lazyLoad: {
         rootMargin: '100px',
-        localDebugDelayMs: 0,
       },
-      placeholderEffect: 'none' as any,
+      placeholderEffect: 'bars-scale-y',
     },
     homepage: {
       featured: ['photography/0-travel/img1.jpg'],

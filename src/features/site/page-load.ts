@@ -37,11 +37,6 @@ export interface ControlImageLoadingAttrs {
   fetchPriority: 'high' | 'auto';
 }
 
-export interface DeferredImageLazyLoadConfig {
-  rootMargin: string;
-  localDebugDelayMs: number;
-}
-
 export interface DeferredMountRuntimeConfig {
   selector: string;
   rootMargin: string;

@@ -1,11 +1,9 @@
 ---
 import Layout from '~/features/layout/Layout.astro';
 import GallerySection from '~/features/photography/gallery/Section.astro';
-import { resolveDeferredMountRuntimeConfig } from '~/core/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '~/features/site/load';
 import { getPageLoader } from '~/features/site/load';
-import type { MediaTree } from '~/core/media/types';
-import type { PhotographyPageConfig, MediaConfig } from '~/features/site/types';
+import type { PhotographyPageFrame } from '~/features/photography/loader';
 import '~/styles/pills.css';
 
 const photographyLoad = await orchestratePageLoad({
@@ -16,12 +14,12 @@ const {
   mediaTree,
   photographyConfig,
   mediaConfig,
-} = photographyLoad.frame as { mediaTree: MediaTree; photographyConfig: PhotographyPageConfig; mediaConfig: MediaConfig };
+} = photographyLoad.frame as PhotographyPageFrame;
 
 const { categories } = mediaTree;
 const { grid } = photographyConfig;
 const imageConfig = mediaConfig.image;
-const galleryLazyRuntimePayload = JSON.stringify(resolveDeferredMountRuntimeConfig(imageConfig.lazyLoad, import.meta.env.DEV));
+const galleryLazyRuntimePayload = JSON.stringify({ rootMargin: imageConfig.lazyLoad.rootMargin, mountDelayMs: import.meta.env.DEV ? import.meta.env.DEV_RESPONSE_DELAY_MS : 0 });
 ---
 
 <Layout

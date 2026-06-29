@@ -17,20 +17,17 @@ function isImageLoadingEffectName(value: string): value is ImageLoadingEffectNam
 }
 
 /**
- * @throws When rootMargin is missing/invalid or localDebugDelayMs is not a non-negative integer.
+ * @throws When rootMargin is missing/invalid.
  */
 export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['lazyLoad'] {
   const source = assertObject<Partial<SiteImageConfig['lazyLoad']>>(config, 'image.lazyLoad');
-  const rootMargin = assertString(source.rootMargin, 'image.lazyLoad.rootMargin');
-  const localDebugDelayMs = source.localDebugDelayMs;
-
-  if (typeof localDebugDelayMs !== 'number' || !Number.isInteger(localDebugDelayMs) || localDebugDelayMs < 0) {
-    throw new Error('Missing or invalid image.lazyLoad.localDebugDelayMs (must be a non-negative integer)');
+  if ((source as Record<string, unknown>).localDebugDelayMs !== undefined) {
+    console.warn('localDebugDelayMs is no longer supported; the field is ignored. Use astro.config.mjs DEV_RESPONSE_DELAY_MS for dev-time observability.');
   }
+  const rootMargin = assertString(source.rootMargin, 'image.lazyLoad.rootMargin');
 
   return {
     rootMargin,
-    localDebugDelayMs,
   };
 }
 

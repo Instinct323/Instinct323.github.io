@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractDateFromSlug } from '~/features/blog/loader';
+import { extractDateFromSlug } from '~/core/content/blog-post';
 import { compareByWeightAndDate } from '~/core/content/normalize';
 
 // extractDateFromSlug is tested in isolation since loadBlogPosts

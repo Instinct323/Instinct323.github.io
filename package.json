@@ -8,9 +8,9 @@
     "@vitejs/plugin-react": "^6.0.2"
   },
   "scripts": {
-    "dev": "astro dev --host",
+    "dev": "bun scripts/build-blog-data.js && astro dev --host",
     "check": "bun run typecheck && bun run lint && bun run build",
-    "build": "bun scripts/copy-content-assets.js && astro build --silent",
+    "build": "bun scripts/build-blog-data.js && bun scripts/copy-content-assets.js && astro build --silent",
     "preview": "astro preview --host",
     "typecheck": "astro check --silent",
     "lint": "bun tests/verify-no-media-json-refs.js && bun tests/verify-no-unused-tokens.js && eslint . --ext .js,.ts,.astro",

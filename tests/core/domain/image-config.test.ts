@@ -21,7 +21,6 @@ describe('resolveSiteImageConfig', () => {
     },
     lazyLoad: {
       rootMargin: '200px',
-      localDebugDelayMs: 1000,
     },
     placeholderEffect: 'ring-quarter-fast',
   };
@@ -174,7 +173,6 @@ describe('resolveSiteImageConfig', () => {
 describe('resolveImageLazyLoadConfig', () => {
   const validLazyLoadConfig = {
     rootMargin: '200px',
-    localDebugDelayMs: 1000,
   };
 
   it('returns lazyLoad config with valid input', () => {
@@ -182,50 +180,15 @@ describe('resolveImageLazyLoadConfig', () => {
 
     expect(result).toEqual({
       rootMargin: '200px',
-      localDebugDelayMs: 1000,
     });
   });
 
   it('throws when rootMargin is missing', () => {
-    const configWithoutRootMargin = {
-      localDebugDelayMs: 1000,
-    };
+    const configWithoutRootMargin = {};
 
     expect(() => resolveImageLazyLoadConfig(configWithoutRootMargin)).toThrow(
       'Missing or invalid image.lazyLoad.rootMargin (must be a non-empty string)'
     );
-  });
-
-  it('throws when localDebugDelayMs is negative', () => {
-    const configWithNegativeDelay = {
-      rootMargin: '200px',
-      localDebugDelayMs: -100,
-    };
-
-    expect(() => resolveImageLazyLoadConfig(configWithNegativeDelay)).toThrow(
-      'Missing or invalid image.lazyLoad.localDebugDelayMs (must be a non-negative integer)'
-    );
-  });
-
-  it('throws when localDebugDelayMs is not an integer', () => {
-    const configWithFloatDelay = {
-      rootMargin: '200px',
-      localDebugDelayMs: 1000.5,
-    };
-
-    expect(() => resolveImageLazyLoadConfig(configWithFloatDelay)).toThrow(
-      'Missing or invalid image.lazyLoad.localDebugDelayMs (must be a non-negative integer)'
-    );
-  });
-
-  it('accepts zero as valid localDebugDelayMs', () => {
-    const configWithZeroDelay = {
-      rootMargin: '200px',
-      localDebugDelayMs: 0,
-    };
-
-    const result = resolveImageLazyLoadConfig(configWithZeroDelay);
-    expect(result.localDebugDelayMs).toBe(0);
   });
 });
 

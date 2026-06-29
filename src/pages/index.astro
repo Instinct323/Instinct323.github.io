@@ -4,7 +4,6 @@ import EditorialHero from '~/features/home/sections/Hero.astro';
 import FeaturedMediaCarousel from '~/plugins/swiper/FeaturedMediaCarousel.astro';
 import '~/features/home/content-loader';
 import { loadFeaturedSlides } from '~/features/home/featured-slides';
-import { resolveDeferredMountRuntimeConfig } from '~/core/runtime/deferred-mount-init';
 import { orchestratePageLoad } from '~/features/site/load';
 import { getPageLoader } from '~/features/site/load';
 import type { HomePageData } from '~/features/home/types';
@@ -17,7 +16,7 @@ const homeLoad = await orchestratePageLoad({
 
 const { profile, home, site } = homeLoad.frame as HomePageData;
 const featuredSlides = (homeLoad.controls ?? []) as FeaturedSlide[];
-const lazyLoadRuntimePayload = JSON.stringify(resolveDeferredMountRuntimeConfig(site.image.lazyLoad, import.meta.env.DEV));
+const lazyLoadRuntimePayload = JSON.stringify({ rootMargin: site.image.lazyLoad.rootMargin, mountDelayMs: import.meta.env.DEV ? import.meta.env.DEV_RESPONSE_DELAY_MS : 0 });
 const placeholderEffectName = site.image.placeholderEffect;
 
 const hasSlides = featuredSlides.length > 0;

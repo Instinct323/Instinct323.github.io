@@ -5,4 +5,5 @@ export interface LayoutProps {
   noindex?: boolean;
   shell?: string;
   contentWidth?: string;
+  needsKatex?: boolean;
 }

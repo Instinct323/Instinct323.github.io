@@ -2,6 +2,7 @@ import type { SiteEffectsConfig } from './effects';
 import type { ResolvedProfileData } from '~/features/about/types';
 import type { ContentImage } from '~/core/media/types';
 import type { HomePageConfig } from '~/features/home/home-config';
+import type { SiteImageConfig } from '~/features/site/image-config';
 
 export interface SiteMetadata {
   siteUrl: string;
@@ -77,24 +78,7 @@ export interface SiteConfig {
       };
     };
   };
-  image: {
-    format: string;
-    quality: number;
-    widths: {
-      medium: number[];
-      high: number[];
-    };
-    dprScale: {
-      low: number;
-      medium: number;
-      high: number;
-    };
-    lazyLoad: {
-      rootMargin: string;
-      localDebugDelayMs: number;
-    };
-    placeholderEffect: string;
-  };
+  image: Omit<SiteImageConfig, 'placeholderEffect'> & { placeholderEffect: string };
   photography: PhotographyPageConfig;
   effects: SiteEffectsConfig;
 }
