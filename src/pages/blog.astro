@@ -2,8 +2,7 @@
 import Layout from '~/features/layout/Layout.astro';
 import '~/features/blog/loader';
 import { renderMarkdownWithKatex } from '~/core/content/markdown';
-import { orchestratePageLoad } from '~/features/site/load';
-import { getPageLoader } from '~/features/site/load';
+import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
 import { LATEX_REGEX, type BlogPageFrame } from '~/core/content/blog-data-types';
 
 const blogLoad = await orchestratePageLoad({
@@ -13,7 +12,7 @@ const blogLoad = await orchestratePageLoad({
 const { posts } = blogLoad.frame as BlogPageFrame;
 const initialPost = posts[0];
 const initialContentHtml = renderMarkdownWithKatex(initialPost.content, { fileURL: initialPost.baseUrl });
-const needsKatex = posts.some((post) => LATEX_REGEX.test(post.content));
+const needsKatex = LATEX_REGEX.test(initialPost.content);
 ---
 
 <Layout
@@ -220,99 +219,40 @@ const needsKatex = posts.some((post) => LATEX_REGEX.test(post.content));
     }
   }
 
+  :global(.blog-status) {
+    padding: 2rem 0;
+    text-align: center;
+  }
+  :global(.blog-status--loading) {
+    color: var(--text-muted);
+  }
+  :global(.blog-status--error) {
+    color: #ef4444;
+  }
+
 
 </style>
 
 <script is:inline define:vars={{ postMeta: posts.map((p) => ({ slug: p.slug, title: p.title })) }}>
   window.__BLOG_META__ = postMeta;
+  (() => {
+    const hash = location.hash.slice(1);
+    if (!hash) return;
+    document.querySelectorAll('.blog-item').forEach((el) => {
+      el.classList.toggle('active', el.dataset.slug === hash);
+    });
+    const meta = postMeta.find((m) => m.slug === hash);
+    const defaultSlug = postMeta[0]?.slug;
+    if (meta && meta.slug !== defaultSlug) {
+      const detailTitle = document.getElementById('detail-title');
+      const detailContent = document.getElementById('detail-content');
+      if (detailTitle) detailTitle.textContent = meta.title;
+      if (detailContent) detailContent.innerHTML = '<div class="blog-status blog-status--loading">Loading...</div>';
+    }
+  })();
 </script>
 
 <script>
-  import { renderMarkdown } from '~/core/content/markdown-client';
-  import type { BlogPostData } from '~/core/content/blog-data-types';
-
-  (() => {
-    const blogList = document.getElementById('blog-list');
-    const detailTitle = document.getElementById('detail-title');
-    const detailContent = document.getElementById('detail-content');
-
-    if (!blogList || !detailTitle || !detailContent) return;
-
-    const postsMeta = window.__BLOG_META__;
-    const metaBySlug = new Map(postsMeta.map((m) => [m.slug, m]));
-    const postCache = new Map<string, BlogPostData>();
-
-    async function loadPost(slug: string): Promise<BlogPostData | null> {
-      const cached = postCache.get(slug);
-      if (cached) return cached;
-
-      try {
-        const res = await fetch(`/blog-data/${slug}.json`);
-        if (!res.ok) return null;
-        const data = (await res.json()) as BlogPostData;
-        postCache.set(slug, data);
-        return data;
-      } catch {
-        return null;
-      }
-    }
-
-    function prefetchPost(slug: string): void {
-      fetch(`/blog-data/${slug}.json`, { priority: 'low' } as RequestInit).catch(() => {
-        // prefetch failures are non-critical
-      });
-    }
-
-    async function renderPostContent(content: string, baseUrl: string, hasLatex: boolean): Promise<string> {
-      if (hasLatex) {
-        try {
-          const { renderMarkdownWithKatex } = await import('~/core/content/markdown-katex');
-          return renderMarkdownWithKatex(content, { fileURL: baseUrl });
-        } catch (e) {
-          console.error('Failed to load katex renderer:', e);
-          setStatusMessage('Failed to load article.', '#ef4444');
-          return '';
-        }
-      }
-      return renderMarkdown(content, { fileURL: baseUrl });
-    }
-
-    function setStatusMessage(text: string, color: string): void {
-      if (!detailContent) return;
-      detailContent.innerHTML = '';
-      const el = document.createElement('div');
-      el.textContent = text;
-      el.style.cssText = `color: ${color}; padding: 2rem 0; text-align: center;`;
-      detailContent.appendChild(el);
-    }
-
-    const items = blogList.querySelectorAll('.blog-item');
-
-    items.forEach((item) => {
-      const slug = (item as HTMLElement).dataset.slug;
-      if (!slug) return;
-
-      item.addEventListener('mouseenter', () => prefetchPost(slug), { once: true });
-
-      item.addEventListener('click', async () => {
-        items.forEach((i) => i.classList.remove('active'));
-        item.classList.add('active');
-
-        const meta = metaBySlug.get(slug);
-        if (!meta) return;
-
-        detailTitle.textContent = meta.title;
-        setStatusMessage('Loading...', 'var(--text-muted)');
-
-        const post = await loadPost(slug);
-        if (!post) {
-          setStatusMessage('Failed to load article.', '#ef4444');
-          return;
-        }
-
-        detailTitle.textContent = post.title;
-        detailContent.innerHTML = await renderPostContent(post.content, post.baseUrl, post.hasLatex);
-      });
-    });
-  })();
+  import { initBlogClient } from '~/features/blog/client';
+  initBlogClient();
 </script>

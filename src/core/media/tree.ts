@@ -42,7 +42,10 @@ function appendImageToCategoryMap(
     });
   }
 
-  const category = categoryMap.get(parsed.categoryId)!;
+  const category = categoryMap.get(parsed.categoryId);
+  if (!category) {
+    throw new Error(`Category ${parsed.categoryId} missing after creation`);
+  }
 
   image.alt = image.alt || parsed.alt;
   image.album = parsed.album;
@@ -56,7 +59,10 @@ function appendImageToCategoryMap(
       });
     }
 
-    const album = category.albumsMap.get(parsed.album)!;
+    const album = category.albumsMap.get(parsed.album);
+    if (!album) {
+      throw new Error(`Album ${parsed.album} missing after creation`);
+    }
 
     album.images.push(image);
     return;
@@ -90,9 +96,12 @@ export async function loadMediaTreeFromGallery(
 ): Promise<MediaTree> {
   const categoryMap = new Map<string, CategoryAccumulator>();
 
-  const entries = Object.entries(CONTENT_IMAGE_MODULES) as [string, ImageModuleEntry][];
-  for (const [path, mod] of entries.sort(([pathA], [pathB]) => compareNatural(pathA, pathB))) {
-    if (!path.includes(PHOTOGRAPHY_FILTER) || !isImageModuleEntry(mod)) {
+  const entries = Object.entries(CONTENT_IMAGE_MODULES)
+    .filter((entry): entry is [string, ImageModuleEntry] => isImageModuleEntry(entry[1]))
+    .sort(([pathA], [pathB]) => compareNatural(pathA, pathB));
+
+  for (const [path, mod] of entries) {
+    if (!path.includes(PHOTOGRAPHY_FILTER)) {
       continue;
     }
 

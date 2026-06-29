@@ -11,22 +11,22 @@ export type BackgroundConfig = unknown;
 /** Controls data: optional UI controls (featured slides, avatar, etc.). */
 export type ControlsConfig = unknown;
 
-export interface PageLoadPlan {
+export interface PageLoadPlan<TFrame = FrameConfig, TBackground = BackgroundConfig, TControls = ControlsConfig> {
   /** Loads the primary page frame. Always required. */
-  frame: () => Promise<FrameConfig>;
+  frame: () => Promise<TFrame>;
   /** Optional background loader. Receives the resolved frame. */
-  background?: (_ctx: { frame: FrameConfig }) => Promise<BackgroundConfig>;
+  background?: (_ctx: { frame: TFrame }) => Promise<TBackground>;
   /** Optional controls loader. Receives the resolved frame. */
-  controls?: (_ctx: { frame: FrameConfig }) => Promise<ControlsConfig>;
+  controls?: (_ctx: { frame: TFrame }) => Promise<TControls>;
 }
 
-export interface PageLoadResult {
+export interface PageLoadResult<TFrame = FrameConfig, TBackground = BackgroundConfig, TControls = ControlsConfig> {
   /** Resolved frame data. Always present. */
-  frame: FrameConfig;
+  frame: TFrame;
   /** Resolved background data, or `null` when no background loader was supplied. */
-  background: BackgroundConfig;
+  background: TBackground | null;
   /** Resolved controls data, or `null` when no controls loader was supplied. */
-  controls: ControlsConfig;
+  controls: TControls | null;
 }
 
 export type ControlImagePriority = 'critical' | 'deferred';

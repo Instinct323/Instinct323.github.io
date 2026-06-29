@@ -15,7 +15,8 @@ export function parseJsonc(raw: string): unknown {
     (e) => FATAL_ERROR_CODES.has(e.error)
   );
   if (fatalErrors.length > 0) {
-    throw new SyntaxError('Invalid JSONC');
+    const messages = fatalErrors.map((e) => `line ${e.line + 1}, col ${e.offset + 1}: error ${e.error}`).join('; ');
+    throw new SyntaxError(`Invalid JSONC (${messages})`);
   }
   return result;
 }

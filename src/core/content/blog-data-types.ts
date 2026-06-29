@@ -7,6 +7,8 @@ export interface BlogPostData {
   hasLatex: boolean;
 }
 
+import type { BlogPost } from './blog-post';
+
 export interface BlogPageFrame {
-  posts: import('./blog-post').BlogPost[];
+  posts: BlogPost[];
 }

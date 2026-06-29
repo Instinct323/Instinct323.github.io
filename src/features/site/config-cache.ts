@@ -17,17 +17,17 @@ function parseSiteConfig(raw: string): SiteConfig {
  * accepting updates to `content/config.jsonc` resets this cache so the next
  * call re-parses the fresh raw content.
  */
-let siteConfig: SiteConfig | null = null;
+let cachedSiteConfig: SiteConfig | null = null;
 
 if (import.meta.hot) {
   import.meta.hot.accept('/content/config.jsonc?raw', () => {
-    siteConfig = null;
+    cachedSiteConfig = null;
   });
 }
 
 export function loadSiteConfig(): SiteConfig {
-  if (siteConfig === null) {
-    siteConfig = parseSiteConfig(siteConfigRaw);
+  if (cachedSiteConfig === null) {
+    cachedSiteConfig = parseSiteConfig(siteConfigRaw);
   }
-  return siteConfig;
+  return cachedSiteConfig;
 }

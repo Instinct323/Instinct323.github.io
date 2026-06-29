@@ -13,5 +13,3 @@ function normalizeProfile(profileData: ProfileData): ProfileData {
 export function loadProfile(): ProfileData {
   return normalizeProfile(profile as ProfileData);
 }
-
-

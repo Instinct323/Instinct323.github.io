@@ -21,7 +21,7 @@ function isImageLoadingEffectName(value: string): value is ImageLoadingEffectNam
  */
 export function resolveImageLazyLoadConfig(config: unknown): SiteImageConfig['lazyLoad'] {
   const source = assertObject<Partial<SiteImageConfig['lazyLoad']>>(config, 'image.lazyLoad');
-  if ((source as Record<string, unknown>).localDebugDelayMs !== undefined) {
+  if ('localDebugDelayMs' in source) {
     console.warn('localDebugDelayMs is no longer supported; the field is ignored. Use astro.config.mjs DEV_RESPONSE_DELAY_MS for dev-time observability.');
   }
   const rootMargin = assertString(source.rootMargin, 'image.lazyLoad.rootMargin');

@@ -11,5 +11,5 @@ export interface SiteEffectsConfig {
  * directly to call sites — do not reintroduce a getEffectsResolver() helper.
  */
 export const EFFECTS_RESOLVERS: Record<string, (_config: unknown) => unknown> = {
-  starfield: resolveStarfieldEffectConfig as (_config: unknown) => unknown,
+  starfield: (config: unknown) => resolveStarfieldEffectConfig(config) as unknown,
 };

@@ -9,10 +9,8 @@ import { loadMediaTree } from '~/features/photography/media-tree';
 import { loadMediaConfig } from '~/features/site/config-loader';
 
 function resolvePhotographyConfig(config: SiteConfig['photography']): PhotographyPageConfig {
-  const source = config as Partial<PhotographyPageConfig>;
-
   return {
-    grid: assertObject<PhotographyPageConfig['grid']>(source.grid, 'photography.grid'),
+    grid: assertObject<PhotographyPageConfig['grid']>(config.grid, 'photography.grid'),
   };
 }
 
@@ -20,10 +18,8 @@ function resolvePhotographyConfig(config: SiteConfig['photography']): Photograph
 export async function loadEffectsConfig(): Promise<SiteEffectsConfig> {
   const effects = assertObject<SiteEffectsConfig>(loadSiteConfig().effects, 'effects');
 
-  const starfieldResolver = EFFECTS_RESOLVERS.starfield as (_config: unknown) => StarfieldEffectConfig;
-
   return {
-    starfield: starfieldResolver(effects.starfield),
+    starfield: EFFECTS_RESOLVERS.starfield(effects.starfield) as StarfieldEffectConfig,
   };
 }
 

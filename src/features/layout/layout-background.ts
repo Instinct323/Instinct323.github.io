@@ -33,9 +33,9 @@ interface LayoutBackgroundFrame {
 export async function loadLayoutBackgrounds({
   frame,
 }: {
-  frame: unknown;
+  frame: LayoutBackgroundFrame;
 }): Promise<LayoutBackgroundData> {
-  const { mediaConfig } = frame as LayoutBackgroundFrame;
+  const { mediaConfig } = frame;
 
   const BACKGROUND_MOBILE_ASPECT_RATIO =
     backgroundMobileSource.width / backgroundMobileSource.height;
@@ -96,13 +96,14 @@ export async function loadLayoutBackgrounds({
     }),
   );
 
-  const backgroundByVariant = Object.fromEntries(backgroundVariantEntries) as Record<
-    BackgroundVariantKey,
-    Awaited<ReturnType<typeof getImage>>
-  >;
+  const mobileEntry = backgroundVariantEntries.find(([key]) => key === 'mobile');
+  const desktopEntry = backgroundVariantEntries.find(([key]) => key === 'desktop');
+  if (!mobileEntry || !desktopEntry) {
+    throw new Error('Background variant resolution failed');
+  }
 
   return {
-    backgroundMobile: backgroundByVariant.mobile,
-    backgroundDesktop: backgroundByVariant.desktop,
+    backgroundMobile: mobileEntry[1],
+    backgroundDesktop: desktopEntry[1],
   };
 }

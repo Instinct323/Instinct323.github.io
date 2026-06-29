@@ -61,7 +61,9 @@ export function resolveControlImageLoading(priority: ControlImagePriority): Cont
 }
 
 /** Executes a page-load plan in three sequential stages: frame, controls, background. */
-export async function orchestratePageLoad(plan: PageLoadPlan): Promise<PageLoadResult> {
+export async function orchestratePageLoad<TFrame, TBackground, TControls>(
+  plan: PageLoadPlan<TFrame, TBackground, TControls>,
+): Promise<PageLoadResult<TFrame, TBackground, TControls>> {
   const frame = await plan.frame();
   const controls = plan.controls ? await plan.controls({ frame }) : null;
   const background = plan.background ? await plan.background({ frame }) : null;

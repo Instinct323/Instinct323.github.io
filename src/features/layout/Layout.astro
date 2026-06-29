@@ -18,6 +18,8 @@ import type { LayoutBackgroundData } from '~/features/layout/layout-background';
 import '~/styles/layout-shell.css';
 import '~/styles/tokens.css';
 
+interface Props extends LayoutProps {}
+
 const {
   title,
   description,
@@ -26,7 +28,7 @@ const {
   shell = 'default',
   contentWidth = 'standard',
   needsKatex = false,
-} = Astro.props as LayoutProps;
+} = Astro.props;
 
 type LayoutFrameData = {
   siteMetadata: Awaited<ReturnType<typeof loadSiteMetadata>>;
@@ -34,7 +36,7 @@ type LayoutFrameData = {
   effectsConfig: Awaited<ReturnType<typeof loadEffectsConfig>>;
 };
 
-const layoutLoad = await orchestratePageLoad({
+const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundData, never>({
   frame: async () => {
     const [siteMetadata, mediaConfig, effectsConfig] = await Promise.all([
       loadSiteMetadata(),
@@ -56,8 +58,8 @@ const layoutLoad = await orchestratePageLoad({
 const {
   siteMetadata,
   effectsConfig,
-} = layoutLoad.frame as LayoutFrameData;
-const { backgroundMobile, backgroundDesktop } = layoutLoad.background as LayoutBackgroundData;
+} = layoutLoad.frame;
+const { backgroundMobile, backgroundDesktop } = layoutLoad.background;
 
 // Fail-fast: Astro.site must be configured in astro.config.ts
 if (!Astro.site) {
