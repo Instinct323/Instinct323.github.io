@@ -28,7 +28,22 @@ function copyContentAssets() {
   }
 
   if (dirsWithMarkdown.length > 0) {
-    console.warn(`Content assets copied (${dirsWithMarkdown.length} directories)`);
+    console.warn(`Content: ${dirsWithMarkdown.length} dirs`);
+  }
+
+  const verifyDir = join(contentDir, 'verify');
+  let verifyCount = 0;
+  if (existsSync(verifyDir)) {
+    for (const entry of readdirSync(verifyDir, { withFileTypes: true })) {
+      if (entry.isFile()) {
+        cpSync(join(verifyDir, entry.name), join(publicDir, entry.name));
+        verifyCount++;
+      }
+    }
+  }
+
+  if (verifyCount > 0) {
+    console.warn(`Verify: ${verifyCount} files`);
   }
 }
 
