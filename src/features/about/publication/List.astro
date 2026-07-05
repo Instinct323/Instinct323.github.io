@@ -40,8 +40,10 @@ const { publications, highlightAuthor } = Astro.props as Props;
                 <button
                   type="button"
                   class="publication-link-button publication-abstract-toggle"
-                  data-abstract-toggle
+                  data-panel-toggle
                   data-target={`publication-abstract-${publicationIndex}`}
+                  data-show-label="Abstract"
+                  data-hide-label="Hide Abstract"
                   aria-expanded="false"
                 >
                   Abstract
@@ -62,9 +64,11 @@ const { publications, highlightAuthor } = Astro.props as Props;
                 <button
                   type="button"
                   class="publication-link-button publication-video-toggle"
-                  data-video-toggle
+                  data-panel-toggle
                   data-target={`publication-video-${publicationIndex}`}
                   data-embed={embedUrl}
+                  data-show-label="Video"
+                  data-hide-label="Hide Video"
                   aria-expanded="false"
                 >
                   Video
