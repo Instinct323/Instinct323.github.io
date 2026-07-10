@@ -1,0 +1,10 @@
+{
+  "title": "Can Single-View Mesh Reconstruction Generalize to Robot Camera Rotation?",
+  "abstract": "Single-view mesh reconstruction predicts object meshes and spatial layouts from a single observation, making it attractive for fast robot spatial reasoning and real-to-sim digital twins. However, robot-mounted cameras naturally rotate during manipulation and navigation, while learned single-view reconstruction models often rely on view-dependent priors and may generalize poorly to out-of-distribution camera rotations. Such rotations can introduce 3D inconsistencies, incorrect layouts, and violations of physical constraints, but this failure mode remains under-evaluated. We introduce an evaluation protocol with controlled axis-wise roll, pitch, and yaw sweeps to trace errors in monocular depth estimation (MDE), canonical object meshes, camera-space layout, and physical plausibility within a representative SAM3D-style pipeline. On the Aria Digital Twin dataset and a real Franka wrist-camera sequence, camera rotations induce MDE distortion, layout drift, and collision penetration, while canonical mesh predictions remain relatively stable. A two-stage SAM3D+FoundationPose pipeline is more robust than one-stage feed-forward layout prediction, and our Gravity-Aware Refinement reduces one-stage pairwise ICP-based layout-orientation error by 47.1%. Our evaluation reveals that current single-view mesh reconstruction methods generalize poorly to robot camera rotation, and suggests that explicit gravity cues are important for reliable robotic single-view mesh reconstruction.",
+  "authors": ["Yu Zhan", "Guangcheng Chen", "Hanjing Ye", "Zhiqin Cheng", "Zanjia Tong", "Wenjun Xu", "Hong Zhang"],
+  "date": "2026-06",
+  "source": "arXiv",
+  "links": {
+    "DOI": "https://doi.org/10.48550/arXiv.2606.22987"
+  }
+}

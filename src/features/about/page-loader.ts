@@ -48,17 +48,21 @@ export async function loadAboutAvatarImage(profileData: ResolvedProfileData): Pr
   return avatarImage;
 }
 
-/** Loads and sorts publications by weight, then date, then title. */
+/** Loads and sorts publications by author rank weight, then date, then title. */
 export async function loadPublications(): Promise<Publication[]> {
-  const publications = Object.entries(PUBLICATION_MODULES)
-    .map(([filePath, mod]) => normalizePublication(mod.default, filePath));
+  const { name } = extractRequiredProfile(loadProfile());
 
-  publications.sort((a, b) =>
-    compareByWeightAndDate(
-      { weight: a.weight ?? 0, date: a.date, slug: a.title },
-      { weight: b.weight ?? 0, date: b.date, slug: b.title }
-    )
-  );
+  const rank = (p: Publication): number => {
+    const i = p.authors.indexOf(name);
+    return i >= 0 ? -i : Number.MIN_SAFE_INTEGER;
+  };
 
-  return publications;
+  return Object.entries(PUBLICATION_MODULES)
+    .map(([filePath, mod]) => normalizePublication(mod.default, filePath))
+    .sort((a, b) =>
+      compareByWeightAndDate(
+        { weight: rank(a), date: a.date, slug: a.title },
+        { weight: rank(b), date: b.date, slug: b.title }
+      )
+    );
 }
