@@ -162,6 +162,6 @@
   background: var(--image-load-placeholder-bg);
   border: 1px solid var(--image-load-placeholder-border);
   box-shadow: var(--image-load-placeholder-shadow);
-  backdrop-filter: blur(14px) saturate(130%);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
 }

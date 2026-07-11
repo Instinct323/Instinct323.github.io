@@ -11,8 +11,8 @@
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--pill-radius);
-  backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   transition:
     background var(--motion-duration-sm) var(--motion-ease-smooth),
     transform var(--motion-duration-sm) var(--motion-ease-smooth);

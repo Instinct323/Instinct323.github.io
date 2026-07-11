@@ -19,6 +19,9 @@ export default defineConfig({
   },
   integrations: [sitemap()],
   vite: {
+    build: {
+      cssMinify: 'esbuild',
+    },
     define: {
       'import.meta.env.DEV_RESPONSE_DELAY_MS': JSON.stringify(DEV_RESPONSE_DELAY_MS),
     },
