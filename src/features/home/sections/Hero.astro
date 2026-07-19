@@ -49,10 +49,10 @@ const deckItems: DeckItem[] = settings.deckFields.flatMap((field: HomepageHeroDe
     )}
     <h1 class="site-hero-title hero-title-accent title-accent">{profileName}</h1>
     <p class="deck">
-      {deckItems.map((item: DeckItem, index: number) => [
+      {deckItems.map((item, index) => [
         // Render separators from index to avoid branching inside data setup.
         index > 0 && showDeckDivider ? <span class="deck-divider"></span> : null,
-        <span class:list={[item.className]}>{item.value}</span>,
+        <span class:list={item.className}>{item.value}</span>,
       ])}
     </p>
     {Astro.slots.has('default') && (
@@ -107,8 +107,8 @@ const deckItems: DeckItem[] = settings.deckFields.flatMap((field: HomepageHeroDe
   }
 
   .deck-divider {
-    width: var(--deck-divider-size, 3px);
-    height: var(--deck-divider-size, 3px);
+    width: var(--deck-divider-size);
+    height: var(--deck-divider-size);
     border-radius: 50%;
     background: rgba(147, 197, 253, 0.6);
   }

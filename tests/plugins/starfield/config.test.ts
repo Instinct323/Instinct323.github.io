@@ -302,6 +302,31 @@ describe('resolveStarfieldEffectConfig', () => {
     );
   });
 
+  it('accepts valid starColor hex values', () => {
+    expect(resolveStarfieldEffectConfig({ ...validConfig, starColor: '#ffffff' }).starColor).toBe('#ffffff');
+    expect(resolveStarfieldEffectConfig({ ...validConfig, starColor: '#FFFFFF' }).starColor).toBe('#FFFFFF');
+    expect(resolveStarfieldEffectConfig({ ...validConfig, starColor: '#aAbBcC' }).starColor).toBe('#aAbBcC');
+  });
+
+  it('throws for empty starColor', () => {
+    expect(() => resolveStarfieldEffectConfig({ ...validConfig, starColor: '' })).toThrow(
+      'Invalid effects.starfield.starColor (must be #RRGGBB)',
+    );
+  });
+
+  it.each([
+    { starColor: 'ff0000', reason: 'missing hash' },
+    { starColor: '#fff', reason: '3-digit shorthand' },
+    { starColor: '#ff000080', reason: '8-digit hex with alpha' },
+    { starColor: '#gggggg', reason: 'non-hex characters' },
+    { starColor: 'rgb(255,0,0)', reason: 'rgb()' },
+    { starColor: 'red', reason: 'named color' },
+  ])('throws for invalid starColor $reason: "$starColor"', ({ starColor }) => {
+    expect(() => resolveStarfieldEffectConfig({ ...validConfig, starColor })).toThrow(
+      'Invalid effects.starfield.starColor (must be #RRGGBB)',
+    );
+  });
+
   it('throws when config is not an object', () => {
     expect(() => resolveStarfieldEffectConfig(null)).toThrow(
       'Missing or invalid effects.starfield configuration object',

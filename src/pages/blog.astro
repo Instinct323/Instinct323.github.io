@@ -1,15 +1,14 @@
 ---
 import Layout from '~/features/layout/Layout.astro';
-import '~/features/blog/loader';
-import { renderMarkdown, renderMarkdownWithKatex } from '~/core/content/markdown';
+import { renderMarkdown, renderMarkdownWithKatex } from '~/core/content/markdown-renderer';
 import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
-import { LATEX_REGEX, type BlogPageFrame } from '~/core/content/blog-data-types';
+import { LATEX_REGEX } from '~/core/content/blog-data-types';
 
 const blogLoad = await orchestratePageLoad({
   frame: getPageLoader('blog').frame,
 });
 
-const { posts } = blogLoad.frame as BlogPageFrame;
+const { posts } = blogLoad.frame;
 const initialPost = posts[0];
 const needsKatex = LATEX_REGEX.test(initialPost.content);
 const initialContentHtml = needsKatex
@@ -112,7 +111,7 @@ const initialContentHtml = needsKatex
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-strong);
@@ -142,7 +141,7 @@ const initialContentHtml = needsKatex
   .date-mask {
     width: 2px;
     height: 12px;
-    background: var(--surface-border);
+    background: var(--shell-elevated-surface-border);
     border-radius: 1px;
   }
 
@@ -154,7 +153,7 @@ const initialContentHtml = needsKatex
   }
 
   #detail-title {
-    margin: 0 0 var(--space-stack-md) 0;
+    margin: 0 0 var(--space-stack-md);
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-strong);
@@ -167,14 +166,14 @@ const initialContentHtml = needsKatex
   }
 
   #detail-content :global(h2) {
-    margin: 1.5rem 0 0.75rem 0;
+    margin: 1.5rem 0 0.75rem;
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-strong);
   }
 
   #detail-content :global(h3) {
-    margin: 1.25rem 0 0.5rem 0;
+    margin: 1.25rem 0 0.5rem;
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-strong);

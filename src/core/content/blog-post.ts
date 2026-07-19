@@ -39,7 +39,7 @@ export function extractDateFromSlug(slug: string): Date | null {
 export function parseBlogPost(filePath: string, content: string, baseUrl: string): BlogPost {
   const parsed = parseMarkdownWithFrontmatter(content);
   const slug = extractSlugFromPath(filePath);
-  const date = parsed.date ?? extractDateFromSlug(slug) ?? null;
+  const date = parsed.date ?? extractDateFromSlug(slug);
   const weight = typeof parsed.data.weight === 'number' ? parsed.data.weight : 0;
   const title = parsed.title ?? slug;
 

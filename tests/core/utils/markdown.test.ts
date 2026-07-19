@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { parseMarkdownWithFrontmatter, renderMarkdown } from '~/core/content/markdown';
+import { parseMarkdownWithFrontmatter } from '~/core/content/markdown';
+import { renderMarkdown } from '~/core/content/markdown-renderer';
 
 describe('renderMarkdown', () => {
   it('renders basic markdown', () => {

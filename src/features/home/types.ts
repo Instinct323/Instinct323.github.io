@@ -5,10 +5,6 @@ import type { HomePageConfig, HomePageHero } from './home-config';
 export type {
   HomePageConfig,
   HomePageHero,
-  HomepageSectionKey,
-  HomepageHeroDeckField,
-  HomepageEditorialGapVariant,
-  HomePageFeaturedMediaConfig,
 } from './home-config';
 
 export interface HomePageSiteInfo {
@@ -23,7 +19,6 @@ export interface HomePageConfigGroup {
   layout: HomePageConfig['layout'];
   editorialHero: HomePageConfig['editorialHero'];
   featuredMedia: HomePageConfig['featuredMedia'];
-  featuredCarousel: HomePageConfig['featuredMedia']['carousel'];
 }
 
 export interface HomePageData {

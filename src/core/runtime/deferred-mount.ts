@@ -1,6 +1,6 @@
 import type { DeferredMountRuntimeConfig } from '~/features/site/page-load';
 
-export const DEFERRED_MOUNT_DATA = {
+const DEFERRED_MOUNT_DATA = {
   mount: 'data-deferred-mount',
   state: 'data-deferred-state',
   group: 'data-deferred-group',
@@ -120,6 +120,9 @@ function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
   }
 
   window.setTimeout(() => {
+    if (!node.isConnected) {
+      return;
+    }
     mountDeferredNode(node);
   }, mountDelayMs);
 }
@@ -134,7 +137,7 @@ function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
 export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
   const { selector, rootMargin, mountDelayMs } = config;
 
-  const nodes = Array.from(document.querySelectorAll<HTMLElement>(selector));
+  const nodes = document.querySelectorAll<HTMLElement>(selector);
   if (nodes.length === 0) {
     return;
   }

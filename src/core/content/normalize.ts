@@ -30,7 +30,7 @@ export function slugToTitle(slug: string): string {
   return wordsToTitle(slug.split(/[-_]/));
 }
 
-export function sanitizePositiveWidths(widths: number[] | undefined): number[] {
+export function sanitizePositiveWidths(widths: unknown): number[] {
   if (!Array.isArray(widths)) {
     return [];
   }
@@ -38,8 +38,9 @@ export function sanitizePositiveWidths(widths: number[] | undefined): number[] {
   return Array.from(
     new Set(
       widths
+        .filter((width): width is number => typeof width === 'number' && Number.isFinite(width))
         .map(width => Math.round(width))
-        .filter(width => Number.isFinite(width) && width > 0)
+        .filter(width => width > 0)
     )
   ).sort((a, b) => a - b);
 }

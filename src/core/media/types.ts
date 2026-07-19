@@ -75,8 +75,3 @@ export interface FeaturedSlide {
   image: ContentImage;
 }
 
-/** Image loading contract for content loaders. */
-export interface ImageLoader {
-  computeOptions(_surface: string, _overrides: Partial<ContentImageOptions>): Promise<ContentImageOptions>;
-  loadImage(_path: string, _options: ContentImageOptions): Promise<ContentImage | null>;
-}

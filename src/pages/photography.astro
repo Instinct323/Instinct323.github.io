@@ -2,7 +2,6 @@
 import Layout from '~/features/layout/Layout.astro';
 import GallerySection from '~/features/photography/gallery/Section.astro';
 import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
-import type { PhotographyPageFrame } from '~/features/photography/loader';
 import { getDevResponseDelayMs } from '~/core/utils/dev-response-delay';
 import '~/styles/pills.css';
 
@@ -14,7 +13,7 @@ const {
   mediaTree,
   photographyConfig,
   mediaConfig,
-} = photographyLoad.frame as PhotographyPageFrame;
+} = photographyLoad.frame;
 
 const { categories } = mediaTree;
 const { grid } = photographyConfig;
@@ -64,9 +63,7 @@ const galleryLazyRuntimePayload = JSON.stringify({ rootMargin: imageConfig.lazyL
 <script>
   import { initDeferredMounts } from '~/core/runtime/deferred-mount-page';
 
-  if (import.meta.env.SSR === false) {
-    initDeferredMounts();
-  }
+  initDeferredMounts();
 </script>
 
 <style>

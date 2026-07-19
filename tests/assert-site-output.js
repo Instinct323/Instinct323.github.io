@@ -18,6 +18,13 @@ const ROUTE_HTML_FILES = new Map([
 
 const ASTRO_ASSET_PREFIX = '/_astro/';
 
+const NAV_HREFS = {
+  home: '/',
+  about: '/about/',
+  blog: '/blog/',
+  photography: '/photography/',
+};
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -85,15 +92,7 @@ function assertCarouselHooks(homeHtml) {
 
 function assertPrimaryNavOrder(routeHtml, route, cfg) {
   const navOrder = cfg.navigation.order;
-  const expectedNavItems = navOrder.map((key) => {
-    const hrefMap = {
-      home: '/',
-      about: '/about/',
-      blog: '/blog/',
-      photography: '/photography/',
-    };
-    return { key, href: hrefMap[key] };
-  });
+  const expectedNavItems = navOrder.map((key) => ({ key, href: NAV_HREFS[key] }));
 
   let prevIndex = -1;
   for (const item of expectedNavItems) {

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import '~/plugins/starfield'; // registers starfield effect resolver for loadEffectsConfig
 import {
   loadHomepageConfig,
   loadMediaConfig,
@@ -53,21 +52,21 @@ describe('config-loader lazy singleton', () => {
     expect(typeof home.editorialHero.showDeckDivider).toBe('boolean');
     expect(home.featuredMedia).toBeDefined();
     expect(Array.isArray(home.featuredMedia.items)).toBe(true);
-    expect(home.featuredCarousel).toBeDefined();
-    expect(typeof home.featuredCarousel.ariaLabel).toBe('string');
-    expect(typeof home.featuredCarousel.prevButtonAriaLabel).toBe('string');
-    expect(typeof home.featuredCarousel.nextButtonAriaLabel).toBe('string');
-    expect(typeof home.featuredCarousel.emptyText).toBe('string');
-    expect(typeof home.featuredCarousel.showNavigationArrows).toBe('boolean');
-    expect(typeof home.featuredCarousel.showIndicator).toBe('boolean');
-    expect(typeof home.featuredCarousel.counterPadLength).toBe('number');
-    expect(home.featuredCarousel.visual).toBeDefined();
-    expect(typeof home.featuredCarousel.visual.spaceBetween).toBe('number');
-    expect(home.featuredCarousel.visual.slideWidth).toBeDefined();
-    expect(typeof home.featuredCarousel.visual.slideWidth.desktop).toBe('string');
-    expect(typeof home.featuredCarousel.visual.slideWidth.tablet).toBe('string');
-    expect(typeof home.featuredCarousel.visual.slideWidth.mobile).toBe('string');
-    expect(typeof home.featuredCarousel.visual.inactiveOpacity).toBe('number');
+    expect(home.featuredMedia.carousel).toBeDefined();
+    expect(typeof home.featuredMedia.carousel.ariaLabel).toBe('string');
+    expect(typeof home.featuredMedia.carousel.prevButtonAriaLabel).toBe('string');
+    expect(typeof home.featuredMedia.carousel.nextButtonAriaLabel).toBe('string');
+    expect(typeof home.featuredMedia.carousel.emptyText).toBe('string');
+    expect(typeof home.featuredMedia.carousel.showNavigationArrows).toBe('boolean');
+    expect(typeof home.featuredMedia.carousel.showIndicator).toBe('boolean');
+    expect(typeof home.featuredMedia.carousel.counterPadLength).toBe('number');
+    expect(home.featuredMedia.carousel.visual).toBeDefined();
+    expect(typeof home.featuredMedia.carousel.visual.spaceBetween).toBe('number');
+    expect(home.featuredMedia.carousel.visual.slideWidth).toBeDefined();
+    expect(typeof home.featuredMedia.carousel.visual.slideWidth.desktop).toBe('string');
+    expect(typeof home.featuredMedia.carousel.visual.slideWidth.tablet).toBe('string');
+    expect(typeof home.featuredMedia.carousel.visual.slideWidth.mobile).toBe('string');
+    expect(typeof home.featuredMedia.carousel.visual.inactiveOpacity).toBe('number');
   });
 
   it('loadMediaConfig returns media config with expected structure', () => {

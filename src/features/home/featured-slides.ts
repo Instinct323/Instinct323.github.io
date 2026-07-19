@@ -1,7 +1,8 @@
-import { createImageVariantSet } from '~/core/media/image';
+import { createImageVariantSet, loadContentImageResolved } from '~/core/media/image';
 import type { ContentImage, ContentImageOptions, FeaturedSlide } from '~/core/media/types';
-import { getMediaConfigCached, HOME_COVERFLOW_SIZES, computeContentImageOptions, loadContentImageWithConfigValidation } from '~/core/media/surface';
+import { HOME_COVERFLOW_SIZES, computeContentImageOptionsFromConfig } from '~/core/media/surface';
 import { getValidatedHomepageGalleryConfig } from '~/features/home/gallery-config';
+import { loadMediaConfig } from '~/features/site/config-loader';
 
 /**
  * Loads and renders a list of featured slides for the homepage coverflow
@@ -12,12 +13,12 @@ import { getValidatedHomepageGalleryConfig } from '~/features/home/gallery-confi
  *
  * The `loadContentImage` parameter is the dependency-injection seam used
  * by tests to swap in deterministic content images; production code passes
- * `loadContentImageWithConfigValidation` from `~/core/media/surface`.
+ * `loadContentImageResolved` from `~/core/media/image`.
  */
 export async function loadFeaturedSlidesForHomepage(
   featuredPaths: string[],
   homeImageOptions: ContentImageOptions,
-  loadContentImage: (_path: string, _options: ContentImageOptions) => Promise<ContentImage | null>
+  loadContentImage: (_path: string, _options: ContentImageOptions) => ContentImage | null | Promise<ContentImage | null>,
 ): Promise<FeaturedSlide[]> {
   const featuredImages = await Promise.all(featuredPaths.map(async (path) => {
     const image = await loadContentImage(path, homeImageOptions);
@@ -45,13 +46,23 @@ export async function loadFeaturedSlidesForHomepage(
 }
 
 /**
- * Production entry point: resolves the homepage gallery config, computes
- * the home image options, and delegates to `loadFeaturedSlidesForHomepage`
- * with the standard validated image loader.
+ * Production entry point: loads MediaConfig once, validates the homepage
+ * gallery config, computes home image options, and delegates to
+ * `loadFeaturedSlidesForHomepage` with the standard image loader.
  */
 export async function loadFeaturedSlides(): Promise<FeaturedSlide[]> {
-  const homepageGalleryConfig = await getValidatedHomepageGalleryConfig(getMediaConfigCached);
-  const homeImageOptions = await computeContentImageOptions('home', {});
+  const mediaConfig = loadMediaConfig();
+  const homepageGalleryConfig = getValidatedHomepageGalleryConfig(mediaConfig);
+  const homeImageOptions = computeContentImageOptionsFromConfig(
+    mediaConfig,
+    'home',
+    {},
+    homepageGalleryConfig.image.widths,
+  );
 
-  return loadFeaturedSlidesForHomepage(homepageGalleryConfig.featured, homeImageOptions, loadContentImageWithConfigValidation);
+  return loadFeaturedSlidesForHomepage(
+    homepageGalleryConfig.featured,
+    homeImageOptions,
+    loadContentImageResolved,
+  );
 }

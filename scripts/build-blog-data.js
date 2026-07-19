@@ -20,17 +20,13 @@ fs.mkdirSync(outputDir, { recursive: true });
 
 if (!fs.existsSync(blogDir)) throw new Error(`Blog content directory not found: ${blogDir}`);
 
-const entries = fs.readdirSync(blogDir, { withFileTypes: true })
+const readmePaths = fs.readdirSync(blogDir, { withFileTypes: true })
   .filter((d) => d.isDirectory())
-  .map((d) => {
-    const slug = d.name;
-    const readmePath = path.join(blogDir, slug, 'README.md');
-    return { slug, readmePath };
-  })
-  .filter(({ readmePath }) => fs.existsSync(readmePath));
+  .map((d) => path.join(blogDir, d.name, 'README.md'))
+  .filter((readmePath) => fs.existsSync(readmePath));
 
 const posts = [];
-for (const { readmePath } of entries) {
+for (const readmePath of readmePaths) {
   const content = fs.readFileSync(readmePath, 'utf-8');
   const relativePath = path.relative(rootDir, readmePath).replace(/\\/g, '/');
   const baseUrl = new URL(relativePath, `file://${rootDirUrl}`).href;

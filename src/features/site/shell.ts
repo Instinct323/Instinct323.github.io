@@ -1,8 +1,5 @@
-import type { LayoutProps } from '~/features/layout/types';
 import type { ShellsConfig } from '~/features/site/types';
 import { assertString } from '~/core/validation/assert';
-
-export type { LayoutProps };
 
 const contentWidthTokens: Record<string, string> = {
   compact: 'var(--page-width-compact)',
@@ -19,32 +16,18 @@ function resolveContentWidth(contentWidth: string): string {
   return resolved;
 }
 
-const PAGE_OVERLAY = 'var(--page-overlay)';
-
-const BASE_SHELL_TOKENS = {
-  overlayAccentPrimary: 'var(--shell-hero-accent-primary)',
-  overlayAccentSecondary: 'var(--shell-hero-accent-secondary)',
-  surfaceBg: 'var(--shell-elevated-surface-bg)',
-  cardSurfaceBg: 'var(--shell-elevated-card-bg)',
-  surfaceBorder: 'var(--shell-elevated-surface-border)',
-  pageCanvas: 'var(--shell-elevated-canvas)',
-};
-
 const SHELLS_CONFIG: ShellsConfig = {
   home: {
-    ...BASE_SHELL_TOKENS,
     textStrong: 'var(--shell-home-text-strong)',
     textBody: 'var(--shell-home-text-body)',
     textMuted: 'var(--shell-home-text-muted)',
   },
   about: {
-    ...BASE_SHELL_TOKENS,
     textStrong: 'var(--shell-home-text-strong)',
     textBody: 'var(--shell-home-text-body)',
     textMuted: 'var(--shell-home-text-muted)',
   },
   photography: {
-    ...BASE_SHELL_TOKENS,
     textStrong: 'var(--shell-text-strong-photography)',
     textBody: 'var(--shell-text-body-photography)',
     textMuted: 'var(--shell-text-muted-photography)',
@@ -54,7 +37,10 @@ const SHELLS_CONFIG: ShellsConfig = {
 /**
  * Builds the inline style string for a page shell by mapping semantic
  * shell tokens from config to CSS custom properties. Unknown pages fall
- * back to the base overlay and content-width tokens only.
+ * back to the content-width token only. Static visual tokens (canvas,
+ * surface, overlay accents) are consumed directly from source CSS tokens
+ * in `layout-shell.css`; only per-shell text state and the dynamic
+ * content width are emitted here.
  */
 export function buildShellStyle(
   shell: string,
@@ -65,18 +51,11 @@ export function buildShellStyle(
   const layoutContentWidth = resolveContentWidth(contentWidth);
 
   const shellStyleTokens: Record<string, string> = {
-    '--page-overlay': PAGE_OVERLAY,
     '--layout-content-width': layoutContentWidth,
   };
 
   if (shellConfig) {
     Object.assign(shellStyleTokens, {
-      '--page-overlay-accent-primary': shellConfig.overlayAccentPrimary,
-      '--page-overlay-accent-secondary': shellConfig.overlayAccentSecondary,
-      '--surface-bg': shellConfig.surfaceBg,
-      '--card-surface-bg': shellConfig.cardSurfaceBg,
-      '--surface-border': shellConfig.surfaceBorder,
-      '--page-canvas': shellConfig.pageCanvas,
       '--text-strong': shellConfig.textStrong,
       '--text-body': shellConfig.textBody,
       '--text-muted': shellConfig.textMuted,

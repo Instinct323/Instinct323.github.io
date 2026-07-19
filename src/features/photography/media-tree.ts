@@ -1,11 +1,11 @@
 import { loadContentImageResolved } from '~/core/media/image';
 import type { MediaTree } from '~/core/media/types';
-import { getMediaConfigCached, computeContentImageOptionsFromConfig } from '~/core/media/surface';
+import { computeContentImageOptionsFromConfig } from '~/core/media/surface';
 import { loadMediaTreeFromGallery } from '~/core/media/tree';
+import type { MediaConfig } from '~/features/site/types';
 
-export async function loadMediaTree(): Promise<MediaTree> {
-  const mediaConfig = await getMediaConfigCached();
-  const galleryImageOptions = await computeContentImageOptionsFromConfig(mediaConfig, 'photography', {});
+export async function loadMediaTree(mediaConfig: MediaConfig): Promise<MediaTree> {
+  const galleryImageOptions = computeContentImageOptionsFromConfig(mediaConfig, 'photography', {});
 
   return loadMediaTreeFromGallery(mediaConfig.grid, galleryImageOptions, (path, options) => {
     const imageAsset = loadContentImageResolved(path, options);

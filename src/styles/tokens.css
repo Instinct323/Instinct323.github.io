@@ -36,10 +36,7 @@
   --page-width-wide: 80rem;
   --page-bg-position: center top;
   --page-bg-size: cover;
-  --page-bg-opacity: 1.0;
-  --page-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.0));
-  --shell-hero-accent-primary: radial-gradient(110% 80% at 20% 10%, rgba(255, 255, 255, 0.24), transparent 52%);
-  --shell-hero-accent-secondary: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 42%);
+  --page-bg-opacity: 1;
   --shell-elevated-surface-bg: rgba(248, 250, 252, 0.78);
   --shell-elevated-card-bg: rgba(255, 255, 255, 0.9);
   --shell-elevated-surface-border: rgba(203, 213, 225, 0.42);
@@ -69,8 +66,6 @@
   --link-accent-bg-hover: rgba(43, 81, 182, 0.15);
 
   /* Surfaces */
-  --surface-bg: rgba(255, 255, 255, 0.76);
-  --surface-border: rgba(148, 163, 184, 0.34);
   --page-canvas: #edf2f7;
 
   /* Glass surfaces */

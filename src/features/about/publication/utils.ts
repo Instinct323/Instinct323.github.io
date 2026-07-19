@@ -13,6 +13,11 @@ interface RawPublication {
   weight?: unknown;
 }
 
+function normalizeOptionalString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  return value.trim() || undefined;
+}
+
 function assertAuthors(value: unknown, filePath: string): string[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw new Error(`Invalid publication field "authors" in ${filePath}`);
@@ -42,8 +47,7 @@ function normalizePublicationLinks(raw: RawPublication): Record<string, string> 
 
       return [normalizedName, normalizedHref] as const;
     })
-    .filter((entry): entry is readonly [string, string] => Boolean(entry))
-;
+    .filter((entry): entry is readonly [string, string] => entry !== null);
 
   if (links.length === 0) {
     return undefined;
@@ -66,9 +70,9 @@ export function normalizePublication(rawValue: unknown, filePath: string): Publi
     title,
     date,
     authors: assertAuthors(raw.authors, filePath),
-    abstract: typeof raw.abstract === 'string' && raw.abstract.trim() ? raw.abstract.trim() : undefined,
-    source: typeof raw.source === 'string' && raw.source.trim() ? raw.source.trim() : undefined,
-    video: typeof raw.video === 'string' && raw.video.trim() ? raw.video.trim() : undefined,
+    abstract: normalizeOptionalString(raw.abstract),
+    source: normalizeOptionalString(raw.source),
+    video: normalizeOptionalString(raw.video),
     links: normalizePublicationLinks(raw),
   };
 

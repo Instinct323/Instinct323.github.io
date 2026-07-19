@@ -6,9 +6,3 @@ export interface BlogPostData {
   baseUrl: string;
   hasLatex: boolean;
 }
-
-import type { BlogPost } from './blog-post';
-
-export interface BlogPageFrame {
-  posts: BlogPost[];
-}

@@ -1,4 +1,4 @@
-import { siteConfigRaw } from '~/core/content/astro-adapter/config';
+import siteConfigRaw from '/content/config.jsonc?raw';
 import { parseJsonc } from '~/core/utils/jsonc';
 import { assertObject } from '~/core/validation/assert';
 import type { SiteConfig } from '~/features/site/types';
@@ -20,6 +20,7 @@ function parseSiteConfig(raw: string): SiteConfig {
 let cachedSiteConfig: SiteConfig | null = null;
 
 if (import.meta.hot) {
+  // Vite requires a literal dependency ID here; keep it beside the matching import.
   import.meta.hot.accept('/content/config.jsonc?raw', () => {
     cachedSiteConfig = null;
   });

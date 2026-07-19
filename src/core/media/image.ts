@@ -12,7 +12,7 @@ import {
 import { RESPONSIVE_WIDTH_STEPS } from '~/core/media/sizing';
 import { assertPositiveScale } from '~/core/validation/assert';
 import {
-  CONTENT_MODULE_KEY_TEMPLATE,
+  CONTENT_MODULE_KEY_PREFIX,
   PHOTOGRAPHY_MODULE_KEY_PREFIX,
 } from '~/core/content/paths';
 
@@ -57,14 +57,14 @@ export function resolveContentImageMetadata(path: string): ImageMetadata | null 
     return null;
   }
 
-  const directMatch = CONTENT_IMAGE_MODULES[`${CONTENT_MODULE_KEY_TEMPLATE}${normalizedPath}`]?.default;
+  const directMatch = CONTENT_IMAGE_MODULES[`${CONTENT_MODULE_KEY_PREFIX}${normalizedPath}`]?.default;
   if (directMatch) {
     return directMatch;
   }
 
   // config.jsonc paths like "0-travel/..." need to map to "photography/0-travel/..."
   const withPhotographyPrefix = `${PHOTOGRAPHY_MODULE_KEY_PREFIX}${normalizedPath}`;
-  return CONTENT_IMAGE_MODULES[`${CONTENT_MODULE_KEY_TEMPLATE}${withPhotographyPrefix}`]?.default ?? null;
+  return CONTENT_IMAGE_MODULES[`${CONTENT_MODULE_KEY_PREFIX}${withPhotographyPrefix}`]?.default ?? null;
 }
 
 /** Extracts album, category, and alt text from photography content paths for semantic labeling. */
@@ -112,11 +112,8 @@ function fallbackAltFromContentPath(path: string): string {
 }
 
 function resolveContentImageAlt(path: string, alt?: string): string {
-  if (typeof alt === 'string' && alt.trim()) {
-    return alt.trim();
-  }
-
-  return fallbackAltFromContentPath(path);
+  const normalizedAlt = typeof alt === 'string' ? alt.trim() : '';
+  return normalizedAlt || fallbackAltFromContentPath(path);
 }
 
 /** Scales the source image width so its longest edge does not exceed maxLongEdge, preserving aspect ratio. */
@@ -139,7 +136,7 @@ function computeResponsiveWidths(source: ImageMetadata, options: ContentImageOpt
 
   widths.push(maxWidth);
 
-  return Array.from(new Set(widths.filter(width => width > 0))).sort((a, b) => a - b);
+  return Array.from(new Set(widths)).sort((a, b) => a - b);
 }
 
 /** Builds responsive width metadata and validates format/quality before generating the responsive descriptor. */

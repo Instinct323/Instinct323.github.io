@@ -1,6 +1,7 @@
 import { loadSiteConfig } from './config-cache';
 import { resolveFeaturedCarouselVisual } from '~/plugins/swiper/config-resolver';
 import { resolveSiteImageConfig } from '~/features/site/image-config-resolver';
+import { assertMediaConfigShape } from '~/core/media/config';
 import type { HomePageConfigGroup } from '~/features/home/types';
 import type { MediaConfig, NavigationConfig, SiteConfig, SiteMetadata } from '~/features/site/types';
 
@@ -38,7 +39,6 @@ export function loadHomepageConfig(): HomePageConfigGroup {
     layout: home.layout,
     editorialHero: home.editorialHero,
     featuredMedia,
-    featuredCarousel: featuredMedia.carousel,
   };
 }
 
@@ -47,7 +47,7 @@ export function loadMediaConfig(): MediaConfig {
   const config = loadSiteConfig();
   const featuredMedia = getFeaturedMediaConfig();
 
-  return {
+  const mediaConfig: MediaConfig = {
     grid: config.photography.grid,
     image: resolveSiteImageConfig(config.image),
     homepage: {
@@ -55,6 +55,9 @@ export function loadMediaConfig(): MediaConfig {
       carousel: featuredMedia.carousel,
     },
   };
+
+  assertMediaConfigShape(mediaConfig);
+  return mediaConfig;
 }
 
 /** Extracts SEO metadata slice for layout injection. */

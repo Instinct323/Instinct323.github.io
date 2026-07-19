@@ -31,10 +31,9 @@ export function calculateCarouselWidths(
  * Retrieves the homepage gallery configuration with fail-fast validation.
  * Misconfiguration causes an immediate build failure rather than silent runtime breakage.
  */
-export async function getValidatedHomepageGalleryConfig(
-  getMediaConfigCached: () => Promise<MediaConfig>
-): Promise<ValidatedHomepageGalleryConfig> {
-  const mediaConfig = await getMediaConfigCached();
+export function getValidatedHomepageGalleryConfig(
+  mediaConfig: MediaConfig,
+): ValidatedHomepageGalleryConfig {
   const homepageConfig = mediaConfig.homepage;
   const featured = homepageConfig?.featured;
   const carousel = homepageConfig?.carousel;
@@ -64,11 +63,10 @@ export async function getValidatedHomepageGalleryConfig(
   const widths = assertStrictlyIncreasingPositiveWidths(calculatedWidths, 'calculated carousel widths');
 
   const resolvedFeatured = featured.map((entry, index) => {
-    if (typeof entry !== 'string' || !entry.trim()) {
+    const rawPath = typeof entry === 'string' ? entry.trim() : '';
+    if (!rawPath) {
       throw new Error(`Invalid homepage.featured[${index}]: expected a non-empty string path relative to content/photography/.`);
     }
-
-    const rawPath = entry.trim();
     const normalizedPath = normalizeContentImagePath(`photography/${rawPath}`);
 
     if (!normalizedPath || !normalizedPath.startsWith('photography/')) {

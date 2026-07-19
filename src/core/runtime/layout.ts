@@ -1,6 +1,5 @@
 import { parseDatasetPayload } from '~/core/utils/dataset';
 import { hideCanvases, initStarfield } from '~/plugins/starfield/bootstrap';
-import '~/plugins/starfield';
 
 const SHELL_BACKGROUND_CACHE_KEY = 'site-shell-background-payload-v1';
 
@@ -49,7 +48,7 @@ function applyShellBackgroundImages(payload: ShellBackgroundPayload): void {
   document.body.style.setProperty('--page-bg-image-desktop', `url('${payload.desktopSrc}')`);
 }
 
-function readShellBackgroundCache(): ShellBackgroundPayload | null {
+function readShellBackgroundCache(): { payload: ShellBackgroundPayload; serialized: string } | null {
   let serializedPayload: string | null;
   try {
     serializedPayload = window.sessionStorage.getItem(SHELL_BACKGROUND_CACHE_KEY);
@@ -59,7 +58,7 @@ function readShellBackgroundCache(): ShellBackgroundPayload | null {
   if (!serializedPayload) {
     return null;
   }
-  return parseDatasetPayload(
+  const payload = parseDatasetPayload(
     serializedPayload,
     (raw) => {
       const payload = raw as { mobileSrc?: string; desktopSrc?: string };
@@ -73,6 +72,7 @@ function readShellBackgroundCache(): ShellBackgroundPayload | null {
     },
     'Invalid shell background cache payload',
   );
+  return { payload, serialized: serializedPayload };
 }
 
 /**
@@ -81,15 +81,21 @@ function readShellBackgroundCache(): ShellBackgroundPayload | null {
  * effectively a no-op for the visual state, but the cache write keeps
  * repeat navigations fast.
  */
-function initShellBackground(): void {
-  const cached = readShellBackgroundCache();
-  if (cached) {
-    applyShellBackgroundImages(cached);
+export function initShellBackground(): void {
+  const parsed = parseShellBackgroundPayload();
+  if (!parsed) {
     return;
   }
 
-  const parsed = parseShellBackgroundPayload();
-  if (!parsed) {
+  let cached: ReturnType<typeof readShellBackgroundCache> = null;
+  try {
+    cached = readShellBackgroundCache();
+  } catch {
+    // Corrupt cache is treated as a mismatch; fall through to apply current payload.
+  }
+
+  if (cached && cached.serialized === parsed.serializedPayload) {
+    applyShellBackgroundImages(cached.payload);
     return;
   }
 

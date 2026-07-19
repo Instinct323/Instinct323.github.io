@@ -1,7 +1,6 @@
-export interface ProfileFact {
-  id: string;
-  value: string;
-}
+import type { ProfileFact } from '~/core/content/normalize';
+import type { ContentImage } from '~/core/media/types';
+import type { Publication } from './publication/types';
 
 export interface ProfileLink {
   key: string;
@@ -20,9 +19,6 @@ export interface ResolvedProfileData extends ProfileData {
   location: string;
   organization: string;
 }
-
-import type { ContentImage } from '~/core/media/types';
-import type { Publication } from './publication/types';
 
 export interface AboutPageData {
   profile: ResolvedProfileData;

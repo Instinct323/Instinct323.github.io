@@ -1,5 +1,5 @@
 ---
-import type { ProfileFact } from '~/features/about/types';
+import type { ProfileFact } from '~/core/content/normalize';
 
 interface Props {
   facts: ProfileFact[];
@@ -16,7 +16,7 @@ const renderedFacts = facts
       .trim(),
     value: fact.value.trim(),
   }))
-  .filter((fact): fact is { label: string; value: string } => Boolean(fact.label && fact.value));
+  .filter((fact) => fact.label && fact.value);
 ---
 
 <section data-testid="about-profile-facts" class="card">
@@ -52,7 +52,7 @@ const renderedFacts = facts
 
   dt {
     font-weight: 500;
-    color: var(--text-muted, #486581);
+    color: var(--text-muted);
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -60,7 +60,7 @@ const renderedFacts = facts
 
   dd {
     margin: 0;
-    color: var(--text-body, #243b53);
+    color: var(--text-body);
     font-size: 0.875rem;
     font-weight: 500;
     line-height: 1.4;
@@ -68,7 +68,7 @@ const renderedFacts = facts
 
   .empty {
     margin: 0;
-    color: var(--text-muted, #486581);
+    color: var(--text-muted);
     font-style: italic;
   }
 

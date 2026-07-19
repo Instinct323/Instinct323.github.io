@@ -1,9 +1,9 @@
 import type { StarfieldEffectConfig } from './types';
+import { parseHexColor } from './utils';
 import {
   assertBoolean,
   assertFiniteNumber,
   assertObject,
-  assertString,
 } from '~/core/validation/assert';
 
 /**
@@ -43,7 +43,15 @@ export function resolveStarfieldEffectConfig(config: unknown): StarfieldEffectCo
     throw new Error('Missing or invalid effects.starfield opacity values (must be within [0, 1])');
   }
 
-  const starColor = assertString(rawConfig.starColor, 'effects.starfield.starColor');
+  const starColor = rawConfig.starColor;
+  if (typeof starColor !== 'string') {
+    throw new Error('Invalid effects.starfield.starColor (must be #RRGGBB)');
+  }
+  try {
+    parseHexColor(starColor);
+  } catch {
+    throw new Error('Invalid effects.starfield.starColor (must be #RRGGBB)');
+  }
 
   const starShapes = rawConfig.starShapes;
   if (!Array.isArray(starShapes) || starShapes.length === 0) {

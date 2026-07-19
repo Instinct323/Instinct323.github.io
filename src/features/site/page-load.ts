@@ -1,17 +1,4 @@
-export const PAGE_LOAD_PRIORITY = ['frame', 'controls', 'background'] as const;
-
-export type PageLoadStage = (typeof PAGE_LOAD_PRIORITY)[number];
-
-/** Frame data: primary page-specific content (HomePageData, AboutFrame, etc.). */
-export type FrameConfig = unknown;
-
-/** Background data: optional visual resources (background images by variant, etc.). */
-export type BackgroundConfig = unknown;
-
-/** Controls data: optional UI controls (featured slides, avatar, etc.). */
-export type ControlsConfig = unknown;
-
-export interface PageLoadPlan<TFrame = FrameConfig, TBackground = BackgroundConfig, TControls = ControlsConfig> {
+export interface PageLoadPlan<TFrame = unknown, TBackground = unknown, TControls = unknown> {
   /** Loads the primary page frame. Always required. */
   frame: () => Promise<TFrame>;
   /** Optional background loader. Receives the resolved frame. */
@@ -20,7 +7,7 @@ export interface PageLoadPlan<TFrame = FrameConfig, TBackground = BackgroundConf
   controls?: (_ctx: { frame: TFrame }) => Promise<TControls>;
 }
 
-export interface PageLoadResult<TFrame = FrameConfig, TBackground = BackgroundConfig, TControls = ControlsConfig> {
+export interface PageLoadResult<TFrame = unknown, TBackground = unknown, TControls = unknown> {
   /** Resolved frame data. Always present. */
   frame: TFrame;
   /** Resolved background data, or `null` when no background loader was supplied. */

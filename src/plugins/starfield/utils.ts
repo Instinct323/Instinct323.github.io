@@ -32,10 +32,10 @@ export interface Star {
 
 export type CellGrid = Record<string, Record<string, Star[]>>;
 
-/** Returns white {255,255,255} for invalid hex strings. */
-export function parseHexColorOrDefault(color: string): RgbColor {
+/** Throws if `color` is not a six-digit `#RRGGBB` hex string. */
+export function parseHexColor(color: string): RgbColor {
   if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
-    return { r: 255, g: 255, b: 255 };
+    throw new Error(`Invalid hex color: "${color}". Expected #RRGGBB.`);
   }
 
   return {

@@ -1,6 +1,6 @@
 import type { StarfieldEffectConfig } from './types';
 import {
-  parseHexColorOrDefault,
+  parseHexColor,
   calculateDistance,
   randomRange,
   getOrCreateCell,
@@ -374,7 +374,7 @@ export function initStarfieldCore(
     config,
     ctxBg,
     ctxSt,
-    starRgb: parseHexColorOrDefault(config.starColor),
+    starRgb: parseHexColor(config.starColor),
     cellSize: config.maxDistance,
   };
 

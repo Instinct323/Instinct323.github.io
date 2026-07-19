@@ -5,19 +5,20 @@ import ContentSection from '~/features/about/Content.astro';
 import LinksSection from '~/features/about/Links.astro';
 import ProfileCard from '~/features/about/profile/Card.astro';
 import PublicationsSection from '~/features/about/publication/List.astro';
-import { orchestratePageLoad } from '~/features/site/load';
-import { getPageLoader } from '~/features/site/load';
-import type { AboutPageData } from '~/features/about/types';
-import type { MediaConfig } from '~/features/site/types';
-import type { ContentImage } from '~/core/media/types';
+import { orchestratePageLoad, getPageLoader } from '~/features/site/load';
+
+const aboutLoader = getPageLoader('about');
 
 const aboutLoad = await orchestratePageLoad({
-  frame: getPageLoader('about').frame,
-  controls: getPageLoader('about').controls,
+  frame: aboutLoader.frame,
+  controls: aboutLoader.controls,
 });
 
-const { introductionHtml, profile, publications } = aboutLoad.frame as Omit<AboutPageData, 'avatarImage'> & { mediaConfig: MediaConfig };
-const avatarImage = aboutLoad.controls as ContentImage;
+const { introductionHtml, profile, publications } = aboutLoad.frame;
+const avatarImage = aboutLoad.controls;
+if (!avatarImage) {
+  throw new Error('About page controls unexpectedly returned null');
+}
 const profileName = profile.name;
 ---
 
@@ -44,14 +45,6 @@ const profileName = profile.name;
     </div>
   </section>
 </Layout>
-
-<script>
-  import { initDeferredMounts } from '~/core/runtime/deferred-mount-page';
-
-  if (import.meta.env.SSR === false) {
-    initDeferredMounts();
-  }
-</script>
 
 <style>
   .about-container {

@@ -1,15 +1,13 @@
 import type { ImageMetadata } from 'astro';
 
 import { compareNatural } from '~/core/content/normalize';
-import { PHOTOGRAPHY_FILTER, CONTENT_IMAGE_PATH_PREFIX } from '~/core/content/paths';
+import { PHOTOGRAPHY_FILTER, CONTENT_MODULE_KEY_PREFIX } from '~/core/content/paths';
 import type { ContentImageOptions, MediaAlbum, MediaCategory, MediaImage, MediaTree } from '~/core/media/types';
 import type { MediaConfig } from '~/features/site/types';
 import { parseMediaPath } from '~/core/media/image';
 import { CONTENT_IMAGE_MODULES } from '~/core/content/astro-adapter/images';
 
-export type { ParsedMediaPath } from '~/core/media/image';
-
-export interface CategoryAccumulator {
+interface CategoryAccumulator {
   id: string;
   title: string;
   testId: string;
@@ -105,7 +103,7 @@ export async function loadMediaTreeFromGallery(
       continue;
     }
 
-    const image = loadImageFromContentPath(path.replace(CONTENT_IMAGE_PATH_PREFIX, ''), galleryImageOptions);
+    const image = loadImageFromContentPath(path.replace(CONTENT_MODULE_KEY_PREFIX, ''), galleryImageOptions);
 
     if (!image) {
       continue;

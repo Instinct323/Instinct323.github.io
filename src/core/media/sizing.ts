@@ -116,11 +116,19 @@ function computeScaledTargetWidth(inferredWidths: number[], dprScale: number): n
   return Math.ceil(Math.max(...inferredWidths) * dprScale);
 }
 
+/**
+ * Selects the smallest candidate that satisfies the target width.
+ * If the target exceeds every candidate, returns the maximum candidate.
+ */
 function selectSingleBucket(candidateWidths: number[], targetWidth: number): number {
   const matched = candidateWidths.find((candidateWidth) => candidateWidth >= targetWidth);
   return matched ?? candidateWidths[candidateWidths.length - 1];
 }
 
+/**
+ * Filters candidates by `maxSelectableWidth`. Throws when every candidate
+ * is larger than the bound, because no valid selection would exist.
+ */
 function normalizeCandidateWidths(
   candidateWidths: number[],
   key: string,
@@ -201,7 +209,7 @@ export function computeCarouselResponsiveWidths(
     widths.push(effectiveMaxWidth);
   }
 
-  return Array.from(new Set(widths.filter(width => width > 0))).sort((a, b) => a - b);
+  return Array.from(new Set(widths)).sort((a, b) => a - b);
 }
 
 /** Merges responsive widths across desktop, tablet, and mobile profiles. */

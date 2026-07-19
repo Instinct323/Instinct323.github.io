@@ -1,35 +1,26 @@
 import type {
-  PageLoadStage,
   PageLoadPlan,
   PageLoadResult,
   ControlImagePriority,
   ControlImageLoadingAttrs,
 } from '~/features/site/page-load';
 
-export { PAGE_LOAD_PRIORITY } from '~/features/site/page-load';
-export type { PageLoadStage };
-
 import { loadBlogPosts } from '~/features/blog/loader';
 import { loadAboutPageFrameWithMedia, loadAboutAvatarImage } from '~/features/about/page-loader';
 import { loadHomePage } from '~/features/home/content-loader';
 import { loadPhotographyPage } from '~/features/photography/loader';
 
-export type PageKey = 'home' | 'about' | 'blog' | 'photography';
-
-export interface PageLoader<TFrame = unknown, TControl = unknown> {
-  frame: () => Promise<TFrame>;
-  controls?: (_ctx: { frame: TFrame }) => Promise<TControl>;
-}
-
 const PAGE_LOADERS = {
   home: { frame: loadHomePage },
   about: {
     frame: loadAboutPageFrameWithMedia,
-    controls: ({ frame }: { frame: Awaited<ReturnType<typeof loadAboutPageFrameWithMedia>> }) => loadAboutAvatarImage(frame.profile),
+    controls: ({ frame }: { frame: Awaited<ReturnType<typeof loadAboutPageFrameWithMedia>> }) => loadAboutAvatarImage(frame.profile, frame.mediaConfig),
   },
   blog: { frame: async () => ({ posts: loadBlogPosts() }) },
   photography: { frame: loadPhotographyPage },
 };
+
+type PageKey = keyof typeof PAGE_LOADERS;
 
 /**
  * Returns the page loader for the given key.
@@ -38,8 +29,8 @@ const PAGE_LOADERS = {
  * keys indicate a programmer error (typo, missing registration) and must
  * surface immediately, not return `null` and force every caller to handle it.
  */
-export function getPageLoader<TFrame, TControl>(key: PageKey): PageLoader<TFrame, TControl> {
-  const loader = PAGE_LOADERS[key] as PageLoader<TFrame, TControl>;
+export function getPageLoader<K extends PageKey>(key: K): (typeof PAGE_LOADERS)[K] {
+  const loader = PAGE_LOADERS[key];
   if (!loader) {
     throw new Error(`No page loader registered for key: ${key}`);
   }
@@ -61,8 +52,8 @@ export function resolveControlImageLoading(priority: ControlImagePriority): Cont
 }
 
 /**
- * Loads the page frame first, then runs `controls` and `background` in
- * parallel (both depending on the frame). The shape lets callers load
+ * Loads the page frame first, then runs `controls` and `background`
+ * sequentially (both depending on the frame). The shape lets callers load
  * critical data sequentially while deferring less-critical work.
  */
 export async function orchestratePageLoad<TFrame, TBackground, TControls>(

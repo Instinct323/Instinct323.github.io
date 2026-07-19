@@ -10,12 +10,14 @@ import type { FeaturedSlide } from '~/core/media/types';
 import type { HomePageConfigGroup as HomepageConfig } from '~/features/home/types';
 import { resolveControlImageLoading } from '~/features/site/load';
 
+type FeaturedCarouselSettings = HomepageConfig['featuredMedia']['carousel'];
+
 // Contract: Render the full featured-media carousel region used on the home page,
 // including slide markup, controls, and client bootstrap hooks.
 
 interface Props {
   slides: FeaturedSlide[];
-  settings: HomepageConfig['featuredCarousel'];
+  settings: FeaturedCarouselSettings;
   placeholderEffectName: string;
   lazyLoadRuntimePayload: string;
 }

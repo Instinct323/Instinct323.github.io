@@ -5,11 +5,6 @@ export interface GridColumns {
   mobile: number;
 }
 
-export interface MediaGridConfig {
-  columns: GridColumns;
-  gap: string;
-}
-
 export interface SiteImageConfig {
   format: string;
   quality: number;

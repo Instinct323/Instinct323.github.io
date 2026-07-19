@@ -21,12 +21,6 @@ export interface SiteNavigation {
 }
 
 export interface ShellTokenConfig {
-  overlayAccentPrimary: string;
-  overlayAccentSecondary: string;
-  surfaceBg: string;
-  cardSurfaceBg: string;
-  surfaceBorder: string;
-  pageCanvas: string;
   textStrong: string;
   textBody: string;
   textMuted: string;

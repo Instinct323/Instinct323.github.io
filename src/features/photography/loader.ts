@@ -1,8 +1,6 @@
 import { loadSiteConfig } from '~/features/site/config-cache';
 import { assertObject } from '~/core/validation/assert';
-import type { MediaTree } from '~/core/media/types';
 import type { PhotographyPageConfig } from '~/features/photography/types';
-import type { MediaConfig } from '~/features/site/types';
 import { loadMediaTree } from '~/features/photography/media-tree';
 import { loadMediaConfig } from '~/features/site/config-loader';
 
@@ -11,10 +9,8 @@ export async function loadPhotographyPage(): Promise<{
   photographyConfig: PhotographyPageConfig;
   mediaConfig: Awaited<ReturnType<typeof loadMediaConfig>>;
 }> {
-  const [mediaTree, mediaConfig] = await Promise.all([
-    loadMediaTree(),
-    loadMediaConfig(),
-  ]);
+  const mediaConfig = loadMediaConfig();
+  const mediaTree = await loadMediaTree(mediaConfig);
   const photographyConfig: PhotographyPageConfig = {
     grid: assertObject<PhotographyPageConfig['grid']>(loadSiteConfig().photography.grid, 'photography.grid'),
   };
@@ -22,8 +18,4 @@ export async function loadPhotographyPage(): Promise<{
   return { mediaTree, photographyConfig, mediaConfig };
 }
 
-export interface PhotographyPageFrame {
-  mediaTree: MediaTree;
-  photographyConfig: PhotographyPageConfig;
-  mediaConfig: MediaConfig;
-}
+

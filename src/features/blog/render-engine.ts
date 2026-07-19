@@ -2,7 +2,7 @@ import type { BlogPostData } from '~/core/content/blog-data-types';
 import { KATEX_CSS_HREF, KATEX_CSS_INTEGRITY } from './katex-constants';
 
 export async function renderPostContent(post: BlogPostData): Promise<string> {
-  const { renderMarkdown, renderMarkdownWithKatex } = await import('~/core/content/markdown-render');
+  const { renderMarkdown, renderMarkdownWithKatex } = await import('~/core/content/markdown-renderer');
   const render = post.hasLatex ? renderMarkdownWithKatex : renderMarkdown;
   return render(post.content, { fileURL: post.baseUrl });
 }

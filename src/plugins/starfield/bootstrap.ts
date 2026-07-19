@@ -8,8 +8,10 @@ export function hideCanvases(backgroundCanvas: HTMLCanvasElement, starsCanvas: H
 
 /**
  * Initializes the starfield canvas animation if enabled and motion is not reduced.
- * Returns a cleanup function so the caller can properly dispose event listeners
- * and animation frames to avoid memory leaks.
+ *
+ * Returns a teardown handle for hosts with remount/unmount lifecycles.
+ * The current MPA layout intentionally does not retain it — the effect
+ * lives for the full page lifetime and is cleaned up by navigation.
  *
  * Throws descriptive Errors on the early-skip paths so the caller can decide how
  * to degrade (e.g. hide canvases, mark the DOM, log). Callers must wrap this

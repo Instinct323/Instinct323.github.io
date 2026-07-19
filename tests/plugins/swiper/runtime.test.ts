@@ -131,10 +131,6 @@ describe('carousel runtime', () => {
       },
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
-    } as unknown as {
-      matches: boolean;
-      addEventListener: ReturnType<typeof vi.fn>;
-      removeEventListener: ReturnType<typeof vi.fn>;
     };
 
     mockMatchMedia = vi.fn(() => mockMql);

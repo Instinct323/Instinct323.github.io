@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  parseHexColorOrDefault,
+  parseHexColor,
   calculateDistance,
   randomRange,
   clamp,
@@ -63,46 +63,35 @@ describe('starDensities', () => {
 });
 
 describe('parseHexColor', () => {
-  it('parses a valid 6-digit hex color', () => {
-    expect(parseHexColorOrDefault('#ff0000')).toEqual({ r: 255, g: 0, b: 0 });
-    expect(parseHexColorOrDefault('#00ff00')).toEqual({ r: 0, g: 255, b: 0 });
-    expect(parseHexColorOrDefault('#0000ff')).toEqual({ r: 0, g: 0, b: 255 });
+  it('parses valid 6-digit hex colors', () => {
+    expect(parseHexColor('#ff0000')).toEqual({ r: 255, g: 0, b: 0 });
+    expect(parseHexColor('#00ff00')).toEqual({ r: 0, g: 255, b: 0 });
+    expect(parseHexColor('#0000ff')).toEqual({ r: 0, g: 0, b: 255 });
   });
 
   it('parses uppercase hex digits', () => {
-    expect(parseHexColorOrDefault('#ABCDEF')).toEqual({ r: 171, g: 205, b: 239 });
+    expect(parseHexColor('#ABCDEF')).toEqual({ r: 171, g: 205, b: 239 });
   });
 
-  it('parses mixed case hex digits', () => {
-    expect(parseHexColorOrDefault('#aAbBcC')).toEqual({ r: 170, g: 187, b: 204 });
+  it('parses mixed-case hex digits', () => {
+    expect(parseHexColor('#aAbBcC')).toEqual({ r: 170, g: 187, b: 204 });
   });
 
-  it('parses black', () => {
-    expect(parseHexColorOrDefault('#000000')).toEqual({ r: 0, g: 0, b: 0 });
+  it('parses black and white', () => {
+    expect(parseHexColor('#000000')).toEqual({ r: 0, g: 0, b: 0 });
+    expect(parseHexColor('#ffffff')).toEqual({ r: 255, g: 255, b: 255 });
   });
 
-  it('parses white', () => {
-    expect(parseHexColorOrDefault('#ffffff')).toEqual({ r: 255, g: 255, b: 255 });
-  });
-
-  it('returns white for strings without hash', () => {
-    expect(parseHexColorOrDefault('ff0000')).toEqual({ r: 255, g: 255, b: 255 });
-  });
-
-  it('returns white for 3-digit shorthand', () => {
-    expect(parseHexColorOrDefault('#fff')).toEqual({ r: 255, g: 255, b: 255 });
-  });
-
-  it('returns white for 8-digit hex with alpha', () => {
-    expect(parseHexColorOrDefault('#ff000080')).toEqual({ r: 255, g: 255, b: 255 });
-  });
-
-  it('returns white for empty string', () => {
-    expect(parseHexColorOrDefault('')).toEqual({ r: 255, g: 255, b: 255 });
-  });
-
-  it('returns white for non-hex characters', () => {
-    expect(parseHexColorOrDefault('#gggggg')).toEqual({ r: 255, g: 255, b: 255 });
+  it.each([
+    { input: 'ff0000', reason: 'missing hash' },
+    { input: '#fff', reason: '3-digit shorthand' },
+    { input: '#ff000080', reason: '8-digit hex with alpha' },
+    { input: '', reason: 'empty string' },
+    { input: '#gggggg', reason: 'non-hex characters' },
+    { input: 'rgb(255,0,0)', reason: 'rgb()' },
+    { input: 'red', reason: 'named color' },
+  ])('throws for $reason: "$input"', ({ input }) => {
+    expect(() => parseHexColor(input)).toThrow('Expected #RRGGBB');
   });
 });
 

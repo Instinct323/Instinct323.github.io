@@ -1,6 +1,5 @@
 import { loadMediaConfig, loadSiteMetadata } from '~/features/site/config-loader';
 import { loadEffectsConfig } from '~/features/site/effects-loader';
-import { assertMediaConfigShape } from '~/core/media/config';
 
 export interface LayoutFrameData {
   siteMetadata: Awaited<ReturnType<typeof loadSiteMetadata>>;
@@ -14,8 +13,6 @@ export async function loadLayoutFrame(): Promise<LayoutFrameData> {
     loadMediaConfig(),
     loadEffectsConfig(),
   ]);
-
-  assertMediaConfigShape(mediaConfig);
 
   return { siteMetadata, mediaConfig, effectsConfig };
 }

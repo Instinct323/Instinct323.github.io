@@ -1,9 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
-
-vi.mock('../../../src/lib/media/resolution', () => ({
-  normalizeContentImagePath: vi.fn((p: string) => p),
-  resolveContentImageMetadata: vi.fn(() => null),
-}));
+import { describe, expect, it } from 'vitest';
 
 import { assertMediaConfigShape } from '~/core/media/config';
 import type { MediaConfig } from '~/features/site/types';
@@ -56,18 +51,18 @@ describe('assertMediaConfigShape', () => {
 
   it('throws when grid is missing', () => {
     const { grid: _grid, ...noGrid } = validConfig;
-    expect(() => assertMediaConfigShape(noGrid as any)).toThrow(/missing media grid/);
+    expect(() => assertMediaConfigShape(noGrid)).toThrow(/missing media grid/);
   });
 
   it('throws when grid.columns is missing', () => {
     expect(() =>
-      assertMediaConfigShape({ ...validConfig, grid: { gap: '1rem' } } as any),
+      assertMediaConfigShape({ ...validConfig, grid: { gap: '1rem' } }),
     ).toThrow(/missing media grid/);
   });
 
   it('throws when image is missing', () => {
     const { image: _image, ...noImage } = validConfig;
-    expect(() => assertMediaConfigShape(noImage as any)).toThrow(/missing media/);
+    expect(() => assertMediaConfigShape(noImage)).toThrow(/missing media/);
   });
 
   it('throws when homepage.carousel is missing', () => {
@@ -75,7 +70,7 @@ describe('assertMediaConfigShape', () => {
       ...validConfig,
       homepage: { featured: ['a'] },
     };
-    expect(() => assertMediaConfigShape(badConfig as any)).toThrow(/missing media/);
+    expect(() => assertMediaConfigShape(badConfig)).toThrow(/missing media/);
   });
 
   it('throws for invalid medium widths', () => {

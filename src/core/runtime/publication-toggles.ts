@@ -62,14 +62,4 @@ export function initPublicationPanelToggles(): void {
   });
 }
 
-export function initPublicationToggles(): void {
-  initPublicationPanelToggles();
-}
 
-export function initPublicationAbstractToggles(): void {
-  initPublicationPanelToggles();
-}
-
-export function initPublicationVideoToggles(): void {
-  initPublicationPanelToggles();
-}

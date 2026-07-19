@@ -25,7 +25,7 @@ export interface StarfieldEffectConfig {
   speedFactor: number;
   /** Connection reach in px; also used as the cell size for the spatial hash. */
   maxDistance: number;
-  /** Any CSS color string (`#rrggbb`, `rgb(...)`, named) used to fill stars and lines. */
+  /** Six-digit hex color `#RRGGBB` used to fill stars and derive connection-line RGB. */
   starColor: string;
   /** Star fill alpha in `[0, 1]`. */
   starOpacity: number;

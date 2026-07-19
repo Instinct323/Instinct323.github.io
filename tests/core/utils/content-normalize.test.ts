@@ -161,7 +161,11 @@ describe('sanitizePositiveWidths', () => {
   });
 
   it('returns empty array for non-array input', () => {
-    expect(sanitizePositiveWidths('not an array' as any)).toEqual([]);
+    expect(sanitizePositiveWidths('not an array')).toEqual([]);
+  });
+
+  it('ignores non-number array entries', () => {
+    expect(sanitizePositiveWidths([100, Symbol('width'), 1n, {}, '200'])).toEqual([100]);
   });
 
   it('returns empty array for empty array', () => {

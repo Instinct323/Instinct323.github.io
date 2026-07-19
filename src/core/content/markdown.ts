@@ -1,6 +1,5 @@
 import matter from 'gray-matter';
 import { getDateTime } from './normalize';
-import { renderMarkdown, renderMarkdownWithKatex, type RenderMarkdownOptions } from './markdown-renderer';
 
 export interface ParseMarkdownResult {
   title: string | null;
@@ -8,9 +7,6 @@ export interface ParseMarkdownResult {
   content: string;
   data: Record<string, unknown>;
 }
-
-export { renderMarkdown, renderMarkdownWithKatex };
-export type { RenderMarkdownOptions };
 
 function parseDateFromFrontmatter(data: Record<string, unknown> | undefined): Date | null {
   const rawDate = data?.date;
@@ -21,7 +17,8 @@ function parseDateFromFrontmatter(data: Record<string, unknown> | undefined): Da
 export function parseMarkdownWithFrontmatter(markdown: string): ParseMarkdownResult {
   const parsed = matter(markdown);
   const title = parsed.data?.title;
-  const validTitle = typeof title === 'string' && title.trim().length > 0 ? title.trim() : null;
+  const trimmedTitle = typeof title === 'string' ? title.trim() : '';
+  const validTitle = trimmedTitle || null;
   const date = parseDateFromFrontmatter(parsed.data);
 
   return {

@@ -5,8 +5,9 @@ import type { AboutPageData } from '~/features/about/types';
 import type { Publication } from '~/features/about/publication/types';
 import type { ContentImage } from '~/core/media/types';
 import type { ResolvedProfileData } from '~/features/about/types';
-import { imageLoader } from '~/core/media/surface';
-import { renderMarkdown } from '~/core/content/markdown';
+import { computeContentImageOptionsFromConfig } from '~/core/media/surface';
+import { loadContentImageResolved } from '~/core/media/image';
+import { renderMarkdown } from '~/core/content/markdown-renderer';
 import { normalizePublication } from '~/features/about/publication/utils';
 import { AVATAR_JPG, AVATAR_RELATIVE_PATH } from '~/core/content/paths';
 import { PUBLICATION_MODULES } from '~/core/content/astro-adapter/publications';
@@ -14,7 +15,7 @@ import { extractRequiredProfile } from '~/core/profile';
 import { loadMediaConfig } from '~/features/site/config-loader';
 import type { MediaConfig } from '~/features/site/types';
 
-export async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarImage'>> {
+async function loadAboutPageFrame(): Promise<Omit<AboutPageData, 'avatarImage'>> {
   const [profileData, publications] = await Promise.all([
     loadProfile(),
     loadPublications(),
@@ -35,11 +36,14 @@ export async function loadAboutPageFrameWithMedia(): Promise<Omit<AboutPageData,
   return { ...aboutFrame, mediaConfig };
 }
 
-export async function loadAboutAvatarImage(profileData: ResolvedProfileData): Promise<ContentImage> {
-  const aboutImageOptions = await imageLoader.computeOptions('about', {
+export async function loadAboutAvatarImage(
+  profileData: ResolvedProfileData,
+  mediaConfig: MediaConfig,
+): Promise<ContentImage> {
+  const aboutImageOptions = computeContentImageOptionsFromConfig(mediaConfig, 'about', {
     alt: profileData.name,
   });
-  const avatarImage = await imageLoader.loadImage(AVATAR_RELATIVE_PATH, aboutImageOptions);
+  const avatarImage = loadContentImageResolved(AVATAR_RELATIVE_PATH, aboutImageOptions);
 
   if (!avatarImage) {
     throw new Error(`Missing about avatar image: ${AVATAR_JPG}`);
@@ -49,7 +53,7 @@ export async function loadAboutAvatarImage(profileData: ResolvedProfileData): Pr
 }
 
 /** Loads and sorts publications by author rank weight, then date, then title. */
-export async function loadPublications(): Promise<Publication[]> {
+async function loadPublications(): Promise<Publication[]> {
   const { name } = extractRequiredProfile(loadProfile());
 
   const rank = (p: Publication): number => {

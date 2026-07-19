@@ -60,22 +60,22 @@ const primaryNavigation = buildPrimaryNavModel(loadNavigationConfig());
     font-weight: 600;
     border-radius: 6px;
     transition:
-      background var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease),
-      transform var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease),
-      box-shadow var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease),
-      color var(--motion-duration-ui, 0.2s) var(--motion-ease-standard, ease);
+      background var(--motion-duration-ui) var(--motion-ease-standard),
+      transform var(--motion-duration-ui) var(--motion-ease-standard),
+      box-shadow var(--motion-duration-ui) var(--motion-ease-standard),
+      color var(--motion-duration-ui) var(--motion-ease-standard);
   }
 
   a:hover {
     background: var(--nav-link-hover-bg);
-    transform: var(--motion-lift-sm, translateY(-2px));
+    transform: var(--motion-lift-sm);
   }
 
   a:focus-visible {
     outline: none;
     background: var(--nav-link-hover-bg);
-    box-shadow: var(--focus-ring, 0 0 0 2px rgba(43, 81, 182, 0.4));
-    transform: var(--motion-lift-sm, translateY(-2px));
+    box-shadow: var(--focus-ring);
+    transform: var(--motion-lift-sm);
   }
 
   a.is-active {
