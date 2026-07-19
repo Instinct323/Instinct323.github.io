@@ -31,19 +31,14 @@ function copyContentAssets() {
     console.warn(`Content: ${dirsWithMarkdown.length} dirs`);
   }
 
-  const verifyDir = join(contentDir, 'verify');
-  let verifyCount = 0;
-  if (existsSync(verifyDir)) {
-    for (const entry of readdirSync(verifyDir, { withFileTypes: true })) {
-      if (entry.isFile()) {
-        cpSync(join(verifyDir, entry.name), join(publicDir, entry.name));
-        verifyCount++;
-      }
-    }
-  }
+  const pubRootDir = join(contentDir, 'pub-root');
+  if (existsSync(pubRootDir)) {
+    const entryCount = readdirSync(pubRootDir).length;
+    cpSync(pubRootDir, publicDir, { recursive: true });
 
-  if (verifyCount > 0) {
-    console.warn(`Verify: ${verifyCount} files`);
+    if (entryCount > 0) {
+      console.warn(`Public root: ${entryCount} entries`);
+    }
   }
 }
 

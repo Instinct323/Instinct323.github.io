@@ -17,7 +17,8 @@ bun dev
 │   ├── background/
 │   ├── blog/*/               # Blog posts (README.md + assets)
 │   ├── config.jsonc
-│   └── photography/
+│   ├── photography/
+│   └── pub-root/              # Files copied recursively to public/
 ├── src/
 │   ├── core/                 # Content loading, media processing, runtime, utils
 │   │   ├── content/

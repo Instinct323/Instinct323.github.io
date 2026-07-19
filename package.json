@@ -6,7 +6,7 @@
   "packageManager": "bun@1.3.14",
   "overrides": {},
   "scripts": {
-    "dev": "bun scripts/build-blog-data.js && astro dev --host",
+    "dev": "bun scripts/build-blog-data.js && bun scripts/copy-content-assets.js && astro dev --host",
     "check": "bun run typecheck && bun run lint && bun run build",
     "build": "bun scripts/build-blog-data.js && bun scripts/copy-content-assets.js && astro build --silent",
     "preview": "astro preview --host",
