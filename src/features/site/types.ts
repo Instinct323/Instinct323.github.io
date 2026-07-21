@@ -42,6 +42,7 @@ export interface DeferredMountConfig {
 export interface SiteConfig {
   metadata: SiteMetadata;
   navigation: SiteNavigation;
+  music: string;
   home: {
     hero: HomePageConfig['hero'];
     layout: HomePageConfig['layout'];

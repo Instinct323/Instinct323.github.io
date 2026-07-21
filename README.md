@@ -9,6 +9,10 @@ bun install
 bun dev
 ```
 
+## Configured Music
+
+Set `music` in `content/config.jsonc` to a bare `.ogg` filename stored in `content/music/`. The build validates that filename and publishes only that asset at `/music/<URL-encoded filename>` for the record control.
+
 ## Project Layout
 
 ```text
@@ -17,6 +21,7 @@ bun dev
 │   ├── background/
 │   ├── blog/*/               # Blog posts (README.md + assets)
 │   ├── config.jsonc
+│   ├── music/                 # Explicitly published audio assets
 │   ├── photography/
 │   └── pub-root/              # Files copied recursively to public/
 ├── src/
@@ -31,7 +36,7 @@ bun dev
 │   │   ├── blog/
 │   │   ├── common/
 │   │   ├── home/
-│   │   ├── layout/
+│   │   ├── layout/             # Global layout shell and controls
 │   │   ├── photography/
 │   │   └── site/
 │   ├── pages/                # Astro route entry pages

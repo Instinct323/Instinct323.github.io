@@ -1,6 +1,6 @@
 // Site build output contract: asserts dist/index.html, dist/about/index.html, dist/photography/index.html match navigation, shell style, and per-page testids.
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse as parseJsonc } from 'jsonc-parser';
@@ -9,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SITE_DIR = path.resolve(__dirname, '..');
 const DIST_DIR = path.join(SITE_DIR, 'dist');
 const SITE_CONFIG_PATH = path.join(SITE_DIR, 'content', 'config.jsonc');
+const RECORD_VORBIS_MIME_TYPE = 'audio/ogg; codecs=&quot;vorbis&quot;';
 
 const ROUTE_HTML_FILES = new Map([
   ['/', path.join(DIST_DIR, 'index.html')],
@@ -34,6 +35,14 @@ function readSiteConfig() {
   const cfg = parseJsonc(raw);
   assert.ok(cfg && typeof cfg === 'object', `Failed to parse site config: ${SITE_CONFIG_PATH}`);
   return cfg;
+}
+
+function getConfiguredMusic(cfg) {
+  assert.equal(typeof cfg.music, 'string', 'Site config music must be a filename string');
+  return {
+    fileName: cfg.music,
+    publicPath: `/music/${encodeURIComponent(cfg.music)}`,
+  };
 }
 
 function readRouteHtml(fp) {
@@ -149,8 +158,43 @@ function assertNoSourceModulePreload(homeHtml) {
   );
 }
 
+function assertRecordControlOutput(routeHtml, route, music) {
+  assertHasTestId(routeHtml, 'record-control');
+
+  const buttonAttrs = getStartTagAttrsByTestId(routeHtml, 'record-control-button');
+  assert.equal(getAttribute(buttonAttrs, 'type'), 'button', `Route ${route} record control should use a native button`);
+  assert.equal(getAttribute(buttonAttrs, 'aria-pressed'), 'false', `Route ${route} record control should render unpressed`);
+  assert.equal(getAttribute(buttonAttrs, 'aria-label'), 'Play music', `Route ${route} record control should expose a generic play label`);
+
+  const audioAttrs = getStartTagAttrsByTestId(routeHtml, 'record-control-audio');
+  assert.equal(getAttribute(audioAttrs, 'preload'), 'metadata', `Route ${route} record audio should progressively load metadata`);
+  assert.match(
+    routeHtml,
+    new RegExp(
+      `<source\\b[^>]*\\bsrc=(['"])${escapeRegExp(music.publicPath)}\\1[^>]*\\btype=(['"])${escapeRegExp(RECORD_VORBIS_MIME_TYPE)}\\2`,
+      'i',
+    ),
+    `Route ${route} record audio should point at the configured OGG track`,
+  );
+}
+
+function assertPublishedRecordTrack(music) {
+  const musicDir = path.join(DIST_DIR, 'music');
+  const trackPath = path.join(musicDir, music.fileName);
+  assert.ok(existsSync(trackPath), `Record track missing from build output: ${trackPath}`);
+  const trackStats = statSync(trackPath);
+  assert.ok(trackStats.isFile(), `Record track should be a file: ${trackPath}`);
+  assert.ok(trackStats.size > 0, `Record track should not be empty: ${trackPath}`);
+  assert.deepEqual(
+    readdirSync(musicDir).sort(),
+    [music.fileName],
+    'Build output should publish only the configured music track',
+  );
+}
+
 function main() {
   const cfg = readSiteConfig();
+  const music = getConfiguredMusic(cfg);
   const warnings = [];
 
   const htmlByRoute = {};
@@ -170,6 +214,11 @@ function main() {
   assertPrimaryNavOrder(homeHtml, '/', cfg);
   assertPrimaryNavOrder(aboutHtml, '/about/', cfg);
   assertPrimaryNavOrder(photographyHtml, '/photography/', cfg);
+
+  assertRecordControlOutput(homeHtml, '/', music);
+  assertRecordControlOutput(aboutHtml, '/about/', music);
+  assertRecordControlOutput(photographyHtml, '/photography/', music);
+  assertPublishedRecordTrack(music);
 
   assertShellStyleOutput(homeHtml, '/', 'home');
   assertShellStyleOutput(aboutHtml, '/about/', 'about');

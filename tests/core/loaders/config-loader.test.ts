@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   loadHomepageConfig,
   loadMediaConfig,
+  loadMusicConfig,
   loadNavigationConfig,
   loadSiteMetadata,
 } from '~/features/site/config-loader';
 import { loadSiteConfig } from '~/features/site/config-cache';
+import { loadLayoutFrame } from '~/features/layout/loader';
 import { loadPhotographyPage } from '~/features/photography/loader';
 import { loadEffectsConfig } from '~/features/site/effects-loader';
 
@@ -20,12 +22,14 @@ describe('config-loader lazy singleton', () => {
     const config = loadSiteConfig();
     expect(config).toHaveProperty('metadata');
     expect(config).toHaveProperty('navigation');
+    expect(config).toHaveProperty('music');
     expect(config).toHaveProperty('home');
     expect(config).toHaveProperty('image');
     expect(config).toHaveProperty('photography');
     expect(config).toHaveProperty('effects');
     expect(typeof config.metadata).toBe('object');
     expect(typeof config.navigation).toBe('object');
+    expect(typeof config.music).toBe('string');
     expect(typeof config.home).toBe('object');
     expect(typeof config.image).toBe('object');
     expect(typeof config.photography).toBe('object');
@@ -105,6 +109,21 @@ describe('config-loader lazy singleton', () => {
     expect(typeof meta.defaultTitle).toBe('string');
     expect(typeof meta.defaultDescription).toBe('string');
     expect(meta.keyword).toBeDefined();
+  });
+
+  it('loadMusicConfig resolves the configured music filename and public path', () => {
+    const config = loadSiteConfig();
+    const music = loadMusicConfig();
+
+    expect(music.fileName).toBe(config.music);
+    expect(music.publicPath).toBe(`/music/${encodeURIComponent(config.music)}`);
+    expect(music.mimeType).toBe('audio/ogg; codecs="vorbis"');
+  });
+
+  it('loadLayoutFrame includes configured music', async () => {
+    const frame = await loadLayoutFrame();
+
+    expect(frame.musicConfig).toEqual(loadMusicConfig());
   });
 
   it('loadEffectsConfig returns effects config with expected structure', async () => {

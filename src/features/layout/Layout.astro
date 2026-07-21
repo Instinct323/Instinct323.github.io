@@ -4,6 +4,7 @@
 import LayoutHead from '~/features/layout/Head.astro';
 import Footer from '~/features/layout/Footer.astro';
 import Header from '~/features/layout/Header.astro';
+import RecordControl from '~/features/layout/RecordControl.astro';
 import type { LayoutProps } from '~/features/layout/types';
 import { orchestratePageLoad } from '~/features/site/load';
 import { loadLayoutBackgrounds } from '~/features/layout/layout-background';
@@ -33,6 +34,7 @@ const layoutLoad = await orchestratePageLoad<LayoutFrameData, LayoutBackgroundDa
 
 const {
   siteMetadata,
+  musicConfig,
   effectsConfig,
 } = layoutLoad.frame;
 if (!layoutLoad.background) {
@@ -103,10 +105,13 @@ const starfieldConfig = effectsConfig.starfield;
       <slot />
       <Footer />
     </main>
+    <RecordControl music={musicConfig} />
     <script>
       import { initLayout } from '~/core/runtime/layout';
+      import { initRecordControl } from '~/core/runtime/record-control';
 
       initLayout();
+      initRecordControl();
     </script>
   </body>
 </html>

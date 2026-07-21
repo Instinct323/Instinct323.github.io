@@ -16,6 +16,7 @@
       "blog": {"key": "blog", "href": "/blog"}
     }
   },
+  "music": "Michishirube.ogg",
   // Owned by homepage editors; consumed by src/lib/content-loader.ts and home components.
   "home": {
     // Owned by homepage copywriters; consumed by the home hero text model.
