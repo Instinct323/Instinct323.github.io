@@ -1,8 +1,9 @@
-// Site build output contract: asserts dist/index.html, dist/about/index.html, dist/photography/index.html match navigation, shell style, and per-page testids.
+// Site build output contract: asserts published routes match shared shell, navigation, and page contracts.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { runInNewContext } from 'node:vm';
 import { parse as parseJsonc } from 'jsonc-parser';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +15,7 @@ const RECORD_VORBIS_MIME_TYPE = 'audio/ogg; codecs=&quot;vorbis&quot;';
 const ROUTE_HTML_FILES = new Map([
   ['/', path.join(DIST_DIR, 'index.html')],
   ['/about/', path.join(DIST_DIR, 'about', 'index.html')],
+  ['/blog/', path.join(DIST_DIR, 'blog', 'index.html')],
   ['/photography/', path.join(DIST_DIR, 'photography', 'index.html')],
 ]);
 
@@ -79,6 +81,13 @@ function getStartTagAttrsByTestId(html, testId) {
   return `${match[2]} ${match[4]}`;
 }
 
+function getStartTagAttrsById(html, id) {
+  const pattern = new RegExp(`<([a-zA-Z0-9-]+)\\b([^>]*)\\bid=(['"])${escapeRegExp(id)}\\3([^>]*)>`, 'i');
+  const match = html.match(pattern);
+  assert.ok(match, `Missing id="${id}"`);
+  return `${match[2]} ${match[4]}`;
+}
+
 function getAttribute(attrs, name) {
   const pattern = new RegExp(`\\b${escapeRegExp(name)}=(['"])(.*?)\\1`, 'i');
   const match = attrs.match(pattern);
@@ -87,6 +96,24 @@ function getAttribute(attrs, name) {
 
 function assertHasTestId(html, testId) {
   getStartTagAttrsByTestId(html, testId);
+}
+
+function assertHasId(html, id) {
+  getStartTagAttrsById(html, id);
+}
+
+function getStartTagAttrsByClass(html, className) {
+  const startTagPattern = /<[a-zA-Z0-9-]+\b([^>]*)>/g;
+  return Array.from(html.matchAll(startTagPattern), (match) => match[1]).filter((attrs) =>
+    getAttribute(attrs, 'class')?.split(/\s+/).includes(className),
+  );
+}
+
+function getInlineScriptContaining(html, text) {
+  const scripts = Array.from(html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi));
+  const script = scripts.find((match) => !getAttribute(match[1], 'src') && match[2].includes(text));
+  assert.ok(script, `Missing inline script containing ${text}`);
+  return script[2];
 }
 
 function assertCarouselHooks(homeHtml) {
@@ -158,6 +185,42 @@ function assertNoSourceModulePreload(homeHtml) {
   );
 }
 
+function assertBlogPageCompleteness(blogHtml) {
+  assertHasId(blogHtml, 'blog-list');
+  const blogItems = getStartTagAttrsByClass(blogHtml, 'blog-item');
+  assert.ok(blogItems.length > 0, 'Blog page should render at least one blog item');
+  assert.ok(
+    getAttribute(blogItems[0], 'data-slug')?.trim(),
+    'First blog item should expose a non-empty data-slug',
+  );
+  assert.ok(
+    getAttribute(blogItems[0], 'class')?.split(/\s+/).includes('active'),
+    'First blog item should be active',
+  );
+
+  assertHasId(blogHtml, 'blog-detail-card');
+  assertHasId(blogHtml, 'detail-title');
+  assertHasId(blogHtml, 'detail-content');
+  const bootstrapContext = { window: {}, location: { hash: '' } };
+  runInNewContext(
+    getInlineScriptContaining(blogHtml, 'window.__BLOG_META__'),
+    bootstrapContext,
+  );
+  assert.ok(
+    Array.isArray(bootstrapContext.window.__BLOG_META__) && bootstrapContext.window.__BLOG_META__.length > 0,
+    'Blog page should inline non-empty window.__BLOG_META__ bootstrap data',
+  );
+
+  const moduleScripts = Array.from(blogHtml.matchAll(/<script\b([^>]*)>/gi), (match) => match[1]).filter(
+    (attrs) => getAttribute(attrs, 'type') === 'module' && getAttribute(attrs, 'src')?.startsWith(ASTRO_ASSET_PREFIX),
+  );
+  assert.ok(moduleScripts.length > 0, 'Blog page should reference a built client module');
+  for (const attrs of moduleScripts) {
+    const src = getAttribute(attrs, 'src');
+    assert.ok(src && existsSync(path.join(DIST_DIR, src.replace(/^\//, ''))), `Blog client module missing: ${src}`);
+  }
+}
+
 function assertRecordControlOutput(routeHtml, route, music) {
   assertHasTestId(routeHtml, 'record-control');
 
@@ -204,27 +267,25 @@ function main() {
 
   const homeHtml = htmlByRoute['/'];
   const aboutHtml = htmlByRoute['/about/'];
+  const blogHtml = htmlByRoute['/blog/'];
   const photographyHtml = htmlByRoute['/photography/'];
-  readStylesheetBundles(homeHtml, '/');
-  readStylesheetBundles(aboutHtml, '/about/');
-  readStylesheetBundles(photographyHtml, '/photography/');
+  for (const [route, routeHtml] of Object.entries(htmlByRoute)) {
+    readStylesheetBundles(routeHtml, route);
+    assertPrimaryNavOrder(routeHtml, route, cfg);
+    assertRecordControlOutput(routeHtml, route, music);
+  }
 
   assertHasTestId(homeHtml, 'home-editorial-hero');
 
-  assertPrimaryNavOrder(homeHtml, '/', cfg);
-  assertPrimaryNavOrder(aboutHtml, '/about/', cfg);
-  assertPrimaryNavOrder(photographyHtml, '/photography/', cfg);
-
-  assertRecordControlOutput(homeHtml, '/', music);
-  assertRecordControlOutput(aboutHtml, '/about/', music);
-  assertRecordControlOutput(photographyHtml, '/photography/', music);
   assertPublishedRecordTrack(music);
 
   assertShellStyleOutput(homeHtml, '/', 'home');
   assertShellStyleOutput(aboutHtml, '/about/', 'about');
   assertHasTestId(aboutHtml, 'about-links');
+  assertShellStyleOutput(blogHtml, '/blog/', 'default');
   assertShellStyleOutput(photographyHtml, '/photography/', 'photography');
 
+  assertBlogPageCompleteness(blogHtml);
   assertPhotographyPageCompleteness(photographyHtml);
   assertCarouselControlAria(homeHtml, cfg);
   assertCarouselHooks(homeHtml);
@@ -237,7 +298,7 @@ function main() {
   };
   console.warn(`SITE_CONTRACT_REPORT=${JSON.stringify(summary)}`);
 
-  console.warn('Site output assertions passed for routes /, /about/, /photography/.');
+  console.warn('Site output assertions passed for routes /, /about/, /blog/, /photography/.');
 }
 
 main();

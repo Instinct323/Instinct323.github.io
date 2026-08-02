@@ -85,11 +85,6 @@ function createCarouselRoot(options: {
     }
   }
 
-  const totalEl = document.createElement('span');
-  totalEl.className = 'swiper-counter-total';
-  totalEl.textContent = String(options.slideCount ?? 3);
-  root.appendChild(totalEl);
-
   if (options.hasNavArrows !== false) {
     const prevEl = document.createElement('button');
     prevEl.className = 'nav-arrow--prev';
@@ -206,7 +201,7 @@ describe('carousel runtime', () => {
     it('passes correct counterPadLength from data attribute', () => {
       const root = createCarouselRoot({ counterPadLength: '3' });
       const currentEl = document.createElement('span');
-      currentEl.className = 'swiper-counter-current';
+      currentEl.className = 'count-current';
       root.appendChild(currentEl);
 
       initFeaturedMediaCarousels();
@@ -217,7 +212,7 @@ describe('carousel runtime', () => {
     it('falls back to pad length of 2 for invalid counterPadLength attribute', () => {
       const root = createCarouselRoot({ counterPadLength: 'invalid' });
       const currentEl = document.createElement('span');
-      currentEl.className = 'swiper-counter-current';
+      currentEl.className = 'count-current';
       root.appendChild(currentEl);
 
       initFeaturedMediaCarousels();
@@ -228,7 +223,7 @@ describe('carousel runtime', () => {
     it('falls back to pad length of 2 when counterPadLength attribute is missing', () => {
       const root = createCarouselRoot();
       const currentEl = document.createElement('span');
-      currentEl.className = 'swiper-counter-current';
+      currentEl.className = 'count-current';
       root.appendChild(currentEl);
 
       initFeaturedMediaCarousels();
@@ -236,67 +231,27 @@ describe('carousel runtime', () => {
       expect(currentEl.textContent).toBe('01');
     });
 
-    it('updates progress bar on init', () => {
+    it('updates the counter and indicator fill on slide change', () => {
       const root = createCarouselRoot({ slideCount: 4 });
-      const progressBar = document.createElement('div');
-      progressBar.className = 'swiper-progress-bar';
-      root.appendChild(progressBar);
+      const currentEl = document.createElement('span');
+      currentEl.className = 'count-current';
+      root.appendChild(currentEl);
+      const progressFill = document.createElement('div');
+      progressFill.className = 'indicator-progress-fill';
+      root.appendChild(progressFill);
 
       initFeaturedMediaCarousels();
 
-      expect(progressBar.style.width).toBe('25%');
-    });
+      const instance = createdInstances[0];
+      const on = instance.params.on as Record<string, (_swiper: MockSwiperInstance) => void>;
+      expect(currentEl.textContent).toBe('01');
+      expect(progressFill.style.width).toBe('25%');
 
-    it('falls back to slide count of 1 for invalid counter total', () => {
-      const root = createCarouselRoot({ slideCount: 3 });
-      const totalEl = root.querySelector('.swiper-counter-total')!;
-      totalEl.textContent = 'invalid';
-      const progressBar = document.createElement('div');
-      progressBar.className = 'swiper-progress-bar';
-      root.appendChild(progressBar);
+      instance.realIndex = 2;
+      on.slideChange(instance);
 
-      initFeaturedMediaCarousels();
-
-      expect(progressBar.style.width).toBe('100%');
-    });
-
-    it('falls back to slide count of 1 for zero counter total', () => {
-      const root = createCarouselRoot({ slideCount: 3 });
-      const totalEl = root.querySelector('.swiper-counter-total')!;
-      totalEl.textContent = '0';
-      const progressBar = document.createElement('div');
-      progressBar.className = 'swiper-progress-bar';
-      root.appendChild(progressBar);
-
-      initFeaturedMediaCarousels();
-
-      expect(progressBar.style.width).toBe('100%');
-    });
-
-    it('falls back to slide count of 1 for negative counter total', () => {
-      const root = createCarouselRoot({ slideCount: 3 });
-      const totalEl = root.querySelector('.swiper-counter-total')!;
-      totalEl.textContent = '-3';
-      const progressBar = document.createElement('div');
-      progressBar.className = 'swiper-progress-bar';
-      root.appendChild(progressBar);
-
-      initFeaturedMediaCarousels();
-
-      expect(progressBar.style.width).toBe('100%');
-    });
-
-    it('falls back to slide count of 1 when counter total element is missing', () => {
-      const root = createCarouselRoot({ slideCount: 3 });
-      const totalEl = root.querySelector('.swiper-counter-total')!;
-      totalEl.remove();
-      const progressBar = document.createElement('div');
-      progressBar.className = 'swiper-progress-bar';
-      root.appendChild(progressBar);
-
-      initFeaturedMediaCarousels();
-
-      expect(progressBar.style.width).toBe('100%');
+      expect(currentEl.textContent).toBe('03');
+      expect(progressFill.style.width).toBe('75%');
     });
   });
 

@@ -1,12 +1,27 @@
 import type { BlogPostData } from '~/core/content/blog-data-types';
+import { KATEX_CSS_HREF, KATEX_CSS_INTEGRITY } from './katex-constants';
+
+function ensureKatexCss(): void {
+  if (document.querySelector('link[href*="katex.min.css"]')) {
+    return;
+  }
+
+  const link = document.createElement('link');
+  link.setAttribute('rel', 'stylesheet');
+  link.setAttribute('href', KATEX_CSS_HREF);
+  link.setAttribute('integrity', KATEX_CSS_INTEGRITY);
+  link.setAttribute('crossorigin', 'anonymous');
+
+  document.head.appendChild(link);
+}
 
 /**
  * Browser-side blog detail renderer.
  *
  * `window.__BLOG_META__` is set by an inline `<script is:inline>` in
- * `src/pages/blog.astro:236`. It carries a minimal `{ slug, title }[]` array
+ * `src/pages/blog.astro`. It carries a minimal `{ slug, title }[]` array
  * built at SSR time so this client can render the post list without a
- * second round-trip. Full post bodies are fetched lazily via /blog-data/{slug}.json.
+ * second round-trip. Pre-rendered post bodies are fetched lazily via /blog-data/{slug}.json.
  */
 export function initBlogClient(): void {
   const blogList = document.getElementById('blog-list');
@@ -58,6 +73,15 @@ export function initBlogClient(): void {
     detailContentEl.innerHTML = `<div class="blog-status blog-status--${kind}">${text}</div>`;
   }
 
+  function clearActivePost(slug: string, generation: number): void {
+    if (generation !== renderGeneration) {
+      return;
+    }
+
+    activeSlug = '';
+    items.find((item) => item.dataset.slug === slug)?.classList.remove('active');
+  }
+
   async function renderPost(slug: string): Promise<void> {
     const meta = metaBySlug.get(slug);
     if (!meta || activeSlug === slug) return;
@@ -77,6 +101,7 @@ export function initBlogClient(): void {
         result.kind === 'http'
           ? `Failed to load article (HTTP ${result.status ?? '?'}).`
           : 'Failed to load article (network error).';
+      clearActivePost(slug, generation);
       showStatus(msg, 'error');
       return;
     }
@@ -84,21 +109,18 @@ export function initBlogClient(): void {
 
     detailTitleEl.textContent = post.title;
 
-    try {
-      const { renderPostContent, ensureKatexCss } = await import('~/features/blog/render-engine');
-      if (post.hasLatex) ensureKatexCss();
-      const html = await renderPostContent(post);
-      if (generation !== renderGeneration) return;
-      detailContentEl.innerHTML = html;
-    } catch (e) {
-      if (generation !== renderGeneration) return;
-      console.error('Failed to render post:', e);
-      showStatus('Failed to load article.', 'error');
-    }
+    if (post.hasLatex) ensureKatexCss();
+    detailContentEl.innerHTML = post.html;
   }
 
   function navigateToSlug(slug: string): void {
-    window.location.hash = slug === defaultSlug ? '' : slug;
+    const hash = slug === defaultSlug ? '' : `#${slug}`;
+    if (window.location.hash === hash) {
+      void renderPost(slug);
+      return;
+    }
+
+    window.location.hash = hash;
   }
 
   function getSlugFromHash(): string {

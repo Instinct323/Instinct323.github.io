@@ -34,6 +34,12 @@ jobs:
       - name: Validate and build
         run: bun run check
 
+      - name: Run tests
+        run: bun run test
+
+      - name: Assert site output
+        run: bun run test:site
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

@@ -34,11 +34,6 @@ interface SwiperRoot extends HTMLElement {
   swiperApi?: SwiperInstance;
 }
 
-export interface CarouselConfig {
-  spaceBetween: number;
-  counterPadLength: number;
-}
-
 /** Lazily creates and caches the reduced-motion media query so every carousel shares one instance. */
 function getReducedMotionQuery(): MediaQueryList {
   if (!state.reducedMotionQuery) {
@@ -59,32 +54,16 @@ function hideSwipeHint(root: HTMLElement): void {
   }
 }
 
-function updateProgress(swiper: SwiperInstance, slideCount: number): void {
-  const progressBar = swiper.el.querySelector<HTMLElement>('.swiper-progress-bar');
-
-  if (!progressBar) {
-    return;
-  }
-
-  const progress = ((swiper.activeIndex + 1) / slideCount) * 100;
-  progressBar.style.width = `${progress}%`;
-}
-
-function getCounterPadLength(root: HTMLElement, configPadLength?: number): number {
-  if (configPadLength !== undefined) {
-    return assertPositiveInteger(configPadLength, 'counterPadLength');
-  }
+function getCounterPadLength(root: HTMLElement): number {
   const raw = root.getAttribute('data-counter-pad-length');
   return assertPositiveInteger(parseNumericAttr(raw, 2), 'data-counter-pad-length');
 }
 
-function updateCounter(swiper: SwiperInstance, counterPadLength?: number): void {
-  const currentEl = swiper.el.querySelector<HTMLElement>('.count-current') ||
-    swiper.el.querySelector<HTMLElement>('.swiper-counter-current');
+function updateCounter(swiper: SwiperInstance, counterPadLength: number): void {
+  const currentEl = swiper.el.querySelector<HTMLElement>('.count-current');
 
   if (currentEl) {
-    const padLength = getCounterPadLength(swiper.el, counterPadLength);
-    currentEl.textContent = (swiper.realIndex + 1).toString().padStart(padLength, '0');
+    currentEl.textContent = (swiper.realIndex + 1).toString().padStart(counterPadLength, '0');
   }
 
   const progressFill = swiper.el.querySelector<HTMLElement>('.indicator-progress-fill');
@@ -114,33 +93,10 @@ function getCarouselRoots(): SwiperRoot[] {
   );
 }
 
-function getSlideCount(root: HTMLElement): number {
-  const totalEl = root.querySelector('.swiper-counter-total');
-  const parsed = Number.parseInt(totalEl?.textContent ?? '1', 10);
-
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
-}
-
 function getSpaceBetween(root: HTMLElement): number {
   const raw = root.getAttribute('data-space-between');
   const parsed = parseNumericAttr(raw, 0, { float: true });
   return parsed >= 0 ? parsed : 0;
-}
-
-/**
- * Supports graceful degradation when markup uses legacy or current class
- * names: tries each selector in order and returns the first matching
- * `HTMLElement`, or `null` if none match.
- */
-function getFirstOptionalHTMLElement(root: ParentNode, selectors: string[]): HTMLElement | null {
-  for (const selector of selectors) {
-    const el = root.querySelector(selector);
-    if (el instanceof HTMLElement) {
-      return el;
-    }
-  }
-
-  return null;
 }
 
 /** Updates an existing Swiper instance when the user's motion preference changes at runtime. */
@@ -150,13 +106,13 @@ function applyMotionSettings(swiper: SwiperInstance): void {
   swiper.params.effect = useReducedMotion ? 'slide' : 'coverflow';
 }
 
-function createSwiperConfig(root: SwiperRoot, slideCount: number, config?: Partial<CarouselConfig>): SwiperOptions {
-  const prevEl = getFirstOptionalHTMLElement(root, ['.nav-arrow--prev', '.swiper-nav-btn--prev']);
-  const nextEl = getFirstOptionalHTMLElement(root, ['.nav-arrow--next', '.swiper-nav-btn--next']);
-  const paginationEl = getFirstOptionalHTMLElement(root, ['.swiper-pagination']);
+function createSwiperConfig(root: SwiperRoot): SwiperOptions {
+  const prevEl = root.querySelector<HTMLElement>('.nav-arrow--prev');
+  const nextEl = root.querySelector<HTMLElement>('.nav-arrow--next');
+  const paginationEl = root.querySelector<HTMLElement>('.swiper-pagination');
   const useReducedMotion = prefersReducedMotion();
-  const spaceBetween = config?.spaceBetween ?? getSpaceBetween(root);
-  const counterPadLength = config?.counterPadLength ?? getCounterPadLength(root);
+  const spaceBetween = getSpaceBetween(root);
+  const counterPadLength = getCounterPadLength(root);
 
   return {
     modules: [Navigation, Pagination, EffectCoverflow, Keyboard],
@@ -192,12 +148,10 @@ function createSwiperConfig(root: SwiperRoot, slideCount: number, config?: Parti
       init(_this: SwiperInstance) {
         root.dataset[SWIPER_INIT_FLAG] = 'true';
         root.classList.add('swiper--initialized');
-        updateProgress(_this, slideCount);
         updateCounter(_this, counterPadLength);
       },
       slideChange(_this: SwiperInstance) {
         hideSwipeHint(root);
-        updateProgress(_this, slideCount);
         updateCounter(_this, counterPadLength);
         updatePaginationAria(_this);
       },
@@ -216,11 +170,7 @@ function createSwiperConfig(root: SwiperRoot, slideCount: number, config?: Parti
  * double-init and missing slide markup. Returns success/failure so callers
  * can choose to log or fall back.
  */
-function initSwiper(
-  root: SwiperRoot,
-  slideCount: number,
-  config?: Partial<CarouselConfig>,
-): { success: boolean; reason?: string } {
+function initSwiper(root: SwiperRoot): { success: boolean; reason?: string } {
   if (root.dataset[SWIPER_INIT_FLAG] === 'true') {
     return { success: false, reason: 'already-initialized' };
   }
@@ -230,7 +180,7 @@ function initSwiper(
     return { success: false, reason: 'no-slides' };
   }
 
-  const swiper = new Swiper(root, createSwiperConfig(root, slideCount, config));
+  const swiper = new Swiper(root, createSwiperConfig(root));
   root.swiperApi = swiper;
   return { success: true };
 }
@@ -243,11 +193,7 @@ export function initFeaturedMediaCarousels(): void {
   const roots = getCarouselRoots();
 
   roots.forEach((root) => {
-    const runtimeConfig: Partial<CarouselConfig> = {
-      spaceBetween: getSpaceBetween(root),
-      counterPadLength: getCounterPadLength(root),
-    };
-    initSwiper(root, getSlideCount(root), runtimeConfig);
+    initSwiper(root);
   });
 }
 

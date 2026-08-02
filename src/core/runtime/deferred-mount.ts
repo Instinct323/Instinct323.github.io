@@ -131,8 +131,6 @@ function mountWithDelay(node: HTMLElement, mountDelayMs: number): void {
  * Sets up intersection-based lazy mounting for deferred content nodes.
  * Heavy DOM subtrees are deferred until they enter the viewport so initial
  * page load stays fast and lightweight.
- *
- * @throws When `rootMargin` is syntactically invalid for `IntersectionObserver`.
  */
 export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
   const { selector, rootMargin, mountDelayMs } = config;
@@ -149,23 +147,32 @@ export function initDeferredMounts(config: DeferredMountRuntimeConfig): void {
     return;
   }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) {
-          continue;
-        }
+  let observer: IntersectionObserver;
+  try {
+    observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) {
+            continue;
+          }
 
-        const node = entry.target as HTMLElement;
-        mountWithDelay(node, mountDelayMs);
-        observer.unobserve(node);
-      }
-    },
-    {
-      root: null,
-      rootMargin,
-    },
-  );
+          const node = entry.target as HTMLElement;
+          mountWithDelay(node, mountDelayMs);
+          observer.unobserve(node);
+        }
+      },
+      {
+        root: null,
+        rootMargin,
+      },
+    );
+  } catch (error) {
+    console.error('[deferred-mount]', error);
+    nodes.forEach((node) => {
+      mountWithDelay(node, mountDelayMs);
+    });
+    return;
+  }
 
   nodes.forEach((node) => {
     observer.observe(node);

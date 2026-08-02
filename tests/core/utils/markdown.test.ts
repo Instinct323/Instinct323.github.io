@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseMarkdownWithFrontmatter } from '~/core/content/markdown';
 import { renderMarkdown } from '~/core/content/markdown-renderer';
+import { hasKatexMath } from '~/core/content/markdown-katex-renderer';
 
 describe('renderMarkdown', () => {
   it('renders basic markdown', () => {
@@ -167,5 +168,19 @@ Content`;
     expect(result.data.published).toBe(true);
     expect(result.data.tags).toEqual(['tech', 'code']);
     expect(result.data.title).toBe('Test Post');
+  });
+});
+
+describe('hasKatexMath', () => {
+  it('detects inline and block math', () => {
+    expect(hasKatexMath('Inline $x^2$ formula.')).toBe(true);
+    expect(hasKatexMath('$$\\int_0^1 x \\, dx$$')).toBe(true);
+  });
+
+  it('ignores dollar-delimited template expressions in code', () => {
+    const expression = "pad_before=${eval:'${n_obs_steps}-1'}";
+
+    expect(hasKatexMath(`\`${expression}\``)).toBe(false);
+    expect(hasKatexMath(`\`\`\`yaml\n${expression}\n\`\`\``)).toBe(false);
   });
 });

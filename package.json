@@ -18,7 +18,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@mdit/plugin-katex": "^0.25.2",
-    "astro": "7.0.3",
+    "astro": "7.1.6",
     "gray-matter": "^4.0.3",
     "jsonc-parser": "^3.3.1",
     "katex": "^0.17.0",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "typescript": "^6.0.3",
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "0.9.10",
     "@typescript-eslint/parser": "^8.60.1",
     "eslint": "^10.4.1",
     "eslint-plugin-astro": "^1.7.0",

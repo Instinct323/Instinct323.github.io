@@ -69,4 +69,34 @@ describe('initDeferredMounts', () => {
     expect(node.dataset.deferredState).toBe('loaded');
     expect(node.getAttribute('aria-busy')).toBe('false');
   });
+
+  it('falls back to delayed mounting when IntersectionObserver construction throws', () => {
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <div data-deferred-group="test" data-deferred-mount="true" data-deferred-state="loading" aria-busy="true">
+        <template data-deferred-template><span>content</span></template>
+        <div data-deferred-host></div>
+        <div data-deferred-placeholder><span data-deferred-placeholder-text>Loading...</span></div>
+      </div>
+    `;
+    document.body.appendChild(container);
+    const node = container.querySelector<HTMLElement>('[data-deferred-mount]')!;
+
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor() {
+          throw new SyntaxError('Invalid rootMargin');
+        }
+      },
+    );
+
+    initDeferredMounts({ selector: '[data-deferred-group="test"][data-deferred-mount="true"]', rootMargin: 'invalid', mountDelayMs: 50 });
+
+    expect(node.dataset.deferredState).toBe('loading');
+    vi.advanceTimersByTime(50);
+
+    expect(node.dataset.deferredState).toBe('loaded');
+    expect(node.getAttribute('aria-busy')).toBe('false');
+  });
 });

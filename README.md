@@ -26,6 +26,7 @@ Set `music` in `content/config.jsonc` to a bare `.ogg` filename stored in `conte
 │   └── pub-root/              # Files copied recursively to public/
 ├── src/
 │   ├── core/                 # Content loading, media processing, runtime, utils
+│   │   ├── config/
 │   │   ├── content/
 │   │   ├── media/
 │   │   ├── runtime/
@@ -48,6 +49,7 @@ Set `music` in `content/config.jsonc` to a bare `.ogg` filename stored in `conte
 │   ├── features/
 │   ├── mocks/
 │   ├── plugins/
+│   ├── scripts/
 │   ├── assert-site-output.js
 │   ├── verify-no-media-json-refs.js
 │   └── verify-no-unused-tokens.js

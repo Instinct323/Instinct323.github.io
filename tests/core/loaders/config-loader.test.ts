@@ -10,6 +10,7 @@ import { loadSiteConfig } from '~/features/site/config-cache';
 import { loadLayoutFrame } from '~/features/layout/loader';
 import { loadPhotographyPage } from '~/features/photography/loader';
 import { loadEffectsConfig } from '~/features/site/effects-loader';
+import { resolveMusicConfig } from '~/core/config/music';
 
 describe('config-loader lazy singleton', () => {
   it('loadSiteConfig returns the same object on repeated calls (caching)', () => {
@@ -92,6 +93,14 @@ describe('config-loader lazy singleton', () => {
     expect(typeof media.homepage.carousel.ariaLabel).toBe('string');
   });
 
+  it('resolves one featured-media contract for homepage and media consumers', () => {
+    const home = loadHomepageConfig();
+    const media = loadMediaConfig();
+
+    expect(media.homepage.featured).toEqual(home.featuredMedia.items);
+    expect(media.homepage.carousel).toEqual(home.featuredMedia.carousel);
+  });
+
   it('loadPhotographyPage returns photography page config', async () => {
     const page = await loadPhotographyPage();
     const photo = page.photographyConfig;
@@ -118,6 +127,12 @@ describe('config-loader lazy singleton', () => {
     expect(music.fileName).toBe(config.music);
     expect(music.publicPath).toBe(`/music/${encodeURIComponent(config.music)}`);
     expect(music.mimeType).toBe('audio/ogg; codecs="vorbis"');
+  });
+
+  it('resolveMusicConfig rejects paths instead of hiding invalid configuration', () => {
+    expect(() => resolveMusicConfig('../track.ogg')).toThrow(
+      'Invalid music: filename must not contain path separators',
+    );
   });
 
   it('loadLayoutFrame includes configured music', async () => {

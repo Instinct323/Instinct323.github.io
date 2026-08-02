@@ -1,7 +1,8 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { parse } from 'jsonc-parser';
+import { resolveMusicConfig } from '../src/core/config/music.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..');
@@ -24,24 +25,7 @@ function loadMusicFileName() {
     throw new Error('Invalid content/config.jsonc: expected a configuration object');
   }
 
-  const { music } = config;
-  if (typeof music !== 'string' || !music.trim()) {
-    throw new Error('Invalid music: expected a non-empty filename');
-  }
-  if (music !== music.trim()) {
-    throw new Error('Invalid music: filename must not have leading or trailing whitespace');
-  }
-  if (music.includes('/') || music.includes('\\')) {
-    throw new Error('Invalid music: filename must not contain path separators');
-  }
-  if (music.includes('..')) {
-    throw new Error('Invalid music: filename must not contain traversal segments');
-  }
-  if (!music.endsWith('.ogg')) {
-    throw new Error('Invalid music: filename must use the .ogg extension');
-  }
-
-  return music;
+  return resolveMusicConfig(config.music).fileName;
 }
 
 function copyMusicAsset(fileName) {
@@ -57,17 +41,27 @@ function copyMusicAsset(fileName) {
   cpSync(sourcePath, targetPath);
 }
 
+export function clearContentAssetOutputs(targetPublicDir) {
+  if (!existsSync(targetPublicDir)) {
+    mkdirSync(targetPublicDir, { recursive: true });
+    return;
+  }
+
+  for (const entry of readdirSync(targetPublicDir)) {
+    if (entry !== 'blog-data') {
+      rmSync(join(targetPublicDir, entry), { recursive: true, force: true });
+    }
+  }
+}
+
 function copyContentAssets() {
   const musicFileName = loadMusicFileName();
   if (!existsSync(contentDir)) {
     throw new Error('Content directory missing: content');
   }
 
-  if (!existsSync(publicDir)) {
-    mkdirSync(publicDir, { recursive: true });
-  }
-
   const dirsWithMarkdown = findDirectoriesWithMarkdown(contentDir);
+  clearContentAssetOutputs(publicDir);
 
   for (const dirPath of dirsWithMarkdown) {
     const relativePath = dirPath.slice(contentDir.length + 1);
@@ -81,9 +75,6 @@ function copyContentAssets() {
     console.warn(`Content: ${dirsWithMarkdown.length} dirs`);
   }
 
-  copyMusicAsset(musicFileName);
-  console.warn('Configured music asset: 1 file');
-
   const pubRootDir = join(contentDir, 'pub-root');
   if (existsSync(pubRootDir)) {
     const entryCount = readdirSync(pubRootDir).length;
@@ -93,6 +84,9 @@ function copyContentAssets() {
       console.warn(`Public root: ${entryCount} entries`);
     }
   }
+
+  copyMusicAsset(musicFileName);
+  console.warn('Configured music asset: 1 file');
 }
 
 function findDirectoriesWithMarkdown(startDir) {
@@ -126,4 +120,6 @@ function findDirectoriesWithMarkdown(startDir) {
   return results;
 }
 
-copyContentAssets();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  copyContentAssets();
+}

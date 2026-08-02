@@ -43,28 +43,7 @@ export interface SiteConfig {
   metadata: SiteMetadata;
   navigation: SiteNavigation;
   music: string;
-  home: {
-    hero: HomePageConfig['hero'];
-    layout: HomePageConfig['layout'];
-    editorialHero: HomePageConfig['editorialHero'];
-    featuredMedia: {
-      items: string[];
-      carousel: {
-        ariaLabel: string;
-        prevButtonAriaLabel: string;
-        nextButtonAriaLabel: string;
-        emptyText: string;
-        showNavigationArrows: boolean;
-        showIndicator: boolean;
-        counterPadLength: number;
-        visual: {
-          spaceBetween: number;
-          slideWidth: { desktop: string; tablet: string; mobile: string };
-          inactiveOpacity: number;
-        };
-      };
-    };
-  };
+  home: HomePageConfig;
   image: Omit<SiteImageConfig, 'placeholderEffect'> & { placeholderEffect: string };
   photography: PhotographyPageConfig;
   effects: SiteEffectsConfig;

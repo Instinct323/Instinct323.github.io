@@ -1,5 +1,5 @@
 /**
- * Shared markdown-it config and helpers used by both server and client.
+ * Shared markdown-it config and helpers used by build-time and server renderers.
  * Centralizes safe default options and URL rewriting rules so every
  * renderer starts from the same baseline.
  */

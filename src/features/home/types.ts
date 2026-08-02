@@ -14,12 +14,7 @@ export interface HomePageSiteInfo {
   home: HomePageConfigGroup;
 }
 
-export interface HomePageConfigGroup {
-  hero: HomePageConfig['hero'];
-  layout: HomePageConfig['layout'];
-  editorialHero: HomePageConfig['editorialHero'];
-  featuredMedia: HomePageConfig['featuredMedia'];
-}
+export type HomePageConfigGroup = HomePageConfig;
 
 export interface HomePageData {
   profile: ResolvedProfileData;

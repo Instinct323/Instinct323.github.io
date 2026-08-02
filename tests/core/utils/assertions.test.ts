@@ -6,6 +6,7 @@ import {
   assertPositiveInteger,
   assertObject,
 } from '~/core/validation/assert';
+import { validateMusicFileName } from '~/core/validation/music-file-name';
 
 describe('assertFiniteNumber', () => {
   it('passes with a valid finite number', () => {
@@ -124,5 +125,19 @@ describe('assertObject', () => {
     expect(() => assertObject(42, 'config')).toThrow('Missing or invalid config configuration object');
     expect(() => assertObject(true, 'config')).toThrow('Missing or invalid config configuration object');
     expect(() => assertObject(undefined, 'config')).toThrow('Missing or invalid config configuration object');
+  });
+});
+
+describe('validateMusicFileName', () => {
+  it('accepts a bare OGG filename', () => {
+    expect(validateMusicFileName('record.ogg')).toBe('record.ogg');
+  });
+
+  it('rejects invalid filenames', () => {
+    expect(() => validateMusicFileName('')).toThrow('Invalid music: expected a non-empty filename');
+    expect(() => validateMusicFileName(' track.ogg')).toThrow('Invalid music: filename must not have leading or trailing whitespace');
+    expect(() => validateMusicFileName('music/track.ogg')).toThrow('Invalid music: filename must not contain path separators');
+    expect(() => validateMusicFileName('track..ogg')).toThrow('Invalid music: filename must not contain traversal segments');
+    expect(() => validateMusicFileName('track.mp3')).toThrow('Invalid music: filename must use the .ogg extension');
   });
 });
