@@ -3,13 +3,12 @@
 - 使用 caveman 模式
 - 始终使用中文回复，可穿插少量英文术语
 
-# 规范
+# 规则
 
 - 如果你在工作过程中产出了过程文件 (草稿，测试脚本，测试结果)，使用完成后删除
-
-# 安全
-
-- 不可使用 git 命令改变仓库的工作区状态
+- 使用 mineru 时应当优先使用有 token 模式
+- 不可使用 git 命令改变仓库的工作区状态（`git stash`、`git stash pop`、`git checkout -- <path>`、`git reset --hard`、`git restore`、`git clean` 等）
+- 应主动对命令输出做 `grep` 以筛选最短的有效信息
 - git diff 的结果是不准确的，因为仓库在 windows 上
 
 # 工程规范

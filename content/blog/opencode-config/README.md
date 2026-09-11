@@ -41,7 +41,7 @@ bun add -g opencode-ai
 
 告诉 Sisyphus (如果有的话)：
 
-> 将仓库 https://github.com/Instinct323/EnvConfig.git 克隆到临时目录，按照其中的 .opencode/config-guide.md 配置环境
+> 将仓库 https://github.com/Instinct323/EnvConfig.git 克隆到临时目录，按照其中的 opencode/config-guide.md 配置环境
 
 退出 `opencode`，通过以下命令进行身份验证：
 
