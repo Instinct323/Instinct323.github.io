@@ -9,6 +9,7 @@
 - 使用 mineru 时应当优先使用有 token 模式
 - 不可使用 git 命令改变仓库的工作区状态（`git stash`、`git stash pop`、`git checkout -- <path>`、`git reset --hard`、`git restore`、`git clean` 等）
 - 应主动对命令输出做 `grep` 以筛选最短的有效信息
+- 不擅自拆分文件、合并文件，或是其它变更目录结构的操作
 - git diff 的结果是不准确的，因为仓库在 windows 上
 
 # 工程规范

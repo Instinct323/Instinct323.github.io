@@ -1,15 +1,18 @@
 *bak*
 *tmp*
 
-# Agents
-.codegraph
-.sisyphus
-
 # Astro/Node build artifacts
 .astro/
 dist/
 node_modules/
 public/
+
+# Agents
+.codegraph
+.debug-journal.md
+.omo
+.sisyphus
+.workbuddy
 
 # Byte-compiled
 __*cache__

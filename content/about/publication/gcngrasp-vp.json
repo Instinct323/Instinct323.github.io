@@ -6,7 +6,8 @@
   "source": "IROS 2026",
   "links": {
     "Code": "https://github.com/Instinct323/GCNGrasp-VP",
-    "DOI": "https://doi.org/10.48550/arXiv.2606.19091"
+    "DOI": "https://doi.org/10.48550/arXiv.2606.19091",
+    "Poster": "/poster/gcngrasp-vp.pdf"
   },
   "video": "https://www.bilibili.com/video/BV1ewjw6qEbY"
 }
