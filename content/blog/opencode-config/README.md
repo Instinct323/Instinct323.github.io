@@ -28,13 +28,15 @@ wsl
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ln -sf ~/.bun/bin/bun ~/.bun/bin/node
+ln -sf ~/.bun/bin/bun ~/.bun/bin/npm
+ln -sf ~/.bun/bin/bunx ~/.bun/bin/npx
 printf '[install]\nregistry = "https://registry.npmmirror.com/"\n' > ~/.bunfig.toml
 ```
 
 通过命令行安装 [OpenCode](https://opencode.ai/zh)：
 
 ```bash
-bun add -g opencode-ai
+npm install -g @opencode/cli
 ```
 
 ## Configuration
@@ -51,8 +53,17 @@ opencode auth login
 
 ![](assets/auth_login.png)
 
-如果你准备了 `API_Key.md`，重启 `opencode`，继续告诉 Sisyphus：
+# WeChat
 
-> 依次完成以下步骤：
-> - /more-provider 从 @API_Key.md 中获取 API Key 作为参数，进行配置。
-> - /config-omo 配置
+连接到微信需要进行以下配置：
+
+```bash
+npm install -g cli-wechat-bridge@latest
+wechat-setup
+```
+
+在工作目录下运行命令启动：
+
+```bash
+wechat-opencode
+```
